@@ -1,0 +1,13 @@
+.item-link-sidebar{
+    background: white;
+}
+
+.item-link-sidebar :hover{
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.item-link-sidebar > a {
+    color: rgba(24,37,53,255) !important;
+    font-weight: bold !important;
+    font-style: italic !important;
+}

@@ -1,0 +1,37 @@
+.table > :not(caption) > * > * {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.table thead th {
+    background-color: rgba(13, 110, 253, 0.1);
+    font-weight: 600;
+    color: #0d6efd;
+    border-top: none;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.border-start {
+    border-left-width: 3px !important;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease-in-out;
+}
+
+.progress {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+}
+
+.progress-bar {
+    transition: width 0.3s ease-in-out;
+}

@@ -1,0 +1,303 @@
+@extends('layouts.app')
+
+@section('content')
+    @push('css-push')
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            :root {
+                --primary-color: #2563eb;
+                --success-color: #16a34a;
+                --danger-color: #dc2626;
+                --warning-color: #f59e0b;
+                --info-color: #0891b2;
+                --dark-color: #111827;
+                --component-bg: #e0f7ec;
+                --subcomponent-bg: #e7f0fd;
+                --section-bg: #fff7f0;
+                --activity-bg: #FFFFFFFF;
+            }
+
+            .budget-header {
+                background: linear-gradient(135deg, var(--dark-color) 0%, #1f2937 100%);
+                color: white;
+                padding: 2rem 0;
+                margin-bottom: 2rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .budget-header h1 {
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+            }
+
+            .add-component-card {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+                margin-bottom: 2rem;
+                overflow: hidden;
+                transition: box-shadow 0.3s ease;
+            }
+
+            .add-component-card:hover {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .add-component-header {
+                background: var(--primary-color);
+                color: white;
+                padding: 1rem 1.5rem;
+                font-weight: 600;
+            }
+
+            .budget-table-container {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+
+            .budget-table {
+                margin-bottom: 0;
+            }
+
+            .budget-table thead {
+                background: var(--dark-color);
+                color: white;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+
+            .budget-table th {
+                font-weight: 600;
+                padding: 1rem;
+                white-space: nowrap;
+                border: none;
+            }
+
+            .budget-table td {
+                padding: 0.75rem 1rem;
+                vertical-align: middle;
+                border: none;
+            }
+
+            .component-row {
+                background-color: var(--component-bg);
+                border-left: 4px solid var(--success-color);
+                font-weight: 600;
+            }
+
+            .subcomponent-row {
+                background-color: var(--subcomponent-bg);
+                border-left: 4px solid var(--primary-color);
+            }
+
+            .section-row {
+                background-color: var(--section-bg);
+                border-left: 4px solid var(--info-color);
+            }
+
+            .activity-row {
+                background-color: var(--activity-bg);
+                border-left: 4px solid #9ca3af;
+            }
+
+            .budget-table tbody tr {
+                transition: all 0.2s ease;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .budget-table tbody tr:hover {
+                transform: translateX(4px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+
+            .btn-action {
+                padding: 0.375rem 0.75rem;
+                border-radius: 6px;
+                font-size: 0.875rem;
+                transition: all 0.2s ease;
+                border: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+
+            .btn-action:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-edit {
+                background: var(--warning-color);
+                color: white;
+            }
+
+            .btn-delete {
+                background: var(--danger-color);
+                color: white;
+            }
+
+            .btn-add {
+                background: var(--success-color);
+                color: white;
+            }
+
+            .btn-view {
+                background: var(--primary-color);
+                color: white;
+            }
+
+            .activity-details {
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 1.5rem;
+                margin: 0.5rem 1rem;
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .activity-details-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+
+            .detail-item {
+                padding: 0.75rem;
+                background: #f9fafb;
+                border-radius: 6px;
+                border: 1px solid #e5e7eb;
+            }
+
+            .detail-label {
+                font-weight: 600;
+                color: #6b7280;
+                font-size: 0.875rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .modal-content {
+                border-radius: 12px;
+                border: none;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            }
+
+            .modal-header {
+                color: white;
+                border-radius: 12px 12px 0 0;
+                border: none;
+            }
+
+            .modal-header .btn-close {
+                filter: brightness(0) invert(1);
+            }
+
+            .form-control,
+            .form-select {
+                border-radius: 8px;
+                border: 1px solid #e5e7eb;
+                transition: all 0.2s ease;
+            }
+
+            .form-control:focus,
+            .form-select:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            }
+
+            .form-label {
+                font-weight: 600;
+                color: #374151;
+                margin-bottom: 0.5rem;
+            }
+
+            @media (max-width: 768px) {
+                .budget-table-container {
+                    overflow-x: auto;
+                }
+
+                .budget-table {
+                    min-width: 800px;
+                }
+
+                .action-buttons {
+                    flex-direction: column;
+                }
+
+                .btn-action {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                .add-component-form {
+                    flex-direction: column;
+                }
+
+                .add-component-form input,
+                .add-component-form button {
+                    width: 100%;
+                }
+            }
+
+            .amount {
+                font-weight: 600;
+                color: var(--success-color);
+            }
+
+            .total-amount {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: white;
+            }
+
+            .level-indicator {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .level-number {
+                background: rgba(0, 0, 0, 0.1);
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.875rem;
+                font-weight: 600;
+            }
+
+            .loading {
+                opacity: 0.6;
+                pointer-events: none;
+            }
+
+            .swal2-container {
+                z-index: 9999;
+            }
+
+            .indent-1 {
+                padding-left: 2rem;
+            }
+
+            .indent-2 {
+                padding-left: 3rem;
+            }
+
+            .indent-3 {
+                padding-left: 4rem;
+            }
+        </style>
+    @endpush
+
+    @if ($budgetPlan->type == 'c2d')
+        @include('dashboard.budget-plans.show.c2d')
+    @else
+        @include('dashboard.budget-plans.show.memdef')
+    @endif
+@endsection
