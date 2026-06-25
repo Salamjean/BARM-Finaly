@@ -258,7 +258,7 @@
                                             </td>
                                             <td>
                                                 <div class="border-start border-warning border-3 ps-2 py-1">
-                                                    <div class="fw-medium">{{ $candidat->cohort->title }}</div>
+                                                    <div class="fw-medium">{{ $refus->candidature->cohort->title ?? '-' }}</div>
                                                 </div>
                                             </td>
 
@@ -279,7 +279,14 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="d-flex justify-content-center">
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <button type="button" class="btn btn-outline-success btn-sm"
+                                                        data-bs-toggle="modal" data-bs-target="#modalAssignPartner"
+                                                        data-candidature-id="{{ $refus->candidature->id }}"
+                                                        data-candidature-name="{{ $refus->candidature->user->fullName() }}"
+                                                        title="Assigner un nouveau partenaire">
+                                                        <i class="bx bx-user-plus"></i>
+                                                    </button>
                                                     <a href="{{ route('adherent.show', $refus->candidature->user->id) }}"
                                                         class="btn btn-outline-danger btn-sm"
                                                         title="Voir le profil de l'adhérent">

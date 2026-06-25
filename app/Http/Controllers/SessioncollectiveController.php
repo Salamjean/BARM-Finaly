@@ -1084,20 +1084,48 @@ class SessioncollectiveController extends Controller
      */
     public function candidatsRefuses()
     {
-        $title = 'Liste des candidats profilés réservé au BARM (refusés) - BARM';
-        $candidatures = Candidature::whereStep('completed')
+        $title = 'Liste des candidats non profilés / profilés reversés au BARM';
+
+        // 1. Récupérer toutes les candidatures concernées (actives, complétées, auto-emploi, avec session et cohorte)
+        $allCandidatures = Candidature::with(['partenaires' => function ($query) {
+            $query->orderBy('candidaturepartenaires.id', 'desc');
+        }])
+            ->whereStep('completed')
             ->where('resignation', '0')
             ->where('death', '0')
             ->where('absent', '0')
             ->where('orientation', 'auto-emploi')
             ->whereNotNull('session_id')
-            ->whereHas('candidaturePartenaires', function ($query) {
-                $query->where('status', 'refused');
-            })
-            ->with(['user', 'cohort', 'candidaturePartenaires.partenaire.user'])
-            ->orderBy('updated_at', 'desc')
+            ->whereNotNull('cohort_id')
+            ->orderByDesc('created_at')
             ->get();
 
-        return view('dashboard.profilages.candidats_refuses', compact('title', 'candidatures'));
+        // 2. Filtrer pour obtenir les candidats en attente de profilage (le dernier partenaire a refusé)
+        $candidatures = $allCandidatures->filter(function ($candidature) {
+            $dernierPartenaire = $candidature->partenaires->first();
+            return $dernierPartenaire && $dernierPartenaire->pivot->status === 'refused';
+        });
+
+        // 3. Récupérer l'historique complet des refus pour ces candidatures
+        $candidaturepartenaires = CandidaturePartenaire::with([
+            'candidature.user',
+            'partenaire.user'
+        ])
+            ->whereHas('partenaire')
+            ->where('status', 'refused')
+            ->whereIn('candidature_id', $allCandidatures->pluck('id'))
+            ->orderByDesc('updated_at')
+            ->get();
+
+        // 4. Récupérer les partenaires techniques pour le modal d'assignation
+        $partners = Partenaire::all();
+        $partenaires = [];
+        foreach ($partners as $partner) {
+            if (in_array('partner-technical', userPermissions($partner->user))) {
+                $partenaires[] = $partner;
+            }
+        }
+
+        return view('dashboard.profilages.candidats_refuses', compact('title', 'candidatures', 'candidaturepartenaires', 'partenaires'));
     }
 }

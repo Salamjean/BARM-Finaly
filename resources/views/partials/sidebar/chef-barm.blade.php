@@ -148,7 +148,7 @@
                     </li>
                     <li class="menu-item {{ routeItem('profilage.candidats_refuses') }}">
                         <a href="{{ route('profilage.candidats_refuses') }}" class="menu-link">
-                            <div>Liste des candidats profilés réservés au BARM (<span class="text-danger">refusés</span>)</div>
+                            <div>Liste des candidats non profilés / profilés reversés au BARM</div>
                         </a>
                     </li>
                 </ul>
