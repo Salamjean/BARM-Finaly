@@ -71,7 +71,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($candidatures as $index => $candidat)
+                            @foreach ($candidatures as $index => $candidat)
                                 <tr class="align-middle">
                                     <td>
                                         <div class="d-flex align-items-center">
@@ -91,7 +91,7 @@
                                     </td>
                                     <td>
                                         <div class="border-start border-danger border-3 ps-2 py-1">
-                                            <div class="fw-bold text-primary">{{ $candidat->cohort->reference ?? 'Non assigné' }}</div>
+                                            <div class="fw-bold text-primary">{{ $candidat->cohort->title ?? $candidat->cohort->reference ?? 'Non assigné' }}</div>
                                         </div>
                                     </td>
                                     <td>
@@ -137,17 +137,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center py-4">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <i class="bx bx-user-check fs-1 text-success mb-3"></i>
-                                            <h5 class="text-muted">Aucun candidat refusé</h5>
-                                            <p class="text-muted mb-0">Aucun candidat n'a été refusé par le BARM</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

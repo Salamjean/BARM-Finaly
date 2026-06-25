@@ -509,6 +509,51 @@ class SessioncollectiveController extends Controller
         }
     }
 
+    // marquer plusieurs candidats présents/absents à une session collective
+    public function bulkUpdatePresence(Request $request, Sessioncollective $sessioncollective)
+    {
+        try {
+            $request->validate([
+                'candidature_ids' => 'required|array',
+                'candidature_ids.*' => 'exists:candidatures,id',
+                'presence_status' => 'required|in:0,1',
+            ]);
+
+            $candidatureIds = $request->candidature_ids;
+            $presenceStatus = $request->presence_status;
+
+            foreach ($candidatureIds as $candidatureId) {
+                $candidature = Candidature::findOrFail($candidatureId);
+
+                // Trouver le pivot pour la session et la candidature
+                $pivotData = $sessioncollective->candidatures()->where('candidature_id', $candidatureId)->first()?->pivot;
+                if ($pivotData) {
+                    $pivotData->update([
+                        'presence' => '1',
+                        'presence_status' => $presenceStatus,
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                // Mettre à jour la candidature
+                $candidature->update([
+                    'session_collective' => '1',
+                    'session_id' => $sessioncollective->id
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Les candidats sélectionnés ont été mis à jour avec succès.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     // page de modification du partenaire par le conseiller et le candidat apres validation du partenaire
     public function candidatpartner(Candidature $candidature)
     {
@@ -857,11 +902,37 @@ class SessioncollectiveController extends Controller
         $partenaire = Partenaire::where('user_id', $user_id)->first();
 
         $profilage = Profilage::where('partenaire_id', $partenaire->id)->first();
-        $histories = CandidaturePartenaire::whereNotNull('status')
+        
+        // Récupérer l'historique des statuts (accepted, refused)
+        $statutHistories = CandidaturePartenaire::whereNotNull('status')
             ->where('partenaire_id', $partenaire->id)
+            ->with(['candidature.user', 'candidature.cohort'])
             ->get();
 
-        
+        // Récupérer les candidats marqués absents pour ce partenaire
+        $absents = Candidature::where('absent', '1')
+            ->whereHas('partenaires', function ($query) use ($partenaire) {
+                $query->where('partenaire_id', $partenaire->id);
+            })
+            ->with(['user', 'cohort'])
+            ->get();
+
+        // Convertir les absents en objets simulés de type CandidaturePartenaire
+        $mappedAbsents = $absents->map(function ($candidat) use ($partenaire) {
+            $history = new CandidaturePartenaire();
+            $history->id = 'absent_' . $candidat->id;
+            $history->candidature_id = $candidat->id;
+            $history->partenaire_id = $partenaire->id;
+            $history->status = 'absent';
+            $history->reason_rejet = $candidat->absent_justification;
+            $history->updated_at = $candidat->absent_date ?? $candidat->updated_at;
+            $history->setRelation('candidature', $candidat);
+            return $history;
+        });
+
+        // Combiner et ordonner par date de mise à jour décroissante
+        $histories = $statutHistories->concat($mappedAbsents)->sortByDesc('updated_at');
+
         $title = 'Historique des candidats profilés - BARM';
 
         return view('dashboard.profilages.historique', compact(
@@ -952,6 +1023,43 @@ class SessioncollectiveController extends Controller
     }
 
     /**
+     * Réassigner un candidat absent (annuler son absence)
+     */
+    public function reassignCandidatePartner(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'candidature_id' => 'required|exists:candidatures,id',
+            ]);
+
+            $candidature = Candidature::findOrFail($request->candidature_id);
+
+            // Remettre à zéro les champs d'absence
+            $candidature->update([
+                'absent' => '0',
+                'absent_date' => null,
+                'absent_justification' => null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Le candidat a été réassigné avec succès.'
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation: ' . implode(', ', $e->validator->errors()->all())
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Affiche la liste des candidats marqués comme absents
      */
     
@@ -964,7 +1072,7 @@ class SessioncollectiveController extends Controller
             ->where('death', '0')
             ->where('orientation', 'auto-emploi')
             ->whereNotNull('session_id')
-            ->with(['user', 'cohort', 'partnerTechnical'])
+            ->with(['user', 'cohort', 'partnerTechnical', 'partenaires.user'])
             ->orderBy('absent_date', 'desc')
             ->get();
 

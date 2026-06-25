@@ -116,8 +116,12 @@
                                                     <span class="badge bg-success">
                                                         Accepté
                                                     </span>
+                                                @elseif ($history->status == 'absent')
+                                                    <span class="badge bg-warning text-white">
+                                                        Absent
+                                                    </span>
                                                 @else
-                                                    <span class="badge bg-warning text-dark">
+                                                    <span class="badge bg-warning text-white">
                                                         En attente
                                                     </span>
                                                 @endif
@@ -131,6 +135,15 @@
                                                         </div>
                                                         <small class="text-muted">
                                                             Refusé le {{ dateFr($history->updated_at) }}
+                                                        </small>
+                                                    </div>
+                                                @elseif ($history->status == 'absent')
+                                                    <div class="border-start border-warning border-3 ps-2 py-1">
+                                                        <div class="text-warning small fw-bold">
+                                                            {{ $history->reason_rejet ?? 'Aucun motif spécifié' }}
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            Marqué absent le {{ dateFr($history->updated_at) }}
                                                         </small>
                                                     </div>
                                                 @else

@@ -52,10 +52,31 @@
 
 
             <div class="p-4">
+                @if (can('conseiller-auto-emploi') || can('chef-cellule-formation-et-insertion'))
+                    <div id="bulkActionsContainer" class="mb-3 p-3 bg-light rounded-3 d-none justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bx bx-check-double text-primary fs-4"></i>
+                            <span class="fw-medium text-dark"><span id="selectedCount" class="fw-bold text-primary">0</span> candidat(s) sélectionné(s)</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success btn-sm" id="bulkMarkPresentBtn">
+                                <i class="bx bx-user-check me-1"></i> Marquer Présent
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" id="bulkMarkAbsentBtn">
+                                <i class="bx bx-user-x me-1"></i> Marquer Absent
+                            </button>
+                        </div>
+                    </div>
+                @endif
                 <div class="table-responsive">
                     <table class="dt-responsive table table-hover" id="datatable--barm" style="width:100%">
                         <thead>
                             <tr class="table-primary">
+                                @if (can('conseiller-auto-emploi') || can('chef-cellule-formation-et-insertion'))
+                                    <th class="border-0 text-center" style="width: 40px;">
+                                        <input type="checkbox" id="selectAllCandidats" class="form-check-input">
+                                    </th>
+                                @endif
                                 <th class="border-0">
                                     <i class="bx bx-calendar-plus text-primary me-1"></i>
                                     Date d'ajout
@@ -82,6 +103,15 @@
                         <tbody>
                             @foreach ($candidatures as $index => $candidat)
                                 <tr class="align-middle">
+                                    @if (can('conseiller-auto-emploi') || can('chef-cellule-formation-et-insertion'))
+                                        <td class="text-center">
+                                            @if ($candidat->pivot->presence == '0')
+                                                <input type="checkbox" class="form-check-input candidat-checkbox" value="{{ $candidat->id }}">
+                                            @else
+                                                <input type="checkbox" class="form-check-input" disabled title="Déjà traité">
+                                            @endif
+                                        </td>
+                                    @endif
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <span class="badge bg-info me-2">{{ $index + 1 }}</span>
@@ -270,6 +300,122 @@
             let currentCandidatId = null;
             let currentRoute = null;
             const confirmPresenceModal = new bootstrap.Modal(document.getElementById('confirmPresenceModal'));
+
+            // Variables pour la sélection en lot
+            const selectAllCheckbox = $('#selectAllCandidats');
+            const candidateCheckboxes = $('.candidat-checkbox');
+            const bulkActionsContainer = $('#bulkActionsContainer');
+            const selectedCountSpan = $('#selectedCount');
+
+            // Fonction pour mettre à jour l'affichage des actions en lot
+            function updateBulkActions() {
+                const checkedCount = $('.candidat-checkbox:checked').length;
+                selectedCountSpan.text(checkedCount);
+
+                if (checkedCount > 0) {
+                    bulkActionsContainer.removeClass('d-none').addClass('d-flex');
+                } else {
+                    bulkActionsContainer.removeClass('d-flex').addClass('d-none');
+                }
+
+                // Gérer l'état du select all
+                const allEnabledChecked = $('.candidat-checkbox:checked').length === candidateCheckboxes.length && candidateCheckboxes.length > 0;
+                selectAllCheckbox.prop('checked', allEnabledChecked);
+            }
+
+            // Événement Select All
+            selectAllCheckbox.on('change', function() {
+                const isChecked = $(this).is(':checked');
+                candidateCheckboxes.prop('checked', isChecked);
+                updateBulkActions();
+            });
+
+            // Événement Checkbox Individuelle
+            candidateCheckboxes.on('change', function() {
+                updateBulkActions();
+            });
+
+            // Action Marquer Présent / Absent en lot
+            function submitBulkPresence(presenceStatus) {
+                const selectedIds = [];
+                $('.candidat-checkbox:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+
+                if (selectedIds.length === 0) return;
+
+                const statusText = presenceStatus === 1 ? 'présent(s)' : 'absent(s)';
+                const confirmTitle = presenceStatus === 1 ? 'Marquer comme présents ?' : 'Marquer comme absents ?';
+                const confirmText = `Voulez-vous marquer les ${selectedIds.length} candidat(s) sélectionné(s) comme ${statusText} et les débloquer chez le partenaire technique ?`;
+                const confirmColor = presenceStatus === 1 ? '#198754' : '#dc3545';
+
+                Swal.fire({
+                    title: confirmTitle,
+                    text: confirmText,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: confirmColor,
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Oui, confirmer',
+                    cancelButtonText: 'Annuler',
+                    customClass: {
+                        popup: 'swal-modern'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Mise à jour en lot...',
+                            text: 'Traitement en cours',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        });
+
+                        $.ajax({
+                            url: "{{ route('sessioncollectives.bulk-update-presence', $sessioncollective->id) }}",
+                            type: 'POST',
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                candidature_ids: selectedIds,
+                                presence_status: presenceStatus
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Succès !',
+                                    text: response.message || `Les candidats ont été marqués ${statusText}.`,
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                let errorMsg = 'Une erreur est survenue lors de la mise à jour.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMsg = xhr.responseJSON.message;
+                                }
+                                Swal.fire({
+                                    title: 'Erreur !',
+                                    text: errorMsg,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                                console.error(error);
+                            }
+                        });
+                    }
+                });
+            }
+
+            $('#bulkMarkPresentBtn').on('click', function() {
+                submitBulkPresence(1);
+            });
+
+            $('#bulkMarkAbsentBtn').on('click', function() {
+                submitBulkPresence(0);
+            });
 
             // Gestion du bouton de confirmation de présence
             $('.confirm-presence-btn').on('click', function() {

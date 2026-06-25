@@ -721,6 +721,10 @@ Route::group(['middleware' => ['auth']], function () {
         SessioncollectiveController::class,
         'updatecandidatsession'
     ])->name('updatecandidatsession');
+    Route::post('/sessioncollectives/{sessioncollective}/bulk-update-presence', [
+        SessioncollectiveController::class,
+        'bulkUpdatePresence'
+    ])->name('sessioncollectives.bulk-update-presence');
     Route::get('/candidatpartner/{candidature}', [
         SessioncollectiveController::class,
         'candidatpartner'
@@ -790,6 +794,7 @@ Route::group(['middleware' => ['auth']], function () {
         ])->name('partenaire_candidat_profile');
         Route::post('/end_profilage', [SessioncollectiveController::class, 'end_profilage'])->name('end_profilage');
         Route::post('/mark_candidate_absent', [SessioncollectiveController::class, 'markCandidateAbsent'])->name('mark_candidate_absent');
+        Route::post('/mark_candidate_reassign', [SessioncollectiveController::class, 'reassignCandidatePartner'])->name('mark_candidate_reassign');
         Route::get('/candidats_absents', [SessioncollectiveController::class, 'candidatsAbsents'])->name('candidats_absents');
         Route::get('/candidats_refuses', [SessioncollectiveController::class, 'candidatsRefuses'])->name('candidats_refuses');
     });

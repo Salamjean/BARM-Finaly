@@ -165,7 +165,7 @@ class Candidature extends Model
 
     public function profilages(): BelongsToMany
     {
-        return $this->belongsToMany(Profilage::class,'candidatprofilages','profilage_id','candidature_id')->withPivot('profile');
+        return $this->belongsToMany(Profilage::class,'candidatprofilages','candidature_id','profilage_id')->withPivot('profile');
     }
 
     public function commissions(): BelongsToMany
