@@ -47,12 +47,16 @@
                 <label class="form-check-label" for="collapsible-phone">&bull; Conditions disciplinaires :</label>
                 {{-- {{ dd($submission->condition_disciplinaire) }} --}}
                 @php
-                    if ($submission->condition_disciplinaire) {
+                    $decoded_conditions = $submission->condition_disciplinaire ? json_decode($submission->condition_disciplinaire) : [];
+                    if (!is_array($decoded_conditions)) {
+                        $decoded_conditions = [];
+                    }
 
-                        $first_element = json_decode($submission->condition_disciplinaire)[0];
+                    if (count($decoded_conditions) > 0) {
+                        $first_element = $decoded_conditions[0];
                         $orther_element = [];
 
-                        foreach (json_decode($submission->condition_disciplinaire) as $key => $element) {
+                        foreach ($decoded_conditions as $key => $element) {
                             if ($key != 0) {
                                 $orther_element[$key - 1] = $element;
                             }
@@ -182,7 +186,7 @@
             "use strict";
 
             var rowIndex =
-                {{ $submission->condition_disciplinaire ? count(json_decode($submission->condition_disciplinaire)) : 1 }};
+                {{ $submission->condition_disciplinaire && is_array(json_decode($submission->condition_disciplinaire)) && count(json_decode($submission->condition_disciplinaire)) > 0 ? count(json_decode($submission->condition_disciplinaire)) : 1 }};
 
             // Add item handler
             $('.add__items__btn').click(function() {
