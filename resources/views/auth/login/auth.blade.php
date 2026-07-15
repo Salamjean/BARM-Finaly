@@ -132,24 +132,42 @@
                     @csrf
                     <input type="hidden" name="user" value="client" />
 
-                    <!-- Email Field -->
+                    @if(session('error'))
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-xl">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-circle text-red-500 mr-3 text-lg"></i>
+                                <p class="text-red-700 font-medium">{{ session('error') }}</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    @error('error')
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-xl">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-circle text-red-500 mr-3 text-lg"></i>
+                                <p class="text-red-700 font-medium">{{ $message }}</p>
+                            </div>
+                        </div>
+                    @enderror
+
+                    <!-- Identifiant Field -->
                     <div class="space-y-2">
                         <label for="mecano" class="block text-sm font-semibold text-gray-700">
                             Adresse e-mail
                         </label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                                 <i class="fas fa-envelope text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
                             </div>
                             <input 
-                                type="email" 
+                                type="text" 
                                 id="mecano" 
                                 name="mecano"
                                 value="{{ old('mecano') }}"
                                 required
                                 autofocus
                                 class="w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-200 rounded-xl input-focus focus:border-primary-500 focus:ring-0 @error('mecano') border-red-500 @enderror"
-                                placeholder="votre.email@exemple.com"
+                                placeholder="Entrez votre adresse e-mail"
                             >
                         </div>
                         @error('mecano')
@@ -166,7 +184,7 @@
                             Mot de passe
                         </label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                                 <i class="fas fa-lock text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
                             </div>
                             <input 

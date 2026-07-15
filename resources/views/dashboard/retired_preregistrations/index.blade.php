@@ -86,7 +86,11 @@
         </div>
         <div class="card-body">
             <form method="GET" class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label for="search" class="form-label">Recherche</label>
+                    <input type="text" name="search" id="search" class="form-control" placeholder="Nom, prénom, mécano..." value="{{ request('search') }}">
+                </div>
+                <div class="col-md-3">
                     <label for="status" class="form-label">Statut</label>
                     <select name="status" id="status" class="form-select">
                         <option value="">Tous les statuts</option>
@@ -95,7 +99,7 @@
                         <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejetées</option>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="verified" class="form-label">Vérification</label>
                     <select name="verified" id="verified" class="form-select">
                         <option value="">Toutes</option>
@@ -103,7 +107,7 @@
                         <option value="0" {{ request('verified') == '0' ? 'selected' : '' }}>Non vérifiées</option>
                     </select>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary me-2">
                         <i class="bx bx-search"></i> Filtrer
                     </button>
@@ -128,11 +132,11 @@
                 <table class="table table-striped table-hover" id="preregistrationsTable">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
                             <th>Nom & Prénom</th>
                             <th>Mécano</th>
-                            <th>Téléphone</th>
-                            <th>Email</th>
+                            <th>Date de retraite</th>
+                            <th>Téléphones</th>
+                            <th>Résidence</th>
                             <th>Statut</th>
                             <th>Vérification</th>
                             <th>Date demande</th>
@@ -142,7 +146,6 @@
                     <tbody>
                         @forelse($preregistrations as $preregistration)
                         <tr>
-                            <td>{{ $preregistration->id }}</td>
                             <td>
                                 <strong>{{ $preregistration->fullname }}</strong>
                                 @if($preregistration->retired)
@@ -154,8 +157,20 @@
                             <td>
                                 <code>{{ $preregistration->mecano }}</code>
                             </td>
-                            <td>{{ $preregistration->phone }}</td>
-                            <td>{{ $preregistration->email ?? '-' }}</td>
+                            <td>
+                                @if($preregistration->retired_date)
+                                    {{ \Carbon\Carbon::parse($preregistration->retired_date)->format('d/m/Y') }}
+                                @else
+                                    <span class="text-muted">Non définie</span>
+                                @endif
+                            </td>
+                            <td>
+                                {{ $preregistration->phone }}
+                                @if($preregistration->phone2)
+                                    <br><small class="text-muted">{{ $preregistration->phone2 }}</small>
+                                @endif
+                            </td>
+                            <td>{{ $preregistration->residence }}</td>
                             <td>
                                 @switch($preregistration->status)
                                     @case('pending')

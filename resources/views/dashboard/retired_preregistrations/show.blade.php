@@ -14,12 +14,16 @@
                 <td><code>{{ $preregistration->mecano }}</code></td>
             </tr>
             <tr>
-                <th>Téléphone</th>
+                <th>Téléphone 1</th>
                 <td>{{ $preregistration->phone }}</td>
             </tr>
             <tr>
-                <th>Email</th>
-                <td>{{ $preregistration->email ?? '-' }}</td>
+                <th>Téléphone 2</th>
+                <td>{{ $preregistration->phone2 ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Lieu de résidence</th>
+                <td>{{ $preregistration->residence ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Date de demande</th>
@@ -78,17 +82,6 @@
         </table>
     </div>
 </div>
-
-@if($preregistration->message)
-<div class="mt-4">
-    <h6 class="text-primary mb-3">
-        <i class="bx bx-message-dots me-2"></i>Message/Motivation
-    </h6>
-    <div class="alert alert-info">
-        {{ $preregistration->message }}
-    </div>
-</div>
-@endif
 
 @if($preregistration->admin_notes)
 <div class="mt-4">

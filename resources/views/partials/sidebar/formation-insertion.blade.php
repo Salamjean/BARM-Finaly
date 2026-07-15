@@ -1,6 +1,24 @@
 {{-- SIDEBAR POUR CELLULE FORMATION ET INSERTION --}}
-@if (can('conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|conseiller-en-reconversion') ||
-        can('chef-cellule-formation-et-insertion'))
+@if (
+        can('conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|conseiller-en-reconversion') ||
+        can('chef-cellule-formation-et-insertion')
+    )
+
+    {{-- PV Comité crédit --}}
+    <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
+        <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-buildings'></i>
+            <div class="d-flex justify-content-between">
+                <div>PV Comité crédit</div>
+                @if (disbursementPendingCountByUser('pv_credit') > 0)
+                    <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                        style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                        {{ disbursementPendingCountByUser('pv_credit') }}
+                    </span>
+                @endif
+            </div>
+        </a>
+    </li>
 
     {{-- Adhérent --}}
     <li
@@ -67,11 +85,13 @@
     </li>
 
     {{-- Recherche --}}
-    @if (can('conseiller-entreprise-prive') ||
+    @if (
+            can('conseiller-entreprise-prive') ||
             can('point-focal') ||
             can('conseiller-fonction-public') ||
             can('conseiller-auto-emploi') ||
-            can('chef-cellule-formation-et-insertion'))
+            can('chef-cellule-formation-et-insertion')
+        )
         <li class="menu-item {{ routeActive('search.index') }}">
             <a href="{{ route('search.index') }}" class="menu-link">
                 <i class='bx bxs-search'></i>&nbsp;&nbsp;
@@ -139,7 +159,7 @@
 
             {{-- Sessions Collectives --}}
             <li
-                class="menu-item {{ routeActive(['sessioncollectives.create', 'sessioncollectives.index', 'sessioncollectives.show', 'sessioncollectives.edit', 'candidaturevalidated','candidaturevalidated', 'listecandidatureprovisoire']) }}">
+                class="menu-item {{ routeActive(['sessioncollectives.create', 'sessioncollectives.index', 'sessioncollectives.show', 'sessioncollectives.edit', 'candidaturevalidated', 'candidaturevalidated', 'listecandidatureprovisoire']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bxs-universal-access'></i>
                     <div>Sessions Collectives</div>
@@ -155,50 +175,40 @@
                             <div>Liste des candidats present aux sessions</div>
                         </a>
                     </li>
-                    
+
                 </ul>
             </li>
 
             {{-- Profilages --}}
             <li
-                class="menu-item {{ routeActive(['profilage.profilage', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile', 'listecandidaturerefuser', 'listecandidature', 'profilage.candidats_absents', 'profilage.candidats_refuses']) }}">
+                class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class='menu-icon tf-icons bx bx-briefcase'></i>
-                    <div>Profilages</div>
+                    <i class='menu-icon tf-icons bx bx-cross'></i>
+                    <div class="d-flex justify-content-between">
+                        <div>Profilages</div>
+                        @if (focalPointProfilageCount() > 0)
+                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                                {{ focalPointProfilageCount() }}
+                            </span>
+                        @endif
+                    </div>
                 </a>
                 <ul class="menu-sub">
-                    {{-- <li class="menu-item {{ routeItem('profilage.profilage') }}">
+                    <li class="menu-item {{ routeItem('profilage.profilage') }}">
                         <a href="{{ route('profilage.profilage') }}" class="menu-link">
-                            <div>Liste des sessions organisées</div>
+                            <div>Tous les profilages</div>
                         </a>
                     </li>
-                    --}}
-                    <li class="menu-item {{ routeItem('listecandidature') }}">
-                        <a href="{{ route('listecandidature') }}" class="menu-link">
-                            <div>Liste des candidats profilés</div>
+                    <li class="menu-item {{ routeItem('profilage.never_profiled') }}">
+                        <a href="{{ route('profilage.never_profiled') }}" class="menu-link">
+                            <div>Liste des candidats jamais profilés</div>
                         </a>
                     </li>
-                    @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
-                        {{-- <li class="menu-item {{ routeItem('listecandidaturerefuser') }}">
-                            <a href="{{ route('listecandidaturerefuser') }}" class="menu-link">
-                                <div>Liste des candidats non profilés</div>
-                            </a>
-                        </li> --}}
-                        <li class="menu-item {{ routeItem('profilage.candidats_absents') }}">
-                            <a href="{{ route('profilage.candidats_absents') }}" class="menu-link">
-                                <div>Liste des candidats non profilés (<span class="text-danger">absents</span>)</div>
-                            </a>
-                        </li>
-                        <li class="menu-item {{ routeItem('profilage.candidats_refuses') }}">
-                            <a href="{{ route('profilage.candidats_refuses') }}" class="menu-link">
-                                <div>Liste des candidats non profilés / profilés reversés au BARM</div>
-                            </a>
-                        </li>
-                    @endif
                 </ul>
             </li>
 
-            
+
 
             {{-- Formations --}}
             <li class="menu-item {{ routeActive(['cohort.personal.training']) }}">
@@ -359,8 +369,7 @@
                     </a>
                 </li>
 
-                <li
-                    class="menu-item {{ routeActive(['formations.index', 'formations.create', 'formations.presence']) }}">
+                <li class="menu-item {{ routeActive(['formations.index', 'formations.create', 'formations.presence']) }}">
                     <a href="{{ route('formations.index') }}" class="menu-link">
                         <i class='menu-icon tf-icons bx bxs-file-doc'></i>
                         <div>Formations</div>

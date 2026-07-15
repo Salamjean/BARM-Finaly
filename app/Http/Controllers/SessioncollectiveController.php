@@ -737,13 +737,18 @@ class SessioncollectiveController extends Controller
     //Affiche les cohorte
     public function profilage()
     {
-
-
         $cohorts = Cohort::orderByDESC('created_at')->where('status', '0')->get();
 
         $title = 'Organiser un profilage - BARM';
 
         return view('dashboard.profilages.profilage', compact('cohorts', 'title'));
+    }
+
+    public function never_profiled()
+    {
+        $candidatures = Candidature::doesntHave('profilages')->get();
+        $title = 'Candidats jamais profilés';
+        return view('dashboard.profilages.never_profiled', compact('title', 'candidatures'));
     }
 
     //Affiche les profilages par cohorte

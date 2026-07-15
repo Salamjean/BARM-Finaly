@@ -97,7 +97,7 @@
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2 flex-wrap">
-                                            @if (can('conseiller-auto-emploi|point-focal'))
+                                            @if (can('conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|conseiller-en-reconversion|chef-cellule-formation-et-insertion|point-focal'))
                                                 <a href="{{ route('profilage.candidat_profilage', $cohort->id) }}"
                                                     class="btn btn-outline-info btn-sm" title="Candidats à profiler">
                                                     À profiler

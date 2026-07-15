@@ -118,6 +118,7 @@ Route::middleware('guest')->group(function () {
 });
 Route::get('/', [FrontController::class, 'acceuil'])->name('acceuil');
 Route::get('/preregistration', [FrontController::class, 'preregistrationForm'])->name('preregistration.form');
+Route::post('/retired/preregistration/verify', [FrontController::class, 'verifyRetired'])->name('retired.preregistration.verify');
 Route::post('/retired/preregistration', [FrontController::class, 'submitPreregistration'])->name('retired.preregistration.submit');
 Route::get('/about', [FrontController::class, 'about'])->name('about');
 Route::get('/offres', [FrontController::class, 'offres'])->name('offres');
@@ -769,7 +770,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     // profilage
     Route::prefix('profilages')->name('profilage.')->group(function () {
-
+        Route::get('/never_profiled', [SessioncollectiveController::class, 'never_profiled'])->name('never_profiled');
         Route::get('/profilage', [SessioncollectiveController::class, 'profilage'])->name('profilage');
         Route::get('/index_profilage/{cohort}', [SessioncollectiveController::class, 'index_profilage'])->name('index_profilage');
         Route::get('/create_profilage/{cohort}', [SessioncollectiveController::class, 'create_profilage'])->name('create_profilage');

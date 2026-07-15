@@ -118,11 +118,23 @@
     </li>
 
     <li
-        class="menu-item {{ routeActive(['profilage.profilage', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile']) }}">
-        <a href="{{ route('profilage.profilage') }}" class="menu-link">
+        class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile']) }}">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class='menu-icon tf-icons bx bx-cross'></i>
             <div>Profilages</div>
         </a>
+        <ul class="menu-sub">
+            <li class="menu-item {{ routeItem('profilage.profilage') }}">
+                <a href="{{ route('profilage.profilage') }}" class="menu-link">
+                    <div>Tous les profilages</div>
+                </a>
+            </li>
+            <li class="menu-item {{ routeItem('profilage.never_profiled') }}">
+                <a href="{{ route('profilage.never_profiled') }}" class="menu-link">
+                    <div>Liste des candidats jamais profilés</div>
+                </a>
+            </li>
+        </ul>
     </li>
 
     <li class="menu-item {{ routeActive(['cohort.personal.training']) }}">

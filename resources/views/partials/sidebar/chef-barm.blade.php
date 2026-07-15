@@ -23,6 +23,22 @@
         </ul>
     </li>
 
+    {{-- PV Comité crédit --}}
+    <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
+        <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-buildings'></i>
+            <div class="d-flex justify-content-between">
+                <div>PV Comité crédit</div>
+                @if (disbursementPendingCountByUser('pv_credit') > 0)
+                    <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                        style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                        {{ disbursementPendingCountByUser('pv_credit') }}
+                    </span>
+                @endif
+            </div>
+        </a>
+    </li>
+
     {{-- Recherche --}}
     <li class="menu-item {{ routeActive('search.index') }}">
         <a href="{{ route('search.index') }}" class="menu-link">
@@ -120,7 +136,7 @@
             </li>
 
             {{-- Profilages --}}
-            <li class="menu-item {{ routeActive(['profilage.profilage', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile', 'listecandidaturerefuser', 'listecandidature', 'profilage.candidats_absents', 'profilage.candidats_refuses']) }}">
+            <li class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile', 'listecandidaturerefuser', 'listecandidature', 'profilage.candidats_absents', 'profilage.candidats_refuses']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-cross'></i>
                     <div>Profilages</div>
@@ -151,6 +167,11 @@
                             <div>Liste des candidats non profilés / profilés reversés au BARM</div>
                         </a>
                     </li>
+                    <li class="menu-item {{ routeItem('profilage.never_profiled') }}">
+                        <a href="{{ route('profilage.never_profiled') }}" class="menu-link">
+                            <div>Liste des candidats jamais profilés</div>
+                        </a>
+                    </li>
                 </ul>
             </li>
 
@@ -178,21 +199,6 @@
                 </a>
             </li>
 
-            {{-- PV Comité crédit --}}
-            <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
-                <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
-                    <i class='menu-icon tf-icons bx bxs-buildings'></i>
-                    <div class="d-flex justify-content-between">
-                        <div>PV Comité crédit</div>
-                        @if (disbursementPendingCountByUser('pv_credit') > 0)
-                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
-                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
-                                {{ disbursementPendingCountByUser('pv_credit') }}
-                            </span>
-                        @endif
-                    </div>
-                </a>
-            </li>
 
             {{-- Decaissements --}}
             <li class="menu-item {{ routeActive(['monitored-evaluation.disbursement.cohorts', 'monitored-evaluation.disbursement.cohort', 'monitored-evaluation.disbursement.adherent']) }}">

@@ -21,9 +21,10 @@
                         <i class="fas fa-shield-alt mr-2"></i>
                         Découvrir nos services
                     </a>
-                    <a href="{{ route('preregistration.form') }}" class="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
-                        <i class="fas fa-edit mr-2"></i>
-                        Faire ma pré-inscription
+                    <a href="{{ route('preregistration.form') }}" class="relative inline-flex items-center justify-center px-8 py-4 overflow-hidden text-white font-bold bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:-translate-y-1 group">
+                        <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
+                        <i class="fas fa-user-plus mr-3 text-lg z-10"></i>
+                        <span class="relative z-10">Pré-Inscription</span>
                     </a>
                     <a href="{{ route('contact') }}" class="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-primary-600 transition-all duration-300 transform hover:scale-105">
                         <i class="fas fa-phone mr-2"></i>

@@ -27,7 +27,7 @@ class CreditCommitteeController extends Controller
                 });
             })->orderByDesc('created_at')->get();
 
-        elseif (can('chef-barm|c2d'))
+        elseif (can('chef-barm|c2d|responsable-suivi-evaluation|assistant-suivi-evaluation|conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|conseiller-en-reconversion|chef-cellule-formation-et-insertion'))
             $pv = PvCommittee::orderByDesc('created_at')->get();
 
         return view('dashboard.monitored_evaluation.credit_committee.index', ['committees' => $pv]);

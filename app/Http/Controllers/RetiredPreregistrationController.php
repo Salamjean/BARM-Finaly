@@ -26,6 +26,17 @@ class RetiredPreregistrationController extends Controller
             $query->where('verified', $request->verified === '1');
         }
 
+        // Recherche (Nom, prénom, mécano, etc.)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('firstname', 'like', "%{$search}%")
+                  ->orWhere('lastname', 'like', "%{$search}%")
+                  ->orWhere('mecano', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
         $preregistrations = $query->paginate(20);
 
         return view('dashboard.retired_preregistrations.index', compact('preregistrations'));

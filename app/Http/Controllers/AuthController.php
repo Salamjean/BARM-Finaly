@@ -36,17 +36,23 @@ class AuthController extends Controller
             ]);
             $cred = $request->only('mecano', 'password');
 
-            if (Auth::attempt(['email' => $cred['mecano'], 'password' => $cred['password']])) {
+            $userObj = User::where('email', $cred['mecano'])
+                           ->orWhere('mecano', $cred['mecano'])
+                           ->orWhere('matricule', $cred['mecano'])
+                           ->first();
+
+            if ($userObj && Hash::check($cred['password'], $userObj->password)) {
+                Auth::login($userObj);
                 if (Auth::user()->status == 1) {
                     $request->session()->regenerate();
                     return redirect()->intended('/dashboard');
                 } else {
                     Auth::logout();
-                    return back()->withErrors(['error' => 'Votre compte est inactif. Veuillez vous rendre au BARM pour l\activation.']);
+                    return back()->withErrors(['error' => 'Votre compte est inactif. Veuillez vous rendre au BARM pour l\'activation.']);
                 }
             }
 
-            return back()->withErrors(['error', 'Mécano/Matricule ou mot de passe incorrect !']);
+            return back()->withErrors(['error' => 'E-mail ou mot de passe incorrect !']);
         }
     }
 
@@ -61,23 +67,25 @@ class AuthController extends Controller
 
         $cred = $request->only('mecano', 'password');
 
-        if (Auth::attempt([
-            'email' => $cred['mecano'],
-            'password' => $cred['password'],
-        ])) {
+        $userObj = User::where('email', $cred['mecano'])
+                       ->orWhere('mecano', $cred['mecano'])
+                       ->orWhere('matricule', $cred['mecano'])
+                       ->first();
+
+        if ($userObj && Hash::check($cred['password'], $userObj->password)) {
+            Auth::login($userObj);
             if (Auth::user()->status == 1) {
                 $request->session()->regenerate();
                 return redirect()->intended('/dashboard');
             } else {
-
                 Auth::logout();
-                return back()->with('error', 'Votre compte est inactif. Veuillez vous rendre au BARM pour l\activation.');
+                return back()->with('error', 'Votre compte est inactif. Veuillez vous rendre au BARM pour l\'activation.');
             }
         }
 
         $this->extra($request);
 
-        return back()->withErrors(['error' => 'Mécano/Matricule ou mot de passe incorrect !']);
+        return back()->withErrors(['error' => 'E-mail ou mot de passe incorrect !']);
     }
 
     public function signOut(): View
