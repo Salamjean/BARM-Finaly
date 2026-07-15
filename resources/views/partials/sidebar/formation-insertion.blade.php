@@ -181,7 +181,7 @@
 
             {{-- Profilages --}}
             <li
-                class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile']) }}">
+                class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile', 'profilage.candidats_absents', 'profilage.candidats_refuses']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-cross'></i>
                     <div class="d-flex justify-content-between">
@@ -205,6 +205,18 @@
                             <div>Liste des candidats jamais profilés</div>
                         </a>
                     </li>
+                    @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
+                        <li class="menu-item {{ routeItem('profilage.candidats_absents') }}">
+                            <a href="{{ route('profilage.candidats_absents') }}" class="menu-link">
+                                <div>Liste des candidats non profilés (<span class="text-danger">absents</span>)</div>
+                            </a>
+                        </li>
+                        <li class="menu-item {{ routeItem('profilage.candidats_refuses') }}">
+                            <a href="{{ route('profilage.candidats_refuses') }}" class="menu-link">
+                                <div>Liste des candidats non profilés / profilés reversés au BARM</div>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
 
