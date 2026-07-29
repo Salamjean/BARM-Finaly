@@ -55,12 +55,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3 col-md-12" id="list" style="display: none;">
-                        <label class="form-label" for="adherents_id">Participants</label>
+                    <div class="mb-3 col-md-12" id="list" style="display: block;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0" for="adherents_id">Participants</label>
+                            <button type="button" id="btnToggleSelectAll" class="btn btn-sm btn-outline-primary">
+                                Tout désélectionner
+                            </button>
+                        </div>
                         <select id="adherents_id" name="adherents_id[]" class="select2 form-select" multiple>
-                            <option value="" disabled>Selectionnez</option>
                             @foreach ($adherents as $adherent)
-                                <option value="{{ $adherent->id }}" class="text-capitalize">
+                                <option value="{{ $adherent->id }}" selected class="text-capitalize">
                                     {{ $adherent->user->fullName() }}
                                 </option>
                             @endforeach
@@ -90,12 +94,40 @@
     @push('js-push')
         <script>
             $(document).ready(function() {
+                function updateSelectAllButtonState() {
+                    var total = $('#adherents_id option').length;
+                    var selectedCount = $('#adherents_id option:selected').length;
+                    if (total > 0 && total === selectedCount) {
+                        $('#btnToggleSelectAll').text('Tout désélectionner').removeClass('btn-outline-success').addClass('btn-outline-primary');
+                    } else {
+                        $('#btnToggleSelectAll').text('Tout sélectionner').removeClass('btn-outline-primary').addClass('btn-outline-success');
+                    }
+                }
 
-                $('input[type=radio]').click(function() {
-                    if (this.value != 'all')
-                        $('#list').css('display', 'block');
-                    else
-                        $('#list').css('display', 'none');
+                $('input[name="participation"]').change(function() {
+                    if (this.value === 'all') {
+                        $('#adherents_id option').prop('selected', true);
+                    } else {
+                        $('#adherents_id option').prop('selected', false);
+                    }
+                    $('#adherents_id').trigger('change');
+                    updateSelectAllButtonState();
+                });
+
+                $('#btnToggleSelectAll').click(function() {
+                    var total = $('#adherents_id option').length;
+                    var selectedCount = $('#adherents_id option:selected').length;
+                    if (selectedCount === total) {
+                        $('#adherents_id option').prop('selected', false);
+                    } else {
+                        $('#adherents_id option').prop('selected', true);
+                    }
+                    $('#adherents_id').trigger('change');
+                    updateSelectAllButtonState();
+                });
+
+                $('#adherents_id').on('change', function() {
+                    updateSelectAllButtonState();
                 });
             });
         </script>

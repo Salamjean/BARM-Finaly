@@ -64,11 +64,14 @@ class TrainingController extends Controller
         $attrs['partner_technicial_id'] = $partner->id;
 
         
-        if ($request->participation != 'all')
-            foreach ($request->adherents_id as $idA)
+        if ($request->has('adherents_id') && is_array($request->adherents_id) && count($request->adherents_id) > 0) {
+            $adherents = [];
+            foreach ($request->adherents_id as $idA) {
                 $adherents[] = Candidature::findOrFail($idA);
-        else
+            }
+        } else {
             $adherents = Candidature::where('cohort_id', $cohort->id)->where('partner_technical_id', $partner->id)->where('resignation', '0')->get();
+        }
         if (count($adherents) == 0)
             return back()->with('warning', 'Plus de participant disponible');
         $training = Training::create($attrs);
@@ -85,7 +88,6 @@ class TrainingController extends Controller
 
     public function show(int $id)
     {
-
         $partner = $this->partner();
         $training = Training::findOrFail($id);
         $adherents = Candidature::where('cohort_id', $training->cohort->id)
@@ -99,37 +101,44 @@ class TrainingController extends Controller
         ]);
     }
 
+    public function edit(int $id)
+    {
+        $training = Training::findOrFail($id);
+        $adherents = Candidature::where('cohort_id', $training->cohort->id)
+            ->where('partner_technical_id', $this->partner()->id)
+            ->where('resignation', '0')
+            ->get();
+        return view('dashboard.cohort.partner.training.edit', [
+            'training' => $training,
+            'adherents' => $adherents,
+        ]);
+    }
+
     public function update(Request $request, int $id)
     {
-        $partner = $this->partner();
         $training = Training::findOrFail($id);
-        $request->validate([
-            'update' => 'in:update,finished'
-        ]);
+        $partner = $this->partner();
 
         if ($training->status == 'finished' || $partner->id != $training->partner_technicial_id)
-            return back()->with('warning', 'Formation déja terminée.');
+            return back();
 
-        if ($request->update === 'update') {
+        if ($request->update == 'update') {
             $attrs = $request->validate([
                 'title' => 'required|string',
                 'description' => 'nullable|string',
                 'beging_date' => 'required|date',
                 'participation' => 'required|in:all,selected',
-                'adherents_id' => 'nullable|array'
+                'adherents_id' => 'nullable|array',
             ]);
 
-            if ($request->participation != 'all' && !isset($attrs['adherents_id']))
-                return back()->with('warning', 'Veuillez renseigner les personnes concernées.');
-            else
-                unset($attrs['adherents_id']);
-            unset($attrs['participation']);
-
-            if ($request->participation != 'all')
-                foreach ($request->adherents_id as $idA)
+            if ($request->has('adherents_id') && is_array($request->adherents_id) && count($request->adherents_id) > 0) {
+                $adherents = [];
+                foreach ($request->adherents_id as $idA) {
                     $adherents[] = Candidature::findOrFail($idA);
-            else
+                }
+            } else {
                 $adherents = Candidature::where('cohort_id', $training->cohort_id)->where('partner_technical_id', $partner->id)->where('data_collect', false)->where('resignation', '0')->get();
+            }
 
             $training->participations()->delete();
 
