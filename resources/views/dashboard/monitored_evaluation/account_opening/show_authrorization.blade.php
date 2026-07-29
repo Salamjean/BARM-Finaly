@@ -220,12 +220,17 @@
                                                 <div class="small mb-2">
                                                     <strong>Date :</strong> {{ dateFr($adherent->selfEmploymentMonitoredPayment->datetime_plug_removal, 'complet') }}
                                                 </div>
-                                                <div class="text-center">
-                                                    <a href="{{ asset($adherent->selfEmploymentMonitoredPayment->file) }}" 
-                                                       download 
-                                                       class="btn btn-outline-danger btn-sm">
-                                                        <i class="bx bx-file-pdf me-1"></i>
-                                                        Fiche d'autorisation
+                                                <div class="text-center d-flex justify-content-center gap-2">
+                                                    <a href="{{ route('monitored-evaluation.account_opening.file', $adherent->id) }}" 
+                                                       target="_blank" 
+                                                       class="btn btn-primary btn-sm"
+                                                       title="Consulter le PDF d'autorisation">
+                                                        <i class="bx bx-show me-1"></i> Voir
+                                                    </a>
+                                                    <a href="{{ route('monitored-evaluation.account_opening.file', ['id' => $adherent->id, 'download' => 1]) }}" 
+                                                       class="btn btn-danger btn-sm"
+                                                       title="Télécharger le PDF d'autorisation">
+                                                        <i class="bx bx-download me-1"></i> Télécharger
                                                     </a>
                                                 </div>
                                             </div>

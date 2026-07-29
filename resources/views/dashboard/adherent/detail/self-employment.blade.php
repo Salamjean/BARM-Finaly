@@ -175,7 +175,7 @@
                 </div>
             @endif
 
-            @if ($user->candidate->favorable_opinion && $user->candidate->selfEmploymentMonitoredPayment)
+            @if ($user->candidate && ($user->candidate->imputation || $user->candidate->selfEmploymentMonitoredPayment || $user->candidate->favorable_opinion))
                 <div class="mb-5">
                     <div class="d-flex align-items-center mb-4 border-bottom pb-3">
                         <i class="bx bx-file-blank text-warning fs-4 me-3"></i>
@@ -183,25 +183,34 @@
                     </div>
 
                     <div class="row g-4">
-                        <div class="col-md-6">
+                        <div class="col-md-7">
                             <div class="border-start border-primary border-3 ps-3 py-2">
-                                <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                     <div>
                                         <div class="text-muted small mb-1">Document d'autorisation</div>
-                                        <h6 class="mb-0">Fiche favorable</h6>
+                                        <h6 class="mb-0 fw-bold text-dark">Fiche favorable</h6>
                                     </div>
-                                    <a href="{{ asset($user->candidate->selfEmploymentMonitoredPayment->file) }}"
-                                        class="btn btn-primary btn-sm" download>
-                                        <i class="bx bx-download"></i>
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('monitored-evaluation.account_opening.file', $user->candidate->id) }}"
+                                            class="btn btn-primary btn-sm px-3 fw-bold text-white" target="_blank" title="Consulter la fiche d'autorisation">
+                                            <i class="bx bx-show me-1 fs-5 align-middle"></i> Voir l'autorisation
+                                        </a>
+                                        <a href="{{ route('monitored-evaluation.account_opening.file', ['id' => $user->candidate->id, 'download' => 1]) }}"
+                                            class="btn btn-danger btn-sm px-3 fw-bold text-white" title="Télécharger la fiche d'autorisation">
+                                            <i class="bx bx-download me-1 fs-5 align-middle"></i> Télécharger
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <div class="border-start border-success border-3 ps-3 py-2">
-                                <div class="text-muted small mb-1">Date d'ouverture</div>
-                                <h6 class="mb-0 text-success">
-                                    {{ dateFr($user->candidate->selfEmploymentMonitoredPayment->created_at) }}
+                                <div class="text-muted small mb-1">Imputation / Chef BARM</div>
+                                <h6 class="mb-0 text-success fw-bold">
+                                    {{ $user->candidate->imputation ?? 'Non renseigné' }}
+                                    @if($user->candidate->chef_barm)
+                                        <br><small class="text-muted">Chef BARM : {{ $user->candidate->chef_barm }}</small>
+                                    @endif
                                 </h6>
                             </div>
                         </div>

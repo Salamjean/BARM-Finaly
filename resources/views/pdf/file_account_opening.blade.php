@@ -132,7 +132,7 @@
     <div class="container">
         <div class="content">
             <div class="contact">
-                Madame la Présidente Directrice Générale du {{ $adherent->partnerFinancial->user->username }}<br>
+                Madame la Présidente Directrice Générale du {{ $adherent->partner_financial_id ? ($adherent->partnerFinancial?->user?->username ?? '') : ($adherent->other_partner_financial ?? '') }}<br>
                 <u>ABIDJAN</u>
             </div>
 
@@ -144,8 +144,8 @@
             <p style="padding:30px 0px;"><strong>Madame,</strong></p>
 
             <p>
-                Je soussigné Colonel AKE-DANHO Stéphane autorise l’ouverture d’un compte bancaire dans vos livres au
-                profit de :
+                Je soussigné {{ $adherent->chef_barm ?? 'Colonel AKE-DANHO Stéphane' }} autorise l’ouverture d’un compte bancaire dans vos livres au
+                profit de :
             </p>
 
             <p>
@@ -163,14 +163,18 @@
 
             <p>
                 A l’issue du profilage ce bénéficiaire est affecté au partenaire technique
-                <strong>{{ $adherent->partnerTechnical->user->username }}</strong> pour la réalisation de son projet.
+                <strong>{{ $adherent->partnerTechnical?->user?->username ?? '' }}</strong> pour la réalisation de son projet.
             </p>
 
             <p>
                 Ce document est établi pour servir et valoir ce que de droit.
             </p>
 
-            <p><u>IMPUTATION</u> : {{ $adherent->imputation }}</p>
+            <p><strong><u>IMPUTATION</u> </strong> : {{ $adherent->imputation }}</p>
+
+            <p style="color: red; font-size: 11px; margin-top: 15px; text-align: justify; line-height: 1.4;">
+                <strong><u>NB :</u> J’autorise le partenaire financier, {{ $adherent->partner_financial_id ? ($adherent->partnerFinancial?->user?->username ?? '……………..') : ($adherent->other_partner_financial ?? '……………..') }}, à communiquer des informations à caractère personnel lié au compte bancaire domiciliant le prêt contracté par le biais du BARM, sous réserve du strict respect des procédures et dispositions légales en vigueur.</strong>
+            </p>
 
             <div class="signature">
                 <p>Fait à Abidjan le {{ date('d-m-Y') }}</p>

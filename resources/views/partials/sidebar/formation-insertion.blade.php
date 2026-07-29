@@ -3,23 +3,6 @@
         can('conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|conseiller-en-reconversion') ||
         can('chef-cellule-formation-et-insertion')
     )
-
-    {{-- PV Comité crédit --}}
-    <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
-        <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
-            <i class='menu-icon tf-icons bx bxs-buildings'></i>
-            <div class="d-flex justify-content-between">
-                <div>PV Comité crédit</div>
-                @if (disbursementPendingCountByUser('pv_credit') > 0)
-                    <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
-                        style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
-                        {{ disbursementPendingCountByUser('pv_credit') }}
-                    </span>
-                @endif
-            </div>
-        </a>
-    </li>
-
     {{-- Adhérent --}}
     <li
         class="menu-item {{ routeActive(['adherent.create', 'adherent.steps', 'adherent.pending', 'adherent.list', 'adherent.resignations', 'adherent.deaths']) }}">
@@ -276,6 +259,23 @@
                             <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
                                 style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
                                 {{ $adherents_commission_pending_count }}
+                            </span>
+                        @endif
+                    </div>
+                </a>
+            </li>
+
+            {{-- PV Comité crédit --}}
+            <li
+                class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
+                <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
+                    <i class='menu-icon tf-icons bx bxs-buildings'></i>
+                    <div class="d-flex justify-content-between">
+                        <div>PV Comité crédit</div>
+                        @if (disbursementPendingCountByUser('pv_credit') > 0)
+                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                                {{ disbursementPendingCountByUser('pv_credit') }}
                             </span>
                         @endif
                     </div>

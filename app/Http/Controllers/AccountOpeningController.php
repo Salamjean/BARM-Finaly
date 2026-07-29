@@ -64,17 +64,14 @@ class AccountOpeningController extends Controller
     }
 
     public function imputation(Request $request){
-        if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi')) {
+        $adherent = Candidature::findOrFail($request->adherent_id);
 
-            $adherent = Candidature::findOrFail($request->adherent_id);
+        $adherent->imputation = $request->imputation;
+        $adherent->chef_barm = $request->chef_barm;
+        $adherent->pensionnaire_cgrae = $request->pensionnaire_cgrae;
+        $adherent->save();
 
-            $adherent->imputation = $request->imputation;
-            $adherent->pensionnaire_cgrae = $request->pensionnaire_cgrae;
-            $adherent->save();
-            
-        }
-
-        return back()->with('success', 'Imputation renseigné avec succès.');
+        return back()->with('success', 'Imputation renseignée avec succès.');
     }
 
     public function plug_removal(int $id)
@@ -206,14 +203,19 @@ class AccountOpeningController extends Controller
         return back()->with('success', 'Traitement effectué avec succès');
     }
 
-    public function file($id)
+    public function file($id, Request $request)
     {
+        ini_set('memory_limit', '256M');
 
         $title = 'Fiche d"autorisation';
         $adherent = Candidature::findOrFail($id);
 
         $pdf = PDF::loadView('pdf.file_account_opening', compact('title', 'adherent'));
         $pdfname = 'fiche_autorisation_' . str_replace(' ', '_', $adherent->user->fullName()) . '.pdf';
+
+        if ($request->has('download')) {
+            return $pdf->download($pdfname);
+        }
 
         return $pdf->stream($pdfname);
     }

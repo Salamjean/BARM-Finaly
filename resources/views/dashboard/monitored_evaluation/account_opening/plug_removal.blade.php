@@ -120,19 +120,30 @@
                                             @if (!$adherent->imputation)
                                                 <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#imputationModal" data-id="{{ $adherent->id }}"
-                                                    title="Ajouter complément">
+                                                    data-imputation="{{ $adherent->imputation }}"
+                                                    data-chef_barm="{{ $adherent->chef_barm }}"
+                                                    data-pensionnaire_cgrae="{{ $adherent->pensionnaire_cgrae }}"
+                                                    title="Renseigner l'imputation">
                                                     <i class="bx bx-plus"></i>
                                                 </button>
                                             @else
-                                                <a href="{{ route('monitored-evaluation.account_opening.file', $adherent->id) }}"
-                                                    target="_blank" class="btn btn-outline-danger btn-sm"
-                                                    title="Voir le PDF">
-                                                    <i class="bx bx-file"></i>
+                                                <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#imputationModal" data-id="{{ $adherent->id }}"
+                                                    data-imputation="{{ $adherent->imputation }}"
+                                                    data-chef_barm="{{ $adherent->chef_barm }}"
+                                                    data-pensionnaire_cgrae="{{ $adherent->pensionnaire_cgrae }}"
+                                                    title="Modifier l'imputation">
+                                                    <i class="bx bx-edit"></i>
+                                                </button>
+                                                <a href="{{ route('monitored-evaluation.account_opening.file', ['id' => $adherent->id, 'download' => 1]) }}"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                    title="Télécharger le PDF d'autorisation">
+                                                    <i class="bx bx-download"></i>
                                                 </a>
                                             @endif
-                                            <a href="{{ route('adherent.show', $adherent->user->id) }}" target="_blank"
+                                            <a href="{{ route('adherent.show', $adherent->user->id) }}"
                                                 class="btn btn-outline-info btn-sm" title="Voir le profil">
-                                                <i class="bx bx-show"></i>
+                                                <i class="bx bx-user"></i>
                                             </a>
                                         </div>
                                     </div>
@@ -194,6 +205,21 @@
                                                     <strong>Montant:</strong> {{ amount($adherent->paAccepted->amount) }}
                                                     {{ DEVICE }}
                                                 </div>
+                                            </div>
+                                        @endif
+
+                                        @if ($adherent->imputation || $adherent->chef_barm)
+                                            <div class="mb-3 p-2 border border-success rounded">
+                                                <div class="d-flex align-items-center mb-1">
+                                                    <i class="bx bx-check-circle text-success me-2"></i>
+                                                    <small class="text-muted fw-bold">Imputation & Chef BARM</small>
+                                                </div>
+                                                @if ($adherent->imputation)
+                                                    <div class="small"><strong>Imputation:</strong> {{ $adherent->imputation }}</div>
+                                                @endif
+                                                @if ($adherent->chef_barm)
+                                                    <div class="small"><strong>Chef BARM:</strong> {{ $adherent->chef_barm }}</div>
+                                                @endif
                                             </div>
                                         @endif
 
@@ -355,6 +381,13 @@
                             <input type="text" class="form-control" id="imputation" name="imputation" required>
                         </div>
                         <div class="mb-3">
+                            <label for="chef_barm" class="form-label">
+                                <i class="bx bx-user me-1"></i>
+                                Nom du Chef BARM
+                            </label>
+                            <input type="text" class="form-control" id="chef_barm" name="chef_barm" placeholder="ex: Colonel AKE-DANHO Stéphane">
+                        </div>
+                        <div class="mb-3">
                             <label for="pensionnaire_cgrae" class="form-label">
                                 <i class="bx bx-user me-1"></i>
                                 Pensionnaire CGREAE <span class="text-danger">*</span>
@@ -386,7 +419,14 @@
                 $('#imputationModal').on('show.bs.modal', function(event) {
                     var button = $(event.relatedTarget);
                     var adherentId = button.data('id');
+                    var imputation = button.data('imputation') || '';
+                    var chefBarm = button.data('chef_barm') || '';
+                    var pensionnaireCgrae = button.data('pensionnaire_cgrae') || 'Non';
+
                     $('#adherentId').val(adherentId);
+                    $('#imputation').val(imputation);
+                    $('#chef_barm').val(chefBarm);
+                    $('#pensionnaire_cgrae').val(pensionnaireCgrae);
                 });
 
                 $('#searchMecano').on('keyup', function() {
