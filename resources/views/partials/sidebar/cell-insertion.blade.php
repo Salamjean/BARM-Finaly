@@ -195,9 +195,7 @@
             </a>
         </li>
 
-        @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
-
-            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress']) }}">
+            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bxs-timer'></i>
                     <div class="d-flex justify-content-between">
@@ -211,14 +209,6 @@
                     </div>
                 </a>
                 <ul class="menu-sub">
-                    @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
-                        <li class="menu-item {{ routeItem('pre_commission.pending') }}">
-                            <a href="{{ route('pre_commission.pending') }}" class="menu-link">
-                                <div>En attente (point focal)</div>
-                            </a>
-                        </li>
-                    @endif
-
                     <li class="menu-item {{ routeItem('pre_commission.in_progress') }}">
                         <a href="{{ route('pre_commission.in_progress') }}" class="menu-link">
                             <div>En attente (commission) </div>
@@ -231,7 +221,6 @@
                     </li>
                 </ul>
             </li>
-        @endif
         <li
             class="menu-item {{ routeActive(['commissions.cohorte', 'commissions.create', 'commissions.index', 'commissions.candidat_commission']) }}">
             <a href="{{ route('commissions.cohorte') }}" class="menu-link">

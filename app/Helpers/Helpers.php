@@ -209,17 +209,21 @@ function statusCandidature(string $status, string $type = 'text')
             case 'in_progress':
                 return 'En cours';
             case 'missing':
-                return 'Abscent';
+                return 'Absent';
             case 'search_financial_partner':
                 return 'En recherche de partenaire financier';
             case 'finish':
-                return 'Terminer';
+                return 'Terminé';
             case 'refused':
-                return 'Refuser';
+                return 'Refusé';
             case 'rejected':
-                return 'Rejeter';
+                return 'Rejeté';
             case 'accepted':
-                return 'Approuver';
+                return 'Approuvé';
+            case 'deferred':
+                return 'Différé';
+            case 'resignation':
+                return 'Abandon';
             default:
                 return $status;
         }
@@ -238,6 +242,10 @@ function statusCandidature(string $status, string $type = 'text')
                 return $style . '#007E3F"';
             case 'in_progress':
                 return $style . '#00457E"';
+            case 'deferred':
+                return $style . '#047A83"';
+            case 'resignation':
+                return $style . '#6c757d"';
             case 'search_financial_partner':
                 return $style . '#047A83"';
             case 'finish':

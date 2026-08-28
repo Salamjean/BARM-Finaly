@@ -746,7 +746,18 @@ class SessioncollectiveController extends Controller
 
     public function never_profiled()
     {
-        $candidatures = Candidature::doesntHave('profilages')->get();
+        $candidatures = Candidature::with(['user', 'cohort', 'partnerTechnical.user'])
+            ->where('orientation', 'auto-emploi')
+            ->whereNotNull('cohort_id')
+            ->whereNotNull('session_id')
+            ->whereNotNull('partner_technical_id')
+            ->where('resignation', '0')
+            ->where('death', '0')
+            ->whereDoesntHave('choiceFinal')
+            ->where('pa', '0')
+            ->orderByDESC('created_at')
+            ->get();
+
         $title = 'Candidats jamais profilés';
         return view('dashboard.profilages.never_profiled', compact('title', 'candidatures'));
     }

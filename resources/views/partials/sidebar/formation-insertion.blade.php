@@ -214,39 +214,37 @@
             </li>
 
             {{-- Plan d'affaire --}}
-            @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
-                <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress']) }}">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class='menu-icon tf-icons bx bxs-timer'></i>
-                        <div class="d-flex justify-content-between">
-                            <div>Plan d'affaire</div>
-                            @if ($focal_point_area_count > 0)
-                                <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
-                                    style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
-                                    {{ $focal_point_area_count }}
-                                </span>
-                            @endif
-                        </div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item {{ routeItem('pre_commission.pending') }}">
-                            <a href="{{ route('pre_commission.pending') }}" class="menu-link">
-                                <div>En attente (point focal)</div>
-                            </a>
-                        </li>
-                        <li class="menu-item {{ routeItem('pre_commission.in_progress') }}">
-                            <a href="{{ route('pre_commission.in_progress') }}" class="menu-link">
-                                <div>En attente (commission) </div>
-                            </a>
-                        </li>
-                        <li class="menu-item {{ routeItem('pre_commission.validated') }}">
-                            <a href="{{ route('pre_commission.validated') }}" class="menu-link">
-                                <div>Validés</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            @endif
+            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated']) }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class='menu-icon tf-icons bx bxs-timer'></i>
+                    <div class="d-flex justify-content-between">
+                        <div>Plan d'affaire</div>
+                        @if ($focal_point_area_count > 0)
+                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                                {{ $focal_point_area_count }}
+                            </span>
+                        @endif
+                    </div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ routeItem('pre_commission.pending') }}">
+                        <a href="{{ route('pre_commission.pending') }}" class="menu-link">
+                            <div>En attente (point focal)</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ routeItem('pre_commission.in_progress') }}">
+                        <a href="{{ route('pre_commission.in_progress') }}" class="menu-link">
+                            <div>En attente (commission) </div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ routeItem('pre_commission.validated') }}">
+                        <a href="{{ route('pre_commission.validated') }}" class="menu-link">
+                            <div>Validés</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
             {{-- Commission d'approbation --}}
             <li

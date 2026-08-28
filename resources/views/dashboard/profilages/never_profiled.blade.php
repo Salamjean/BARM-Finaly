@@ -53,6 +53,10 @@
                                     Cohorte
                                 </th>
                                 <th class="border-0">
+                                    <i class="bx bx-buildings text-primary me-1"></i>
+                                    Partenaire affecté
+                                </th>
+                                <th class="border-0">
                                     <i class="bx bx-phone text-primary me-1"></i>
                                     Téléphone
                                 </th>
@@ -86,8 +90,17 @@
                                     </td>
                                     <td>
                                         <div class="border-start border-warning border-3 ps-2 py-1">
-                                            <div class="fw-bold text-primary">{{ $candidat->cohort->title ?? $candidat->cohort->reference ?? 'Non assigné' }}</div>
+                                            <div class="fw-bold text-primary">{{ $candidat->cohort->title ?? $candidat->cohort->reference ?? $candidat->cohort->name ?? 'Cohorte ' . $candidat->cohort_id }}</div>
                                         </div>
+                                    </td>
+                                    <td>
+                                        @if ($candidat->partnerTechnical && $candidat->partnerTechnical->user)
+                                            <span class="badge bg-label-info fw-bold">
+                                                {{ $candidat->partnerTechnical->user->username }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-label-secondary">Non assigné</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
@@ -100,7 +113,7 @@
                                         @elseif ($candidat->status == 'refused')
                                             <span class="badge bg-danger">Refusé</span>
                                         @else
-                                            <span class="badge bg-warning">En attente</span>
+                                            <span class="badge bg-warning">En attente de profilage</span>
                                         @endif
                                     </td>
                                     <td>

@@ -166,6 +166,7 @@ class CommissionController extends Controller
             ->where('pa_decision', '0')
             ->where('commission_step', '0')
             ->whereNotNull('partner_financial_id')
+            ->whereNotNull('partner_technical_id')
             ->whereNotNull('focal_point_area')
             ->get();
 
@@ -319,41 +320,66 @@ class CommissionController extends Controller
                     'post_monitored' =>  $request->partner_financial === 'other' ? true : false,
                 ]);
 
-                $lastPA->update([
-                    'status' => 'accepted',
-                    'commission_id' => $request->commission_id,
-                    'credit' => $request->amount,
-                    'sentence_reason' => $request->comment ?? 'Acceptation du candidat pendant la commission',
-                    'sentence_at' => now(),
-                    'sentence_by' => auth()->user()->id,
-                ]);
+                if ($lastPA) {
+                    $lastPA->update([
+                        'status' => 'accepted',
+                        'commission_id' => $request->commission_id,
+                        'credit' => $request->amount,
+                        'sentence_reason' => $request->comment ?? 'Acceptation du candidat pendant la commission',
+                        'sentence_at' => now(),
+                        'sentence_by' => auth()->user()->id,
+                    ]);
+                }
             } elseif ($request->decision == 'resignation') {
 
-                $lastPA->update([
-                    'status' => 'resignation',
-                    'commission_id' => $request->commission_id,
-                    'sentence_reason' => $request->comment ?? 'Resignation du candidat pendant la commission',
-                    'sentence_at' => now(),
-                    'sentence_by' => auth()->user()->id,
-                ]);
+                if ($lastPA) {
+                    $lastPA->update([
+                        'status' => 'resignation',
+                        'commission_id' => $request->commission_id,
+                        'sentence_reason' => $request->comment ?? 'Resignation du candidat pendant la commission',
+                        'sentence_at' => now(),
+                        'sentence_by' => auth()->user()->id,
+                    ]);
+                }
 
                 $candidature->update([
                     'resignation' => '1',
                 ]);
             } elseif ($request->decision == 'deferred' || $request->decision == 'refused') {
 
-                $lastPA->update([
-                    'status' => $request->decision,
-                    'commission_id' => $request->commission_id,
-                    'sentence_reason' => $request->comment ?? 'Rejet pendant la commission',
-                    'sentence_at' => now(),
-                    'sentence_by' => auth()->user()->id,
-                ]);
+                if ($lastPA) {
+                    $lastPA->update([
+                        'status' => $request->decision,
+                        'commission_id' => $request->commission_id,
+                        'sentence_reason' => $request->comment ?? 'Rejet pendant la commission',
+                        'sentence_at' => now(),
+                        'sentence_by' => auth()->user()->id,
+                    ]);
+                }
 
                 $candidature->update([
                     'pa' => '0',
                     'commission_step' => '0',
                     'focal_point_area' => null,
+                ]);
+            } elseif ($request->decision == 'missing') {
+
+                if ($lastPA) {
+                    $lastPA->update([
+                        'status' => 'missing',
+                        'commission_id' => $request->commission_id,
+                        'sentence_reason' => $request->comment ?? 'Absence du candidat pendant la commission',
+                        'sentence_at' => now(),
+                        'sentence_by' => auth()->user()->id,
+                    ]);
+                }
+
+                // Lorsqu'un bénéficiaire est marqué Absent, son dossier n'est pas définitivement écarté :
+                // Son Plan d'Affaires reste valide (pa = '1', pa_decision = '0')
+                // et commission_step est remis à '0' pour qu'il soit reprogrammable lors d'une prochaine session
+                $candidature->update([
+                    'commission_step' => '0',
+                    'pa_decision' => '0',
                 ]);
             }
 
