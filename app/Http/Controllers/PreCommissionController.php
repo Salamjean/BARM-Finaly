@@ -86,6 +86,19 @@ class PreCommissionController extends Controller
         ]);
     }
 
+    public function deferred()
+    {
+        $pas = PA::with(['candidature.user', 'candidature.cohort', 'candidature.partnerTechnical.user', 'commission', 'sentenceBy'])
+            ->whereIn('status', ['deferred', 'refused', 'resignation', 'rejected'])
+            ->orderByDESC('updated_at')
+            ->get();
+
+        return view('dashboard.pre_commission.deferred', [
+            'title' => 'Plans d\'affaires différés / rejetés / abandon',
+            'pas' => $pas,
+        ]);
+    }
+
     public function store(Request $request)
     {
 

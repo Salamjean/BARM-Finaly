@@ -97,12 +97,12 @@
                                 <td>{{$activite->observations}}</td>
                                     <td style="font-size:90%">{{ dateFormat($activite->created_at) }}</td>
                                <td>
-                                    @if($activite->status == 'En attente')
-                                        <span class="badge bg-label-primary">{{$activite->status}}</span>
-                                    @elseif ($activite->status == 'En cours')
-                                        <span class="badge bg-label-warning">{{$activite->status}}</span>
+                                    @if($activite->status == 'En attente' || $activite->status == 'launch')
+                                        <span class="badge bg-label-primary">{{ statusBudget($activite->status) }}</span>
+                                    @elseif ($activite->status == 'En cours' || $activite->status == 'negotiation')
+                                        <span class="badge bg-label-warning">{{ statusBudget($activite->status) }}</span>
                                     @else
-                                        <span class="badge bg-label-secondary">{{$activite->status}}</span>
+                                        <span class="badge bg-label-secondary">{{ statusBudget($activite->status) }}</span>
                                     @endif
                                 </td>
                                 <td style="width: 15%">

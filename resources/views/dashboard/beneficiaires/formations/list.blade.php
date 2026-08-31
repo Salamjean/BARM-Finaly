@@ -86,7 +86,7 @@
                                             @endif</td>
                                         <td><span class="badge bg-label-dark me-1">{{ $form->operateur->username }}</span></td>
                                         <td>{{ date('d/m/Y - H:i', strtotime($form->created_at)) }}</td>
-                                        <td><span class="badge bg-label-warning me-1">{{$form->status}}</span></td>
+                                        <td><span class="badge bg-label-warning me-1">{{ status($form->status) }}</span></td>
                                         <td class="text-right">
                                             @if (($form->file_attachment1 ?? null) != null)
                                             <a href="{{ asset('assets/faces/pj/' . $form->file_attachment1) }}" class="btn btn-sm btn-primary btn-rounded" title="Télécharger le plan d'affaire" download="{{ $form->file_attachment1 }}"><i class="fas fa-paperclip"></i></a>

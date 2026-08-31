@@ -155,7 +155,7 @@
             </li>
 
             {{-- Plan d'affaire --}}
-            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress']) }}">
+            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated', 'pre_commission.deferred']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bxs-timer'></i>
                     <div class="d-flex justify-content-between">
@@ -171,6 +171,11 @@
                     <li class="menu-item {{ routeItem('pre_commission.validated') }}">
                         <a href="{{ route('pre_commission.validated') }}" class="menu-link">
                             <div>Validés</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ routeItem('pre_commission.deferred') }}">
+                        <a href="{{ route('pre_commission.deferred') }}" class="menu-link">
+                            <div>Différé / Refusé / Abandon</div>
                         </a>
                     </li>
                 </ul>

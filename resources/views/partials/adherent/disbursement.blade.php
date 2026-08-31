@@ -209,15 +209,15 @@
                                                 </div>
                                                 <div class="media">
                                                     <label>Titre du plan d&apos;affaire</label>
-                                                    <p>{{ $adherent->paAccepted->title }}</p>
+                                                    <p>{{ $adherent->paAccepted?->title ?? '-' }}</p>
                                                 </div>
                                                 <div class="media">
                                                     <label>Montant</label>
-                                                    <p>{{ amount($adherent->paAccepted->amount) . DEVICE }}</p>
+                                                    <p>{{ $adherent->paAccepted ? amount($adherent->paAccepted->amount) . DEVICE : '-' }}</p>
                                                 </div>
                                                 <div class="media">
                                                     <label>Crédit sollicité</label>
-                                                    <p>{{ amount($adherent->paAccepted->credit) . DEVICE }}</p>
+                                                    <p>{{ $adherent->paAccepted ? amount($adherent->paAccepted->credit) . DEVICE : '-' }}</p>
                                                 </div>
                                                 <div class="media">
                                                     <label>Date d&apos;ouverture de compte</label>

@@ -47,41 +47,44 @@
                 <label class="form-check-label" for="collapsible-phone">&bull; Conditions disciplinaires :</label>
                 {{-- {{ dd($submission->condition_disciplinaire) }} --}}
                 @php
-                    $decoded_conditions = $submission->condition_disciplinaire ? json_decode($submission->condition_disciplinaire) : [];
-                    if (!is_array($decoded_conditions)) {
-                        $decoded_conditions = [];
+                    $raw_conditions = $submission->condition_disciplinaire ? json_decode($submission->condition_disciplinaire) : [];
+                    if (is_object($raw_conditions)) {
+                        $raw_conditions = (array) $raw_conditions;
                     }
+                    if (!is_array($raw_conditions)) {
+                        $raw_conditions = [];
+                    }
+                    $decoded_conditions = array_values($raw_conditions);
 
-                    if (count($decoded_conditions) > 0) {
-                        $first_element = $decoded_conditions[0];
-                        $orther_element = [];
+                    $first_element = $decoded_conditions[0] ?? null;
+                    $orther_element = [];
 
-                        foreach ($decoded_conditions as $key => $element) {
-                            if ($key != 0) {
-                                $orther_element[$key - 1] = $element;
-                            }
+                    foreach ($decoded_conditions as $key => $element) {
+                        if ($key != 0) {
+                            $orther_element[] = $element;
                         }
-                    } else {
-                        $first_element = null;
-                        $orther_element = [];
                     }
                 @endphp
 
                 <div class="row me-2">
                     @if ($first_element)
+                        @php
+                            $first_title = is_object($first_element) ? ($first_element->title_decoration ?? '') : (is_array($first_element) ? ($first_element['title_decoration'] ?? '') : '');
+                            $first_date = is_object($first_element) ? ($first_element->date_decoration ?? '') : (is_array($first_element) ? ($first_element['date_decoration'] ?? '') : '');
+                        @endphp
                         <div class="col-md-8">
                             <label for="title_decoration" class="form-label">Intitulé de la décoration
                                 1
                             </label>
                             <input type="text" class="form-control" id="title_decoration"
                                 placeholder="Médaille d'honneur" name="condition_disciplinaire[0][title_decoration]"
-                                value="{{ $first_element->title_decoration }}" />
+                                value="{{ $first_title }}" />
                         </div>
                         <div class="col-md-3">
                             <label for="date_decoration" class="form-label">Date d'obtention 1</label>
                             <input type="date" class="form-control" id="date_decoration"
                                 name="condition_disciplinaire[0][date_decoration]"
-                                value="{{ $first_element->date_decoration }}" />
+                                value="{{ $first_date }}" />
                         </div>
                     @else
                         <div class="col-md-8">
@@ -105,6 +108,10 @@
 
                 <div id="items__enfant">
                     @foreach ($orther_element as $key => $element)
+                        @php
+                            $elem_title = is_object($element) ? ($element->title_decoration ?? '') : (is_array($element) ? ($element['title_decoration'] ?? '') : '');
+                            $elem_date = is_object($element) ? ($element->date_decoration ?? '') : (is_array($element) ? ($element['date_decoration'] ?? '') : '');
+                        @endphp
                         <div class="row me-2">
                             <div class="col-md-8">
                                 <label for="title_decoration" class="form-label">Intitulé de la décoration
@@ -112,13 +119,13 @@
                                 <input type="text" class="form-control" id="title_decoration"
                                     placeholder="Médaille d'honneur"
                                     name="condition_disciplinaire[{{ $key + 1 }}][title_decoration]"
-                                    value="{{ $element->title_decoration }}" required />
+                                    value="{{ $elem_title }}" required />
                             </div>
                             <div class="col-md-3">
                                 <label for="date_decoration" class="form-label">Date d'obtention {{ $key + 1 }}</label>
                                 <input type="date" class="form-control" id="date_decoration"
                                     name="condition_disciplinaire[{{ $key + 1 }}][date_decoration]"
-                                    value="{{ $element->date_decoration }}" />
+                                    value="{{ $elem_date }}" />
                             </div>
                             <div class="col-md-1 mt-4">
                                 <button type="button" class="btn btn-danger remove__item__btn">
@@ -185,8 +192,7 @@
         $(document).ready(function() {
             "use strict";
 
-            var rowIndex =
-                {{ $submission->condition_disciplinaire && is_array(json_decode($submission->condition_disciplinaire)) && count(json_decode($submission->condition_disciplinaire)) > 0 ? count(json_decode($submission->condition_disciplinaire)) : 1 }};
+            var rowIndex = {{ count($decoded_conditions) > 0 ? count($decoded_conditions) : 1 }};
 
             // Add item handler
             $('.add__items__btn').click(function() {

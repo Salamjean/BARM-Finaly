@@ -806,6 +806,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/pending', [PreCommissionController::class, 'pending'])->name('pending');
         Route::get('/in_progress', [PreCommissionController::class, 'in_progress'])->name('in_progress');
         Route::get('/validated', [PreCommissionController::class, 'validated'])->name('validated');
+        Route::get('/deferred', [PreCommissionController::class, 'deferred'])->name('deferred');
         Route::post('/store', [PreCommissionController::class, 'store'])->name('store');
         Route::post('/refuse', [PreCommissionController::class, 'refuse'])->name('refuse');
     });

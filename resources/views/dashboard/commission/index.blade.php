@@ -93,7 +93,9 @@
                                         <div class="d-flex flex-wrap gap-1">
                                             @foreach ($commission->partenaires as $partenaire)
                                                 @if ($commission->partenaires->find($partenaire->id)->pivot->type == 'partner_technique')
+                                                    <span class="badge bg-primary">
                                                         {{ $partenaire->user->username }}
+                                                    </span>
                                                 @endif
                                             @endforeach
                                             @if ($commission->partenaires->where('pivot.type', 'partner_technique')->isEmpty())

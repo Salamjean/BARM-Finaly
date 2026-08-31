@@ -370,12 +370,12 @@
                     @foreach ($user->candidate->participations as $key => $participation)
                         <ul class="info-list">
                             <li><strong>Formation {{ $key + 1 }}</strong></li>
-                            <li><strong>Titre:</strong> {{ $participation->training->title }}</li>
-                            <li><strong>Description:</strong> {{ $participation->training->description ?? 'N/A' }}</li>
-                            <li><strong>Date de Début:</strong> {{ dateFr($participation->training->beging_date) }}
+                            <li><strong>Titre:</strong> {{ $participation->training?->title ?? 'N/A' }}</li>
+                            <li><strong>Description:</strong> {{ $participation->training?->description ?? 'N/A' }}</li>
+                            <li><strong>Date de Début:</strong> {{ $participation->training?->beging_date ? dateFr($participation->training->beging_date) : 'N/A' }}
                             </li>
-                            <li><strong>Date de Fin:</strong> {{ dateFr($participation->training->end_date) }}</li>
-                            <li><strong>Observation:</strong> {{ $participation->training->observation ?? 'N/A' }}</li>
+                            <li><strong>Date de Fin:</strong> {{ $participation->training?->end_date ? dateFr($participation->training->end_date) : 'N/A' }}</li>
+                            <li><strong>Observation:</strong> {{ $participation->training?->observation ?? 'N/A' }}</li>
                             <li>
                                 <span class="{{ $participation->participation ? 'text-success' : 'text-danger' }}">
                                     Adhérent {{ $participation->participation ? 'présent' : 'absent' }} à la formation
@@ -480,8 +480,8 @@
                             <li><strong>Date :</strong>
                                 {{ $candidatentreprise->date_mise_disposition ? dateFr($candidatentreprise->date_mise_disposition, 'letter') : 'N/A' }}
                             </li>
-                            <li><strong>Status :</strong> <span
-                                    style="color: {{ $candidatentreprise->statut === 'accepted' ? 'green' : ($candidatentreprise->statut === 'refused' ? 'red' : 'aqua') }};">{{ ucfirst($candidatentreprise->statut ?? 'N/A') }}</span>
+                            <li><strong>Statut :</strong> <span
+                                    style="color: {{ $candidatentreprise->statut === 'accepted' ? 'green' : ($candidatentreprise->statut === 'refused' ? 'red' : 'aqua') }};">{{ $candidatentreprise->statut === 'accepted' ? 'Accepté' : ($candidatentreprise->statut === 'refused' ? 'Refusé' : ($candidatentreprise->statut === 'pending' ? 'En attente' : ucfirst($candidatentreprise->statut ?? 'N/A'))) }}</span>
                             </li>
                             <li><strong>Type de Contrat :</strong> {{ $candidatentreprise->type_contrat ?? 'N/A' }}
                             </li>
@@ -614,7 +614,7 @@
                                     N/A
                                 @endif
                             </li>
-                            <li><strong>Status :</strong> <span
+                            <li><strong>Statut :</strong> <span
                                     style="color: {{ $concour->status == '1' ? 'green' : 'red' }};">{{ $concour->status == '1' ? 'Accepté' : 'Refusé' }}</span>
                             </li>
                         </ul>

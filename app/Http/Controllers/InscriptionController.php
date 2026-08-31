@@ -815,10 +815,20 @@ class InscriptionController extends Controller
             $can->condition_financiere = json_encode($request->condition_financiere);
             // dd($request->condition_disciplinaire);
 
-            if ($attrs['condition_disciplinaire'][0]['title_decoration'])
-                $can->condition_disciplinaire = $request->condition_disciplinaire ? json_encode($request->condition_disciplinaire) : null;
-            else
+            $hasDecoration = false;
+            if (!empty($attrs['condition_disciplinaire']) && is_array($attrs['condition_disciplinaire'])) {
+                $filtered_decorations = array_values(array_filter($attrs['condition_disciplinaire'], function ($item) {
+                    return !empty($item['title_decoration']);
+                }));
+                if (!empty($filtered_decorations)) {
+                    $hasDecoration = true;
+                    $can->condition_disciplinaire = json_encode($filtered_decorations);
+                }
+            }
+
+            if (!$hasDecoration) {
                 $can->condition_disciplinaire = null;
+            }
 
 
             if ($can->step != 'pending' && $can->step != 'completed' && $can->step < 6)

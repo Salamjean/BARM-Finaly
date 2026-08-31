@@ -12,7 +12,7 @@
                     <h5 class="card-header">DETAILS D'UNE ACTIVITE
                         <div class="mb-0 text-end">
                             <span class="badge bg-label-secondary">
-                                <small>{{$activities->status}} - {{ dateFormat($activities->updated_at) }}</small>
+                                <small>{{ statusBudget($activities->status) }} - {{ dateFormat($activities->updated_at) }}</small>
                             </span>
                         </div>
                     </h5>

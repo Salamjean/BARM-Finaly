@@ -137,7 +137,7 @@
                                         <div class="d-flex align-items-center">
                                             <i
                                                 class="bx {{ $participation->participation ? 'bx-check-circle text-success' : 'bx-x-circle text-danger' }} fs-5 me-2"></i>
-                                            <h5 class="mb-0">{{ $participation->training->title }}</h5>
+                                            <h5 class="mb-0">{{ $participation->training?->title ?? '' }}</h5>
                                         </div>
                                         <span
                                             class="badge {{ $participation->participation ? 'bg-success' : 'bg-danger' }}">
@@ -149,19 +149,19 @@
                                         <div class="col-md-4">
                                             <div class="small text-muted mb-1">Description</div>
                                             <p class="mb-0">
-                                                {{ $participation->training->description ?? 'Non spécifiée' }}</p>
+                                                {{ $participation->training?->description ?? ' ' }}</p>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="small text-muted mb-1">Période de formation</div>
                                             <div>
                                                 <div><strong>Du:</strong>
-                                                    {{ dateFr($participation->training->beging_date) }}</div>
+                                                    {{ $participation->training?->beging_date ? dateFr($participation->training->beging_date) : '-' }}</div>
                                                 <div><strong>Au:</strong>
-                                                    {{ dateFr($participation->training->end_date) }}</div>
+                                                    {{ $participation->training?->end_date ? dateFr($participation->training->end_date) : '-' }}</div>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
-                                            @if ($participation->training->observation)
+                                            @if ($participation->training?->observation)
                                                 <div class="small text-muted mb-1">Observation</div>
                                                 <div class="text-info">{{ $participation->training->observation }}
                                                 </div>

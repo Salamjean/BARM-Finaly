@@ -214,7 +214,7 @@
             </li>
 
             {{-- Plan d'affaire --}}
-            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated']) }}">
+            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated', 'pre_commission.deferred']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bxs-timer'></i>
                     <div class="d-flex justify-content-between">
@@ -243,6 +243,13 @@
                             <div>Validés</div>
                         </a>
                     </li>
+                    @if (auth()->user() && (str_contains(strtoupper(auth()->user()->username ?? ''), 'FESTOS') || str_contains(strtoupper(auth()->user()->lastname ?? ''), 'FESTOS') || auth()->user()->email === 'festosmonnet@gmail.com' || str_contains(strtoupper(auth()->user()->username ?? ''), 'KOUASSI') || str_contains(strtoupper(auth()->user()->lastname ?? ''), 'N’GUESSAN') || str_contains(strtoupper(auth()->user()->lastname ?? ''), "N'GUESSAN") || auth()->user()->email === 'coyssy.yssan@gmail.com' || can('point-focal') || (auth()->user()->roles && auth()->user()->roles->first() && auth()->user()->roles->first()->slug === 'admin')))
+                        <li class="menu-item {{ routeItem('pre_commission.deferred') }}">
+                            <a href="{{ route('pre_commission.deferred') }}" class="menu-link">
+                                <div>Différé / Refusé / Abandon</div>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
 

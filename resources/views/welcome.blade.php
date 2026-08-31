@@ -1543,7 +1543,7 @@
 											<th>Customer</th>
 											<th>Date</th>
 											<th>Price</th>
-											<th>Status</th>
+											<th>Statut</th>
 											<th>Action</th>
 										</tr>
 									</thead>

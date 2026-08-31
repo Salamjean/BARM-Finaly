@@ -44,12 +44,10 @@ class CommissionController extends Controller
         }
 
         if (Auth::user()->roles->first()->name == 'PARTNER') {
-            foreach ($commission_partenaires as $commission_partenaire) {
-                if ($commission_partenaire->pivot->type == 'partner_technique') {
-                    $candidatures = $commission->candidatures()->where('partner_technical_id', Auth::user()->partenaire->id)->get();
-                } elseif ($commission_partenaire->pivot->type == 'partner_financial') {
-                    $candidatures = $candidatures = $commission->candidatures()->get();
-                }
+            if (in_array('partner-technical', userPermissions(Auth::user()))) {
+                $candidatures = $commission->candidatures()->where('partner_technical_id', Auth::user()->partenaire->id)->get();
+            } else {
+                $candidatures = $commission->candidatures()->get();
             }
         } elseif (can('point-focal')) {
             $candidatures = $commission->candidatures()->where('focal_point_area', Auth::user()->personnel->ville_barm)->get();
@@ -203,10 +201,8 @@ class CommissionController extends Controller
             $candidatures_array = explode(",", $request->candidatures);
 
             $cohort = Cohort::findOrFail($request->cohort_id);
-            $partner = Partenaire::findOrFail($request->technicale_partenaires[0]);
             $candidatures_count = Candidature::whereIn('id', $candidatures_array)
                 ->where('cohort_id', $cohort->id)
-                ->where('partner_technical_id', $partner->id)
                 ->count();
 
             if ($candidatures_count != count($candidatures_array))
@@ -219,7 +215,14 @@ class CommissionController extends Controller
                 'number' => $request->number,
             ]);
 
-            $technicale_partenaires = $request->technicale_partenaires;
+            // Récupérer tous les partenaires techniques sélectionnés et ceux des candidats
+            $candidate_partner_ids = Candidature::whereIn('id', $candidatures_array)
+                ->pluck('partner_technical_id')
+                ->filter()
+                ->unique()
+                ->toArray();
+
+            $technicale_partenaires = array_values(array_unique(array_merge($request->technicale_partenaires, $candidate_partner_ids)));
             $commission->partenaires()->attach($technicale_partenaires, [
                 'type' => 'partner_technique',
             ]);
@@ -247,7 +250,6 @@ class CommissionController extends Controller
 
             Candidature::whereIn('id', $candidatures_array)
                 ->where('cohort_id', $cohort->id)
-                ->where('partner_technical_id', $partner->id)
                 ->update([
                     'commission_step' => true,
                 ]);

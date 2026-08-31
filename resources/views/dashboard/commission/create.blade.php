@@ -78,11 +78,15 @@
                             </div>
 
                             <div class="col-md-12 mb-3">
-                                <label class="form-label">Partenaire Technique concerné : <span class="text-danger">*</span></label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label mb-0">Partenaires Techniques concernés : <span class="text-danger">*</span></label>
+                                    <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" id="selectAllPartnersBtn">
+                                        <i class="bx bx-check-double me-1"></i>Sélectionner tous les partenaires
+                                    </button>
+                                </div>
                                 <select class="form-select select2" id="technical_partner_select" 
-                                    data-placeholder="Choisir le partenaire technique"
-                                    name="technicale_partenaires[]" required>
-                                    <option value="">-- Sélectionner un partenaire technique --</option>
+                                    data-placeholder="Choisir un ou plusieurs partenaires techniques (ANADER, AGEFOP, INIE, PFS-CI...)"
+                                    name="technicale_partenaires[]" multiple required>
                                     @foreach ($technicale_partenaires as $user_technicale)
                                         @if($user_technicale->partenaire)
                                             <option value="{{ $user_technicale->partenaire->id }}">
@@ -93,7 +97,7 @@
                                 </select>
                                 <div class="form-text">
                                     <i class="bx bx-info-circle me-1"></i>
-                                    La sélection du partenaire technique filtre automatiquement les candidats éligibles ci-dessous.
+                                    Vous pouvez associer plusieurs partenaires techniques (ANADER, AGEFOP, INIE, PFS-CI...). L'ensemble des candidats choisis sera validé au sein de la même commission.
                                 </div>
                                 @error('technicale_partenaires')
                                     <span class="invalid-feedback d-block"><strong>{{ $message }}</strong></span>
@@ -103,9 +107,11 @@
                             <!-- Section Candidats -->
                             <div class="col-md-12 mb-3">
                                 <input type="hidden" name="candidatures" id="selectedCandidatesInput">
-                                <button type="button" class="btn btn-outline-secondary w-100" id="openCandidateModalBtn" data-bs-toggle="modal"
+                                <button type="button" class="btn btn-outline-primary w-100 py-2 d-flex justify-content-center align-items-center gap-2" id="openCandidateModalBtn" data-bs-toggle="modal"
                                     data-bs-target="#candidateModal">
-                                    Choisir des candidats
+                                    <i class="bx bx-user-plus fs-5"></i>
+                                    <span id="btnModalText">Choisir des candidats</span>
+                                    <span class="badge bg-primary text-white ms-2" id="selectedCountBadge" style="display: none;">0 sélectionné(s)</span>
                                 </button>
                                 @error('candidatures')
                                     <span class="invalid-feedback d-block"><strong>{{ $message }}</strong></span>
@@ -125,25 +131,35 @@
                                                 aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="mb-3">
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="bx bx-search"></i></span>
-                                                    <input type="text" id="candidateSearch" class="form-control"
-                                                        placeholder="Rechercher par nom, prénom ou mécano...">
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-md-7">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="bx bx-search"></i></span>
+                                                        <input type="text" id="candidateSearch" class="form-control"
+                                                            placeholder="Rechercher par nom, prénom ou mécano...">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="bx bx-buildings"></i></span>
+                                                        <select id="modalPartnerFilter" class="form-select">
+                                                            <option value="all">Tous les partenaires</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="d-flex justify-content-between align-items-center mb-2 px-1">
                                                 <span class="text-muted small" id="eligibleCountInfo">0 candidat(s) éligible(s)</span>
                                                 <div>
-                                                    <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 me-3" id="selectAllBtn">Tout cocher</button>
-                                                    <button type="button" class="btn btn-sm btn-link text-decoration-none text-danger p-0" id="unselectAllBtn">Tout décocher</button>
+                                                    <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 me-3" id="selectAllBtn">Tout cocher visibles</button>
+                                                    <button type="button" class="btn btn-sm btn-link text-decoration-none text-danger p-0" id="unselectAllBtn">Tout décocher visibles</button>
                                                 </div>
                                             </div>
                                             <div class="list-group" id="candidateList" style="max-height: 380px; overflow-y: auto;"></div>
                                         </div>
                                         <div class="modal-footer bg-light">
                                             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                                                <i class="bx bx-check me-1"></i> Valider la sélection
+                                                <i class="bx bx-check me-1"></i> Valider la sélection (<span id="modalFooterCount">0</span>)
                                             </button>
                                         </div>
                                     </div>
@@ -180,15 +196,62 @@
                 const selectedCandidates = new Set();
                 const candidateData = @json($candidats);
 
+                // Fonction pour déterminer le style de badge selon le partenaire
+                function getPartnerBadge(partnerName) {
+                    const name = (partnerName || '').toUpperCase();
+                    if (name.includes('ANADER')) {
+                        return '<span class="badge bg-success text-white"><i class="bx bx-buildings me-1"></i>' + partnerName + '</span>';
+                    } else if (name.includes('AGEFOP')) {
+                        return '<span class="badge bg-primary text-white"><i class="bx bx-buildings me-1"></i>' + partnerName + '</span>';
+                    } else if (name.includes('INIE')) {
+                        return '<span class="badge bg-warning text-dark"><i class="bx bx-buildings me-1"></i>' + partnerName + '</span>';
+                    } else if (name.includes('PFS')) {
+                        return '<span class="badge bg-info text-white"><i class="bx bx-buildings me-1"></i>' + partnerName + '</span>';
+                    }
+                    return '<span class="badge bg-secondary text-white"><i class="bx bx-buildings me-1"></i>' + partnerName + '</span>';
+                }
+
+                function getSelectedPartnerIds() {
+                    const vals = $('#technical_partner_select').val() || [];
+                    return vals.map(function(id) { return parseInt(id); });
+                }
+
+                function updateModalPartnerFilterOptions() {
+                    const selectedPartnerIds = getSelectedPartnerIds();
+                    const filterSelect = $('#modalPartnerFilter');
+                    const previousVal = filterSelect.val();
+
+                    filterSelect.find('option:not([value="all"])').remove();
+
+                    $('#technical_partner_select option:selected').each(function() {
+                        const partnerId = $(this).val();
+                        const partnerName = $(this).text().trim();
+                        filterSelect.append(`<option value="${partnerId}">${partnerName}</option>`);
+                    });
+
+                    if (selectedPartnerIds.includes(parseInt(previousVal))) {
+                        filterSelect.val(previousVal);
+                    } else {
+                        filterSelect.val('all');
+                    }
+                }
+
                 function getFilteredCandidates() {
-                    const selectedPartnerId = $('#technical_partner_select').val();
-                    if (!selectedPartnerId) {
+                    const selectedPartnerIds = getSelectedPartnerIds();
+                    if (selectedPartnerIds.length === 0) {
                         return [];
                     }
 
                     let filtered = candidateData.filter(function(candidate) {
-                        return candidate.partner_technical_id === parseInt(selectedPartnerId);
+                        return selectedPartnerIds.includes(candidate.partner_technical_id);
                     });
+
+                    const partnerFilter = $('#modalPartnerFilter').val();
+                    if (partnerFilter && partnerFilter !== 'all') {
+                        filtered = filtered.filter(function(candidate) {
+                            return candidate.partner_technical_id === parseInt(partnerFilter);
+                        });
+                    }
 
                     const searchTerm = $('#candidateSearch').val().toLowerCase().trim();
                     if (searchTerm) {
@@ -205,28 +268,28 @@
                 }
 
                 function renderCandidateList() {
-                    const selectedPartnerId = $('#technical_partner_select').val();
+                    const selectedPartnerIds = getSelectedPartnerIds();
                     candidateList.empty();
 
-                    if (!selectedPartnerId) {
+                    if (selectedPartnerIds.length === 0) {
                         $('#eligibleCountInfo').text('Aucun partenaire sélectionné');
                         candidateList.append(`
                             <div class="text-center p-4 text-muted">
                                 <i class="bx bx-info-circle fs-2 text-secondary mb-2"></i>
-                                <div>Veuillez sélectionner un <strong>Partenaire Technique</strong> dans le formulaire avant de choisir des candidats.</div>
+                                <div>Veuillez sélectionner au moins un <strong>Partenaire Technique</strong> (ex: ANADER, AGEFOP, INIE, PFS-CI) dans le formulaire avant de choisir des candidats.</div>
                             </div>
                         `);
                         return;
                     }
 
                     const candidates = getFilteredCandidates();
-                    $('#eligibleCountInfo').text(`${candidates.length} candidat(s) éligible(s)`);
+                    $('#eligibleCountInfo').text(`${candidates.length} candidat(s) affiché(s)`);
 
                     if (candidates.length === 0) {
                         candidateList.append(`
                             <div class="text-center p-4 text-muted">
                                 <i class="bx bx-user-x fs-2 text-warning mb-2"></i>
-                                <div>Aucun candidat éligible trouvé pour ce partenaire technique avec les critères requis.</div>
+                                <div>Aucun candidat éligible trouvé pour les critères sélectionnés.</div>
                             </div>
                         `);
                         return;
@@ -241,6 +304,7 @@
                         const firstname = (candidate.user && candidate.user.firstname) ? candidate.user.firstname : '';
                         const lastname = (candidate.user && candidate.user.lastname) ? candidate.user.lastname : '';
                         const focalPoint = candidate.focal_point_area ? candidate.focal_point_area : 'N/A';
+                        const badgeHtml = getPartnerBadge(partnerName);
 
                         candidateList.append(`
                             <label class="list-group-item list-group-item-action d-flex align-items-center py-2 px-3">
@@ -250,10 +314,12 @@
                                         <strong class="text-dark">${firstname} ${lastname}</strong>
                                         <span class="badge bg-label-info">${mecano}</span>
                                     </div>
-                                    <small class="text-muted d-block mt-1">
-                                        <i class="bx bx-buildings me-1"></i>${partnerName} &nbsp;|&nbsp; 
-                                        <i class="bx bx-map-pin me-1"></i>Point Focal : ${focalPoint}
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
+                                        ${badgeHtml}
+                                        <small class="text-muted">
+                                            <i class="bx bx-map-pin me-1"></i>Point Focal : ${focalPoint}
+                                        </small>
+                                    </div>
                                 </div>
                             </label>
                         `);
@@ -261,16 +327,50 @@
                 }
 
                 function updateSelectedUI() {
+                    const count = selectedCandidates.size;
                     $('#selectedCandidatesInput').val(Array.from(selectedCandidates).join(','));
+                    $('#modalFooterCount').text(count);
+
+                    if (count > 0) {
+                        $('#selectedCountBadge').text(`${count} sélectionné(s)`).show();
+                        $('#btnModalText').text('Modifier la sélection des candidats');
+                    } else {
+                        $('#selectedCountBadge').hide();
+                        $('#btnModalText').text('Choisir des candidats');
+                    }
                 }
 
-                // Événement lors du changement de Partenaire Technique
-                $('#technical_partner_select').on('change select2:select', function() {
-                    // Réinitialiser la sélection car tous les candidats d'une commission doivent appartenir au même partenaire
-                    selectedCandidates.clear();
-                    $('#candidateSearch').val('');
+                // Bouton sélectionner tous les partenaires
+                $('#selectAllPartnersBtn').on('click', function() {
+                    const allVals = [];
+                    $('#technical_partner_select option').each(function() {
+                        if ($(this).val()) {
+                            allVals.push($(this).val());
+                        }
+                    });
+                    $('#technical_partner_select').val(allVals).trigger('change');
+                });
+
+                // Événement lors du changement de Partenaires Techniques
+                $('#technical_partner_select').on('change select2:select select2:unselect', function() {
+                    const selectedPartnerIds = getSelectedPartnerIds();
+
+                    // Nettoyer uniquement les candidats dont le partenaire n'est plus sélectionné
+                    selectedCandidates.forEach(function(cId) {
+                        const candidate = candidateData.find(function(c) { return String(c.id) === String(cId); });
+                        if (candidate && !selectedPartnerIds.includes(candidate.partner_technical_id)) {
+                            selectedCandidates.delete(cId);
+                        }
+                    });
+
+                    updateModalPartnerFilterOptions();
                     renderCandidateList();
                     updateSelectedUI();
+                });
+
+                // Filtre par partenaire dans la modale
+                $('#modalPartnerFilter').on('change', function() {
+                    renderCandidateList();
                 });
 
                 // Événement case à cocher pour un candidat
@@ -284,7 +384,7 @@
                     updateSelectedUI();
                 });
 
-                // Tout cocher dans la liste filtrée
+                // Tout cocher dans la vue actuelle
                 $('#selectAllBtn').on('click', function() {
                     const candidates = getFilteredCandidates();
                     candidates.forEach(function(c) {
@@ -294,9 +394,12 @@
                     updateSelectedUI();
                 });
 
-                // Tout décocher
+                // Tout décocher dans la vue actuelle
                 $('#unselectAllBtn').on('click', function() {
-                    selectedCandidates.clear();
+                    const candidates = getFilteredCandidates();
+                    candidates.forEach(function(c) {
+                        selectedCandidates.delete(String(c.id));
+                    });
                     renderCandidateList();
                     updateSelectedUI();
                 });
@@ -316,7 +419,8 @@
                     }
                 });
 
-                // Premier rendu à l'ouverture
+                // Initialisation au chargement
+                updateModalPartnerFilterOptions();
                 renderCandidateList();
                 updateSelectedUI();
             });

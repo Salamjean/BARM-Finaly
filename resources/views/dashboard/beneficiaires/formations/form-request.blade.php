@@ -49,13 +49,13 @@
                                         <td><span class="badge bg-label-dark me-1">{{ $item->operateur->username }}</span></td>
                                         <td>{{ date('d/m/Y - H:i', strtotime($item->created_at)) }}</td>
                                         <td>
-                                            @if ($item->status == 'En cours' || $item->status == 'Suspendue')
-                                                <span class="badge bg-label-warning me-1">{{$item->status}}</span>
-                                                @elseif ($item->status == 'Archivé')
-                                                <span class="badge bg-label-dark me-1">{{$item->status}}</span>
-                                                @else
-                                                <span class="badge bg-label-success me-1">{{$item->status}}</span>
-                                            @endif
+                                             @if ($item->status == 'En cours' || $item->status == 'Suspendue' || $item->status == 'pending')
+                                                 <span class="badge bg-label-warning me-1">{{ status($item->status) }}</span>
+                                                 @elseif ($item->status == 'Archivé' || $item->status == 'disable')
+                                                 <span class="badge bg-label-dark me-1">{{ status($item->status) }}</span>
+                                                 @else
+                                                 <span class="badge bg-label-success me-1">{{ status($item->status) }}</span>
+                                             @endif
                                         </td>
                                         <td>
                                             @if ($item->Approbation_PA == NULL)
