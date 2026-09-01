@@ -92,9 +92,9 @@
                                     <td>
                                         <div class="d-flex flex-wrap gap-1">
                                             @foreach ($commission->partenaires as $partenaire)
-                                                @if ($commission->partenaires->find($partenaire->id)->pivot->type == 'partner_technique')
+                                                @if ($partenaire->pivot && $partenaire->pivot->type == 'partner_technique')
                                                     <span class="badge bg-primary">
-                                                        {{ $partenaire->user->username }}
+                                                        {{ $partenaire->user ? $partenaire->user->username : 'N/A' }}
                                                     </span>
                                                 @endif
                                             @endforeach
@@ -106,9 +106,9 @@
                                     <td>
                                         <div class="d-flex flex-wrap gap-1">
                                             @foreach ($commission->partenaires as $partenaire)
-                                                @if ($commission->partenaires->find($partenaire->id)->pivot->type == 'partner_financial')
+                                                @if ($partenaire->pivot && $partenaire->pivot->type == 'partner_financial')
                                                     <span class="badge bg-success">
-                                                        {{ $partenaire->user->username }}
+                                                        {{ $partenaire->user ? $partenaire->user->username : 'N/A' }}
                                                     </span>
                                                 @endif
                                             @endforeach

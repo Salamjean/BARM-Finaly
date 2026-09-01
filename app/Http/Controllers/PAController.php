@@ -22,13 +22,25 @@ class PAController extends Controller
     public function list_pending()
     {
         $partner = $this->partner('partner-technical');
+        if (!$partner) {
+            return back()->with('error', 'Partenaire non trouvé');
+        }
 
-        $adherents = Candidature::where('pa', false)->where('data_collect', true)->where('partner_technical_id', $partner->id)->whereDoesntHave('pas')->get();
+        $adherents = Candidature::where('pa', false)
+            ->where('data_collect', true)
+            ->where(function ($q) use ($partner) {
+                $q->where('partner_technical_id', $partner->id)
+                  ->orWhereHas('partenaires', function ($p) use ($partner) {
+                      $p->where('partenaire_id', $partner->id);
+                  });
+            })
+            ->whereDoesntHave('pas')
+            ->get();
 
         $partners = Partenaire::all();
         $partner_financials = [];
         foreach ($partners as $key => $partner_fin) {
-            if (in_array('partner-financial', userPermissions($partner_fin->user)))
+            if ($partner_fin->user && in_array('partner-financial', userPermissions($partner_fin->user)))
                 (array)$partner_financials[] = $partner_fin;
         }
 
@@ -111,10 +123,17 @@ class PAController extends Controller
     public function cohorts()
     {
         $partner = $this->partner();
+        if (!$partner) {
+            return back()->with('error', 'Partenaire non trouvé');
+        }
 
-        $partner = auth()->user()->partenaire;
         $cohorts = Cohort::whereHas('adhrents', function ($query) use ($partner) {
-            $query->where('partner_technical_id', $partner->id)->where('pa', true);
+            $query->where(function ($q) use ($partner) {
+                $q->where('partner_technical_id', $partner->id)
+                  ->orWhereHas('partenaires', function ($p) use ($partner) {
+                      $p->where('partenaire_id', $partner->id);
+                  });
+            })->where('pa', true);
         })->get();
 
         return view('dashboard.cohort.partner.pa.cohorts', ['cohorts' => $cohorts]);
@@ -123,15 +142,25 @@ class PAController extends Controller
     public function cohort(int $id)
     {
         $partner = $this->partner();
-        $cohort = Cohort::findOrFail($id);
-        $adherents = Candidature::where('partner_technical_id', $partner->id)->where('cohort_id', $cohort->id)->where('pa', true)->get();
+        if (!$partner) {
+            return back()->with('error', 'Partenaire non trouvé');
+        }
 
+        $cohort = Cohort::findOrFail($id);
+        $adherents = Candidature::where(function ($q) use ($partner) {
+            $q->where('partner_technical_id', $partner->id)
+              ->orWhereHas('partenaires', function ($p) use ($partner) {
+                  $p->where('partenaire_id', $partner->id);
+              });
+        })->where('cohort_id', $cohort->id)->where('pa', true)->get();
+
+        $pa = null;
         foreach ($adherents as $adherent) {
-            $adherent->pa_status = in_array('in_progress', $adherent->pas->pluck('status')->toArray())  ? 'en cours' : 'approuvé';
+            $adherent->pa_status = in_array('in_progress', $adherent->pas->pluck('status')->toArray())  ? 'En cours' : 'Validé';
             $pa = PA::where('candidature_id', $adherent->id)->where('status', 'in_progress')->first();
             if (!$pa)
                 $pa = PA::where('candidature_id', $adherent->id)->where('status', 'accepted')->first();
-            $adherent->pa_file = $pa->url;
+            $adherent->pa_file = $pa ? $pa->url : null;
         }
 
         return view('dashboard.cohort.partner.pa.cohort', ['cohort' => $cohort, 'adherents' => $adherents, 'pa' => $pa]);
@@ -140,19 +169,26 @@ class PAController extends Controller
     public function refused()
     {
         $partner = $this->partner();
-        $adherents = Candidature::where('partner_technical_id', $partner->id)
+        if (!$partner) {
+            return back()->with('error', 'Partenaire non trouvé');
+        }
+
+        $adherents = Candidature::where(function ($q) use ($partner) {
+            $q->where('partner_technical_id', $partner->id)
+              ->orWhereHas('partenaires', function ($p) use ($partner) {
+                  $p->where('partenaire_id', $partner->id);
+              });
+        })
             ->where('data_collect', true)
-            ->where('pa', false)
-            ->where('pa_decision', false)
             ->whereHas('pas', function ($query) {
-                $query->whereIn('status', ['refused', 'deferred', 'rejected']);
+                $query->whereIn('status', ['refused', 'deferred', 'rejected', 'resignation']);
             })
             ->get();
 
         $partners = Partenaire::all();
         $partner_financials = [];
         foreach ($partners as $key => $partner_fin) {
-            if (in_array('partner-financial', userPermissions($partner_fin->user)))
+            if ($partner_fin->user && in_array('partner-financial', userPermissions($partner_fin->user)))
                 (array)$partner_financials[] = $partner_fin;
         }
 

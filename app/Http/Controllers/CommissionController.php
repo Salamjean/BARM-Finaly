@@ -39,17 +39,46 @@ class CommissionController extends Controller
         $partners = Partenaire::all();
         $partner_financials = [];
         foreach ($partners as $key => $partner_fin) {
-            if (in_array('partner-financial', userPermissions($partner_fin->user)))
+            if ($partner_fin->user && in_array('partner-financial', userPermissions($partner_fin->user)))
                 (array)$partner_financials[] = $partner_fin;
         }
 
-        if (Auth::user()->roles->first()->name == 'PARTNER') {
-            if (in_array('partner-technical', userPermissions(Auth::user()))) {
-                $candidatures = $commission->candidatures()->where('partner_technical_id', Auth::user()->partenaire->id)->get();
+        if (Auth::user()->roles && Auth::user()->roles->first() && Auth::user()->roles->first()->name == 'PARTNER') {
+            if (Auth::user()->partenaire) {
+                $partner_id = Auth::user()->partenaire->id;
+
+                if (in_array('partner-technical', userPermissions(Auth::user()))) {
+                    // Vérifier si le partenaire connecté est rattaché à cette commission (table commissionpartenaires)
+                    $is_commission_partner = $commission->partenaires()
+                        ->where('partenaire_id', $partner_id)
+                        ->where('type', 'partner_technique')
+                        ->exists();
+
+                    if ($is_commission_partner) {
+                        // S'il est partenaire technique de la commission, récupérer les candidatures de la commission 
+                        // rattachées directement à ce partenaire ou via la relation multipartenaire
+                        $candidatures = $commission->candidatures()->where(function ($query) use ($partner_id) {
+                            $query->where('partner_technical_id', $partner_id)
+                                  ->orWhereHas('partenaires', function ($q) use ($partner_id) {
+                                      $q->where('partenaire_id', $partner_id);
+                                  });
+                        })->get();
+
+                        // Si aucune candidature spécifique n'est filtrée mais que le partenaire est rattaché à la commission,
+                        // on affiche l'ensemble des candidatures de la commission
+                        if ($candidatures->isEmpty()) {
+                            $candidatures = $commission->candidatures()->get();
+                        }
+                    } else {
+                        $candidatures = $commission->candidatures()->where('partner_technical_id', $partner_id)->get();
+                    }
+                } else {
+                    $candidatures = $commission->candidatures()->get();
+                }
             } else {
                 $candidatures = $commission->candidatures()->get();
             }
-        } elseif (can('point-focal')) {
+        } elseif (can('point-focal') && Auth::user()->personnel) {
             $candidatures = $commission->candidatures()->where('focal_point_area', Auth::user()->personnel->ville_barm)->get();
         } else {
             $candidatures = $commission->candidatures()->get();
@@ -222,23 +251,34 @@ class CommissionController extends Controller
                 ->unique()
                 ->toArray();
 
-            $technicale_partenaires = array_values(array_unique(array_merge($request->technicale_partenaires, $candidate_partner_ids)));
-            $commission->partenaires()->attach($technicale_partenaires, [
-                'type' => 'partner_technique',
-            ]);
+            $selected_technical = is_array($request->technicale_partenaires) ? $request->technicale_partenaires : [];
+            $technicale_partenaires_ids = array_values(array_unique(array_merge($selected_technical, $candidate_partner_ids)));
+
+            $technical_pivot_data = [];
+            foreach ($technicale_partenaires_ids as $p_id) {
+                if (!empty($p_id)) {
+                    $technical_pivot_data[$p_id] = ['type' => 'partner_technique'];
+                }
+            }
+
+            if (!empty($technical_pivot_data)) {
+                $commission->partenaires()->attach($technical_pivot_data);
+            }
 
             $financial_users = User::whereHas('permissions', function (Builder $query) {
                 $query->where('slug', 'like', 'partner-financial%');
             })->get();
 
-            $financial_partenaires = [];
+            $financial_pivot_data = [];
             foreach ($financial_users as $financial_user) {
-                $financial_partenaires[] = $financial_user->partenaire->id;
+                if ($financial_user->partenaire) {
+                    $financial_pivot_data[$financial_user->partenaire->id] = ['type' => 'partner_financial'];
+                }
             }
 
-            $commission->partenaires()->attach($financial_partenaires, [
-                'type' => 'partner_financial',
-            ]);
+            if (!empty($financial_pivot_data)) {
+                $commission->partenaires()->attach($financial_pivot_data);
+            }
 
             $commission->candidatures()->attach($candidatures_array);
 
@@ -460,9 +500,13 @@ class CommissionController extends Controller
         $user_id = Auth::user()->id;
         $partenaire = Partenaire::where('user_id', $user_id)->first();
 
-        $commissions = Commission::whereHas('partenaires', function ($query) use ($partenaire) {
-            $query->where('partenaire_id', $partenaire->id);
-        })->orderByDESC('created_at')->where('cohort_id', $cohort->id)->get();
+        if ($partenaire) {
+            $commissions = Commission::whereHas('partenaires', function ($query) use ($partenaire) {
+                $query->where('partenaire_id', $partenaire->id);
+            })->orderByDESC('created_at')->where('cohort_id', $cohort->id)->get();
+        } else {
+            $commissions = collect();
+        }
 
         $title = 'Liste des commissions - BARM';
 

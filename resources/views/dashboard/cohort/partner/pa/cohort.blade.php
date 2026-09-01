@@ -5,7 +5,7 @@
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <h4 class="py-3 breadcrumb-wrapper mb-4">
-                        <span class="text-muted fw-light">Plan d'affaire / </span> Cohorte
+                        <span class="text-muted fw-light">Plan d'affaire / </span> Validé
                     </h4>
                 </nav>
             </div>

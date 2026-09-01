@@ -12,20 +12,54 @@
 
         </div>
         <div class="bg-white p-4 rounded-3 shadow-none mb-4">
-            <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div class="d-flex align-items-center">
-                    <i class="bx bx-x-circle text-danger fs-3 me-3"></i>
+                    <i class="bx bx-time-five text-warning fs-3 me-3"></i>
                     <div>
-                        <h4 class="mb-0 text-danger">Plans d'affaire rejetés</h4>
-                        <p class="text-muted mb-0">Gestion des plans d'affaire refusés</p>
+                        <h4 class="mb-0 text-warning">Plans d'affaires différés / refusés / abandons</h4>
+                        <p class="text-muted mb-0">Gestion et réorientation des plans d'affaires ajournés, refusés ou en abandon</p>
                     </div>
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="text-center">
-                        <div class="badge bg-danger fs-6 px-3 py-2">
-                            {{ $adherents->count() }}
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    @php
+                        $countDeferred = $adherents->filter(function($a) {
+                            $lp = $a->pas->whereIn('status', ['refused', 'deferred', 'rejected', 'resignation'])->sortByDesc('created_at')->first();
+                            return $lp && $lp->status == 'deferred';
+                        })->count();
+                        $countRefused = $adherents->filter(function($a) {
+                            $lp = $a->pas->whereIn('status', ['refused', 'deferred', 'rejected', 'resignation'])->sortByDesc('created_at')->first();
+                            return $lp && in_array($lp->status, ['refused', 'rejected']);
+                        })->count();
+                        $countResignation = $adherents->filter(function($a) {
+                            $lp = $a->pas->whereIn('status', ['refused', 'deferred', 'rejected', 'resignation'])->sortByDesc('created_at')->first();
+                            return $lp && $lp->status == 'resignation';
+                        })->count();
+                    @endphp
+                    <div class="filter-card text-center p-2 rounded-3" data-filter="deferred" title="Cliquer pour filtrer par les dossiers différés">
+                        <div class="badge bg-warning text-dark fs-6 px-3 py-2">
+                            {{ $countDeferred }}
                         </div>
-                        <div class="small text-muted">Total rejetés</div>
+                        <div class="small fw-semibold mt-1">Différés</div>
+                    </div>
+                    <div class="filter-card text-center p-2 rounded-3" data-filter="refused" title="Cliquer pour filtrer par les dossiers refusés">
+                        <div class="badge bg-danger fs-6 px-3 py-2">
+                            {{ $countRefused }}
+                        </div>
+                        <div class="small fw-semibold mt-1">Refusés</div>
+                    </div>
+                    <div class="filter-card text-center p-2 rounded-3" data-filter="resignation" title="Cliquer pour filtrer par les abandons">
+                        <div class="badge bg-secondary fs-6 px-3 py-2">
+                            {{ $countResignation }}
+                        </div>
+                        <div class="small fw-semibold mt-1">Abandons</div>
+                    </div>
+                    <div class="border-start ps-2">
+                        <div class="filter-card text-center p-2 rounded-3 active" data-filter="all" title="Cliquer pour afficher tous les dossiers">
+                            <div class="badge bg-dark fs-6 px-3 py-2">
+                                {{ $adherents->count() }}
+                            </div>
+                            <div class="small fw-semibold mt-1">Tous</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -36,32 +70,36 @@
                 <div class="table-responsive">
                     <table class="dt-responsive table table-hover" id="datatable--barm" style="width:100%">
                         <thead>
-                            <tr class="table-danger">
+                            <tr class="table-warning">
                                 <th class="border-0">
-                                    <i class="bx bx-hash text-danger me-1"></i>
+                                    <i class="bx bx-hash text-warning me-1"></i>
                                 </th>
                                 <th class="border-0">
-                                    <i class="bx bx-layer-group text-danger me-1"></i>
+                                    <i class="bx bx-layer-group text-warning me-1"></i>
                                     Cohorte
                                 </th>
                                 <th class="border-0">
-                                    <i class="bx bx-user text-danger me-1"></i>
+                                    <i class="bx bx-user text-warning me-1"></i>
                                     Candidat
                                 </th>
                                 <th class="border-0">
-                                    <i class="bx bx-file-blank text-danger me-1"></i>
+                                    <i class="bx bx-file-blank text-warning me-1"></i>
                                     Dernier Plan d'Affaire
                                 </th>
                                 <th class="border-0">
-                                    <i class="bx bx-message-square-detail text-danger me-1"></i>
+                                    <i class="bx bx-check-shield text-warning me-1"></i>
+                                    Statut
+                                </th>
+                                <th class="border-0">
+                                    <i class="bx bx-message-square-detail text-warning me-1"></i>
                                     Raison du Rejet
                                 </th>
                                 <th class="border-0">
-                                    <i class="bx bx-gavel text-danger me-1"></i>
-                                    Décision
+                                    <i class="bx bx-gavel text-warning me-1"></i>
+                                    Décision / Commission
                                 </th>
                                 <th class="border-0 text-center">
-                                    <i class="bx bx-cog text-danger me-1"></i>
+                                    <i class="bx bx-cog text-warning me-1"></i>
                                     Actions
                                 </th>
                             </tr>
@@ -69,8 +107,8 @@
                         <tbody>
                             @foreach ($adherents as $adherent)
                                 @php
-                                    $lastPa = $adherent->pas->whereIn('status', ['refused', 'deferred', 'rejected'])->sortByDesc('created_at')->first();
-                                    $commission = $lastPa->commission ? $lastPa->commission->candidatures->find($adherent->id)->pivot : null;
+                                    $lastPa = $adherent->pas->whereIn('status', ['refused', 'deferred', 'rejected', 'resignation'])->sortByDesc('created_at')->first();
+                                    $commission = ($lastPa && $lastPa->commission) ? $lastPa->commission->candidatures->find($adherent->id)->pivot : null;
                                     $comment = $commission ? $commission->comment : null;
                                 @endphp
                                 <tr class="align-middle">
@@ -110,6 +148,27 @@
                                             </div>
                                         @else
                                             <span class="badge bg-secondary">Aucun PA</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($lastPa)
+                                            @if($lastPa->status == 'deferred')
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="bx bx-time me-1"></i>Différé
+                                                </span>
+                                            @elseif(in_array($lastPa->status, ['refused', 'rejected']))
+                                                <span class="badge bg-danger">
+                                                    <i class="bx bx-x-circle me-1"></i>Refusé
+                                                </span>
+                                            @elseif($lastPa->status == 'resignation')
+                                                <span class="badge bg-secondary">
+                                                    <i class="bx bx-box-arrow-right me-1"></i>Abandon
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary">{{ $lastPa->status }}</span>
+                                            @endif
+                                        @else
+                                            <span class="badge bg-secondary">N/A</span>
                                         @endif
                                     </td>
                                     <td>
@@ -424,6 +483,33 @@
         </script>
 
 
+        <style>
+            .filter-card {
+                cursor: pointer;
+                border: 1px solid #e0e0e0;
+                transition: all 0.2s ease-in-out;
+                user-select: none;
+                min-width: 80px;
+            }
+            .filter-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                background-color: rgba(0, 0, 0, 0.02);
+            }
+            .filter-card.active {
+                border-color: #5a8dee !important;
+                background-color: #f2f4f8 !important;
+                box-shadow: 0 4px 12px rgba(90, 141, 238, 0.2) !important;
+                transform: translateY(-2px);
+            }
+            .filter-card .badge {
+                transition: transform 0.2s ease;
+            }
+            .filter-card:hover .badge {
+                transform: scale(1.05);
+            }
+        </style>
+
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Initialiser les tooltips Bootstrap
@@ -431,6 +517,41 @@
                 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                     return new bootstrap.Tooltip(tooltipTriggerEl);
                 });
+
+                // Filtrage dynamique du tableau par les cartes statistiques
+                const setupTableFilter = function() {
+                    if ($.fn.DataTable && $.fn.DataTable.isDataTable('#datatable--barm')) {
+                        const table = $('#datatable--barm').DataTable();
+                        let currentFilter = 'all';
+
+                        $('.filter-card').on('click', function() {
+                            const filter = $(this).data('filter');
+
+                            if (currentFilter === filter && filter !== 'all') {
+                                currentFilter = 'all';
+                            } else {
+                                currentFilter = filter;
+                            }
+
+                            $('.filter-card').removeClass('active');
+                            $(`.filter-card[data-filter="${currentFilter}"]`).addClass('active');
+
+                            if (currentFilter === 'deferred') {
+                                table.column(4).search('Différé').draw();
+                            } else if (currentFilter === 'refused') {
+                                table.column(4).search('Refusé').draw();
+                            } else if (currentFilter === 'resignation') {
+                                table.column(4).search('Abandon').draw();
+                            } else {
+                                table.column(4).search('').draw();
+                            }
+                        });
+                    } else {
+                        setTimeout(setupTableFilter, 100);
+                    }
+                };
+
+                setupTableFilter();
 
                 @foreach ($adherents as $adherentc)
                     (function(adherentId) {

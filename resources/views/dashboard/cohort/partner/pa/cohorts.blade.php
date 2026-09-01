@@ -13,8 +13,8 @@
                     <div class="d-flex align-items-center">
                         <i class="bx bx-file-blank text-primary fs-4 me-3"></i>
                         <div>
-                            <div class="text-muted small">Plan d'affaire / Cohortes</div>
-                            <h4 class="mb-0 text-primary">Liste des cohortes</h4>
+                             <div class="text-muted small">Plan d'affaire / Validé</div>
+                             <h4 class="mb-0 text-primary">Liste des cohortes (Plans d'affaires validés)</h4>
                         </div>
                     </div>
                 </nav>
@@ -92,9 +92,9 @@
                                         <div class="d-flex align-items-center">
                                             <div>
                                                 <div class="fw-medium">
-                                                    <span class="badge bg-success fs-6">
-                                                        {{ $cohort->adhrents->where('partner_technical_id', auth()->user()->partenaire->id)->count() }}
-                                                    </span>
+                                                     <span class="badge bg-success fs-6">
+                                                         {{ $cohort->adhrents->filter(function($a) { return $a->partner_technical_id == auth()->user()->partenaire->id || $a->partenaires->pluck('id')->contains(auth()->user()->partenaire->id); })->count() }}
+                                                     </span>
                                                 </div>
                                                 <small class="text-muted">Adhérents assignés</small>
                                             </div>
