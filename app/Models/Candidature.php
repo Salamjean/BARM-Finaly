@@ -168,6 +168,11 @@ class Candidature extends Model
         return $this->belongsToMany(Profilage::class,'candidatprofilages','candidature_id','profilage_id')->withPivot('profile');
     }
 
+    public function profilage(): BelongsToMany
+    {
+        return $this->profilages();
+    }
+
     public function commissions(): BelongsToMany
     {
         return

@@ -80,20 +80,17 @@ class AccountOpeningController extends Controller
         $adherents_pending = [];
         $adherents_approved = [];
 
-        if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi')) {
+        $adherents_pending = Candidature::where('cohort_id', $cohort->id)
+            ->whereHas('selfEmploymentMonitoredPayment', function ($query) {
+                $query->where('account_opening', false);
+            })
+            ->get();
 
-            $adherents_pending = Candidature::where('cohort_id', $cohort->id)
-                ->whereHas('selfEmploymentMonitoredPayment', function ($query) {
-                    $query->where('account_opening', false);
-                })
-                ->get();
-
-            $adherents_approved = Candidature::where('cohort_id', $cohort->id)
-                ->whereHas('selfEmploymentMonitoredPayment', function ($query) {
-                    $query->where('account_opening', true);
-                })
-                ->get();
-        }
+        $adherents_approved = Candidature::where('cohort_id', $cohort->id)
+            ->whereHas('selfEmploymentMonitoredPayment', function ($query) {
+                $query->where('account_opening', true);
+            })
+            ->get();
 
         return view('dashboard.monitored_evaluation.account_opening.plug_removal', [
             'cohort' => $cohort,

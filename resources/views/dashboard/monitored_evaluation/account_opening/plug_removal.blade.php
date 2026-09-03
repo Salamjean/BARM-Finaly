@@ -305,19 +305,19 @@
                                             <td>
                                                 <div class="border-start border-info border-3 ps-2 py-1">
                                                     <div class="fw-medium text-warning"
-                                                        title="{{ $adherent->partnerTechnical->user->username }}">
-                                                        {{ Str::limit($adherent->partnerTechnical->user->username, 40) }}
+                                                        title="{{ optional(optional($adherent->partnerTechnical)->user)->username ?? 'N/A' }}">
+                                                        {{ Str::limit(optional(optional($adherent->partnerTechnical)->user)->username ?? 'N/A', 40) }}
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div>
-                                                        <div class="fw-bold text-dark">{{ $adherent->user->fullName() }}
+                                                        <div class="fw-bold text-dark">{{ $adherent->user ? $adherent->user->fullName() : 'N/A' }}
                                                         </div>
                                                         <div class="small text-muted">
                                                             <span
-                                                                class="badge bg-secondary me-1">{{ $adherent->user->mecano }}</span>
+                                                                class="badge bg-secondary me-1">{{ optional($adherent->user)->mecano ?? 'N/A' }}</span>
                                                             <span>{{ $adherent->phone_number }}</span>
                                                         </div>
                                                     </div>
@@ -325,14 +325,14 @@
                                             </td>
                                             <td>
                                                 <div class="border-start border-info border-3 ps-2 py-1">
-                                                    <div class="fw-medium text-info">{{ $adherent->paAccepted->title }}
+                                                    <div class="fw-medium text-info">{{ optional($adherent->paAccepted)->title ?? 'N/A' }}
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="border-start border-primary border-3 ps-2 py-1">
                                                     <div class="fw-medium text-primary">
-                                                        {{ $adherent->partner_financial_id ? $adherent->partnerFinancial->user->username : $adherent->other_partner_financial }}
+                                                        {{ $adherent->partner_financial_id ? (optional(optional($adherent->partnerFinancial)->user)->username ?? 'N/A') : ($adherent->other_partner_financial ?? 'N/A') }}
                                                     </div>
                                                 </div>
                                             </td>

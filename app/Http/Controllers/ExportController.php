@@ -93,7 +93,17 @@ class ExportController extends Controller
     public function exportNeverProfiled()
     {
         $title = 'Liste des Candidats Jamais Profilés';
-        $items = Candidature::whereDoesntHave('profilage')->with(['user', 'cohort', 'partnerTechnical.user'])->get();
+        $items = Candidature::with(['user', 'cohort', 'partnerTechnical.user'])
+            ->where('orientation', 'auto-emploi')
+            ->whereNotNull('cohort_id')
+            ->whereNotNull('session_id')
+            ->whereNotNull('partner_technical_id')
+            ->where('resignation', '0')
+            ->where('death', '0')
+            ->whereDoesntHave('choiceFinal')
+            ->where('pa', '0')
+            ->orderByDESC('created_at')
+            ->get();
         $pdf = PDF::loadView('pdf.exports.never_profiled', compact('title', 'items'));
         return $pdf->download('candidats_jamais_profiles.pdf');
     }
@@ -101,9 +111,15 @@ class ExportController extends Controller
     public function exportCandidatsAbsents()
     {
         $title = 'Liste des Candidats Marqués Comme Absents';
-        $items = Candidature::whereHas('profilage', function ($q) {
-            $q->where('presence', '0');
-        })->with(['user', 'cohort', 'partnerTechnical.user'])->get();
+        $items = Candidature::whereStep('completed')
+            ->where('absent', '1')
+            ->where('resignation', '0')
+            ->where('death', '0')
+            ->where('orientation', 'auto-emploi')
+            ->whereNotNull('session_id')
+            ->with(['user', 'cohort', 'partnerTechnical', 'partenaires.user'])
+            ->orderBy('absent_date', 'desc')
+            ->get();
         $pdf = PDF::loadView('pdf.exports.candidats_absents', compact('title', 'items'));
         return $pdf->download('candidats_absents.pdf');
     }
@@ -111,7 +127,25 @@ class ExportController extends Controller
     public function exportCandidatsRefuses()
     {
         $title = 'Liste des Candidatures Reversées au BARM';
-        $items = Candidature::where('partner_reverse', '1')->with(['user', 'cohort', 'partnerTechnical.user'])->get();
+
+        $allCandidatures = Candidature::with(['user', 'cohort', 'partnerTechnical.user', 'partenaires' => function ($query) {
+            $query->orderBy('candidaturepartenaires.id', 'desc');
+        }])
+            ->whereStep('completed')
+            ->where('resignation', '0')
+            ->where('death', '0')
+            ->where('absent', '0')
+            ->where('orientation', 'auto-emploi')
+            ->whereNotNull('session_id')
+            ->whereNotNull('cohort_id')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $items = $allCandidatures->filter(function ($candidature) {
+            $dernierPartenaire = $candidature->partenaires->first();
+            return $dernierPartenaire && $dernierPartenaire->pivot->status === 'refused';
+        });
+
         $pdf = PDF::loadView('pdf.exports.candidats_refuses', compact('title', 'items'));
         return $pdf->download('candidats_reverses_au_barm.pdf');
     }

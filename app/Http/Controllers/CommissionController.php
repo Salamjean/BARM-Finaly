@@ -55,20 +55,9 @@ class CommissionController extends Controller
                         ->exists();
 
                     if ($is_commission_partner) {
-                        // S'il est partenaire technique de la commission, récupérer les candidatures de la commission 
-                        // rattachées directement à ce partenaire ou via la relation multipartenaire
-                        $candidatures = $commission->candidatures()->where(function ($query) use ($partner_id) {
-                            $query->where('partner_technical_id', $partner_id)
-                                  ->orWhereHas('partenaires', function ($q) use ($partner_id) {
-                                      $q->where('partenaire_id', $partner_id);
-                                  });
-                        })->get();
-
-                        // Si aucune candidature spécifique n'est filtrée mais que le partenaire est rattaché à la commission,
-                        // on affiche l'ensemble des candidatures de la commission
-                        if ($candidatures->isEmpty()) {
-                            $candidatures = $commission->candidatures()->get();
-                        }
+                        // Si le partenaire est rattaché à la commission, tous les candidats sélectionnés
+                        // pour cette commission lui sont entièrement accessibles.
+                        $candidatures = $commission->candidatures()->get();
                     } else {
                         $candidatures = $commission->candidatures()->where('partner_technical_id', $partner_id)->get();
                     }
@@ -78,8 +67,6 @@ class CommissionController extends Controller
             } else {
                 $candidatures = $commission->candidatures()->get();
             }
-        } elseif (can('point-focal') && Auth::user()->personnel) {
-            $candidatures = $commission->candidatures()->where('focal_point_area', Auth::user()->personnel->ville_barm)->get();
         } else {
             $candidatures = $commission->candidatures()->get();
         }
@@ -92,11 +79,7 @@ class CommissionController extends Controller
     {
         $title = 'Liste des candidats - BARM';
 
-        if (Auth::user()->roles->first()->name == 'POINTS FOCAUX') {
-            $candidatures = Candidature::whereHas('createdBy.personnel', function ($query) {
-                $query->where('ville_barm', '=', Auth::user()->personnel->ville_barm);
-            })->whereNotNull('partner_financial_id')->where('cohort_id', $cohort->id)->where('pa_decision', '1')->where('favorable_opinion', '1')->get();
-        } elseif (Auth::user()->roles->first()->name == 'PARTNER') {
+        if (Auth::user()->roles->first()->name == 'PARTNER') {
 
             $all_candidatures =
                 Candidature::where('cohort_id', $cohort->id)->whereNotNull('partner_financial_id')->where('pa_decision', '1')->where('favorable_opinion', '1')->get();
