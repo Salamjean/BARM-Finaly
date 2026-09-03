@@ -29,12 +29,17 @@
 
                     </div>
                 </div>
-                @if (can('conseiller-auto-emploi') || can('chef-cellule-formation-et-insertion'))
-                    <a href="{{ route('sessioncollectives.create') }}" class="btn btn-primary d-flex align-items-center">
-                        <i class="bx bx-plus me-2"></i>
-                        Créer une session collective
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('export.pdf.sessioncollectives') }}" class="btn btn-danger btn-sm text-white shadow-sm me-2">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
                     </a>
-                @endif
+                    @if (can('conseiller-auto-emploi') || can('chef-cellule-formation-et-insertion'))
+                        <a href="{{ route('sessioncollectives.create') }}" class="btn btn-primary d-flex align-items-center no-print">
+                            <i class="bx bx-plus me-2"></i>
+                            Créer une session collective
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
 

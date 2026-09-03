@@ -174,13 +174,11 @@
                             <div>Validés</div>
                         </a>
                     </li>
-                    @if (auth()->user() && (str_contains(strtoupper(auth()->user()->username ?? ''), 'KOUASSI') || str_contains(strtoupper(auth()->user()->lastname ?? ''), 'N’GUESSAN') || str_contains(strtoupper(auth()->user()->lastname ?? ''), "N'GUESSAN") || auth()->user()->email === 'coyssy.yssan@gmail.com' || can('responsable-suivi-evaluation') || (auth()->user()->roles && auth()->user()->roles->first() && auth()->user()->roles->first()->slug === 'admin')))
-                        <li class="menu-item {{ routeItem('pre_commission.deferred') }}">
-                            <a href="{{ route('pre_commission.deferred') }}" class="menu-link">
-                                <div>Différé / Refusé / Abandon</div>
-                            </a>
-                        </li>
-                    @endif
+                    <li class="menu-item {{ routeItem('pre_commission.deferred') }}">
+                        <a href="{{ route('pre_commission.deferred') }}" class="menu-link">
+                            <div>Différé / Refusé / Abandon</div>
+                        </a>
+                    </li>
                 </ul>
             </li>
 

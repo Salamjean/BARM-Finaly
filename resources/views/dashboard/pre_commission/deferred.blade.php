@@ -21,36 +21,44 @@
                     <i class="bx bx-time-five text-warning fs-3 me-3"></i>
                     <div>
                         <h4 class="mb-0 text-warning">Plans d'affaires différés / rejetés / abandon</h4>
-                        <p class="text-muted mb-0">Plans d'affaires ajournés, refusés ou ayant fait l'objet d'un abandon pendant la commission de validation</p>
+                        <p class="text-muted mb-0">Plans d'affaires ajournés, refusés ou ayant fait l'objet d'un abandon
+                            pendant la commission de validation</p>
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <div class="filter-card text-center p-2 rounded-3" data-filter="deferred" title="Cliquer pour filtrer par les dossiers différés">
+                    <div class="filter-card text-center p-2 rounded-3" data-filter="deferred"
+                        title="Cliquer pour filtrer par les dossiers différés">
                         <div class="badge bg-warning text-dark fs-6 px-3 py-2">
                             {{ $pas->where('status', 'deferred')->count() }}
                         </div>
                         <div class="small fw-semibold mt-1">Différés</div>
                     </div>
-                    <div class="filter-card text-center p-2 rounded-3" data-filter="refused" title="Cliquer pour filtrer par les dossiers refusés">
+                    <div class="filter-card text-center p-2 rounded-3" data-filter="refused"
+                        title="Cliquer pour filtrer par les dossiers refusés">
                         <div class="badge bg-danger fs-6 px-3 py-2">
                             {{ $pas->whereIn('status', ['refused', 'rejected'])->count() }}
                         </div>
                         <div class="small fw-semibold mt-1">Refusés</div>
                     </div>
-                    <div class="filter-card text-center p-2 rounded-3" data-filter="resignation" title="Cliquer pour filtrer par les abandons">
+                    <div class="filter-card text-center p-2 rounded-3" data-filter="resignation"
+                        title="Cliquer pour filtrer par les abandons">
                         <div class="badge bg-secondary fs-6 px-3 py-2">
                             {{ $pas->where('status', 'resignation')->count() }}
                         </div>
                         <div class="small fw-semibold mt-1">Abandons</div>
                     </div>
                     <div class="border-start ps-2">
-                        <div class="filter-card text-center p-2 rounded-3 active" data-filter="all" title="Cliquer pour afficher tous les dossiers">
+                        <div class="filter-card text-center p-2 rounded-3 active" data-filter="all"
+                            title="Cliquer pour afficher tous les dossiers">
                             <div class="badge bg-dark fs-6 px-3 py-2">
                                 {{ $pas->count() }}
                             </div>
                             <div class="small fw-semibold mt-1">Tous</div>
                         </div>
                     </div>
+                    <a href="{{ route('export.pdf.deferred') }}" class="btn btn-danger btn-sm text-white shadow-sm ms-2">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
                 </div>
             </div>
         </div>
@@ -107,7 +115,8 @@
                                 <tr class="align-middle">
                                     <td>
                                         <div class="border-start border-info border-3 ps-2 py-1">
-                                            <div class="fw-bold text-info">{{ $adherent->cohort->title ?? 'Non assignée' }}</div>
+                                            <div class="fw-bold text-info">{{ $adherent->cohort->title ?? 'Non assignée' }}
+                                            </div>
                                         </div>
                                     </td>
                                     <td>
@@ -117,12 +126,15 @@
                                                     <i class="bx bx-gavel text-warning me-2"></i>
                                                     <div>
                                                         <div class="fw-bold text-dark">
-                                                            {{ $pa->commission->number }}</div>
+                                                            {{ $pa->commission->number }}
+                                                        </div>
                                                         <div class="small text-muted">
-                                                            {{ dateFr($pa->commission->date) }}</div>
+                                                            {{ dateFr($pa->commission->date) }}
+                                                        </div>
                                                         @if ($pa->commission->lieu)
                                                             <div class="small text-muted">
-                                                                {{ $pa->commission->lieu }}</div>
+                                                                {{ $pa->commission->lieu }}
+                                                            </div>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -155,7 +167,8 @@
                                         @if ($adherent && $adherent->partnerTechnical && $adherent->partnerTechnical->user)
                                             <div class="border-start border-primary border-3 ps-2 py-1">
                                                 <div class="d-flex align-items-center">
-                                                    <span class="badge bg-primary">{{ $adherent->partnerTechnical->user->username }}</span>
+                                                    <span
+                                                        class="badge bg-primary">{{ $adherent->partnerTechnical->user->username }}</span>
                                                 </div>
                                                 <small class="text-muted">Partenaire technique</small>
                                             </div>
@@ -194,7 +207,8 @@
                                     </td>
                                     <td>
                                         <div style="max-width: 250px;">
-                                            <div class="small text-dark">{{ $pa->sentence_reason ?? 'Aucun motif renseigné' }}</div>
+                                            <div class="small text-dark">{{ $pa->sentence_reason ?? 'Aucun motif renseigné' }}
+                                            </div>
                                             @if ($pa->sentence_at)
                                                 <div class="small text-muted fst-italic">
                                                     Le {{ dateFr($pa->sentence_at) }}
@@ -205,9 +219,8 @@
                                     <td>
                                         @if ($pa->url)
                                             <div class="border-start border-primary border-3 ps-2 py-1">
-                                                <a href="{{ asset($pa->url) }}"
-                                                    title="Télécharger le plan d'affaire" target="_blank"
-                                                    class="text-primary text-decoration-none fw-medium">
+                                                <a href="{{ asset($pa->url) }}" title="Télécharger le plan d'affaire"
+                                                    target="_blank" class="text-primary text-decoration-none fw-medium">
                                                     <i class="bx bx-download me-1"></i>Télécharger
                                                 </a>
                                                 @if ($pa->credit ?? $pa->amount)
@@ -251,20 +264,24 @@
                 user-select: none;
                 min-width: 80px;
             }
+
             .filter-card:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
                 background-color: rgba(0, 0, 0, 0.02);
             }
+
             .filter-card.active {
                 border-color: #5a8dee !important;
                 background-color: #f2f4f8 !important;
                 box-shadow: 0 4px 12px rgba(90, 141, 238, 0.2) !important;
                 transform: translateY(-2px);
             }
+
             .filter-card .badge {
                 transition: transform 0.2s ease;
             }
+
             .filter-card:hover .badge {
                 transform: scale(1.05);
             }
@@ -273,13 +290,13 @@
 
     @push('js-push')
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const setupTableFilter = function() {
+            document.addEventListener('DOMContentLoaded', function () {
+                const setupTableFilter = function () {
                     if ($.fn.DataTable && $.fn.DataTable.isDataTable('#datatable--barm')) {
                         const table = $('#datatable--barm').DataTable();
                         let currentFilter = 'all';
 
-                        $('.filter-card').on('click', function() {
+                        $('.filter-card').on('click', function () {
                             const filter = $(this).data('filter');
 
                             if (currentFilter === filter && filter !== 'all') {

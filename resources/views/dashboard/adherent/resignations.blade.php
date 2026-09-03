@@ -33,11 +33,16 @@
                             <small class="text-muted">Gestion des candidatures</small>
                         </div>
                     </div>
-                    <div class="text-center">
-                        <div class="badge bg-info fs-6 px-3 py-2">
-                            {{ $adherents->count() }}
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="{{ route('export.pdf.resignations') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                            <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                        </a>
+                        <div class="text-center">
+                            <div class="badge bg-info fs-6 px-3 py-2">
+                                {{ $adherents->count() }}
+                            </div>
+                            <small class="text-muted d-block">Adhérents</small>
                         </div>
-                        <small class="text-muted d-block">Adhérents</small>
                     </div>
                 </div>
             </div>

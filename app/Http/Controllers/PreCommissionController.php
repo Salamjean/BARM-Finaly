@@ -90,6 +90,9 @@ class PreCommissionController extends Controller
     {
         $pas = PA::with(['candidature.user', 'candidature.cohort', 'candidature.partnerTechnical.user', 'commission', 'sentenceBy'])
             ->whereIn('status', ['deferred', 'refused', 'resignation', 'rejected'])
+            ->whereHas('candidature', function ($q) {
+                $q->where('pa_resubmitted', false);
+            })
             ->orderByDESC('updated_at')
             ->get();
 
@@ -128,7 +131,7 @@ class PreCommissionController extends Controller
             'refuse_reason' => 'required|string|min:10',
             'adherent_id' => 'required|exists:candidatures,id',
         ]);
-        
+
         $candidature = Candidature::where([
             ['id', $request->adherent_id],
             ['death', '0'],
@@ -139,10 +142,10 @@ class PreCommissionController extends Controller
             ->whereNotNull('partner_financial_id')
             ->first();
 
-        if (!$candidature) 
+        if (!$candidature)
             return back()->with('error', 'Candidature non trouvée ou non éligible');
 
-        if(!$candidature->paPending)
+        if (!$candidature->paPending)
             return back()->with('error', 'Candidature non trouvée ou non éligible');
 
         $pa = PA::find($candidature->paPending->id);
@@ -154,6 +157,7 @@ class PreCommissionController extends Controller
         $pa->save();
 
         $candidature->pa = '0';
+        $candidature->focal_point_area = null;
         $candidature->save();
 
         return back()->with('success', 'Plan d\'affaire refusé avec succès');

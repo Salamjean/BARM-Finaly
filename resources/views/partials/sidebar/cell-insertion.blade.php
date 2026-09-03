@@ -1,5 +1,8 @@
-@if (can(
-        'conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|point-focal|conseiller-en-reconversion') || can('chef-cellule-formation-et-insertion'))
+@if (
+        can(
+            'conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|point-focal|conseiller-en-reconversion'
+        ) || can('chef-cellule-formation-et-insertion')
+    )
 
     <li
         class="menu-item {{ routeActive(['adherent.create', 'adherent.steps', 'adherent.pending', 'adherent.list', 'adherent.resignations', 'adherent.deaths']) }}">
@@ -65,11 +68,13 @@
         </ul>
     </li>
 
-    @if (can('conseiller-entreprise-prive') ||
+    @if (
+            can('conseiller-entreprise-prive') ||
             can('point-focal') ||
             can('conseiller-fonction-public') ||
             can('conseiller-auto-emploi') ||
-            can('chef-cellule-formation-et-insertion'))
+            can('chef-cellule-formation-et-insertion')
+        )
         <li class="menu-item {{ routeActive('search.index') }}">
 
             <a href="{{ route('search.index') }}" class="menu-link">
@@ -107,8 +112,11 @@
 
 @endif
 
-@if (can(
-        'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive') )
+@if (
+        can(
+            'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive'
+        )
+    )
     <li class="menu-item">
         <div class="menu-link text-primary">
             <div>Auto Emploi</div>
@@ -160,16 +168,17 @@
                     </a>
                 </li>
                 @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
-                <li class="menu-item {{ routeItem('listecandidaturerefuser') }}">
-                    <a href="{{ route('listecandidaturerefuser') }}" class="menu-link">
-                        <div>Liste des candidats non profilés</div>
-                    </a>
-                </li>
+                    <li class="menu-item {{ routeItem('listecandidaturerefuser') }}">
+                        <a href="{{ route('listecandidaturerefuser') }}" class="menu-link">
+                            <div>Liste des candidats non profilés</div>
+                        </a>
+                    </li>
                 @endif
             </ul>
         </li>
 
-        <li class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile']) }}">
+        <li
+            class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile']) }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class='menu-icon tf-icons bx bx-briefcase'></i>
                 <div>Profilages</div>
@@ -195,32 +204,33 @@
             </a>
         </li>
 
-            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated']) }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class='menu-icon tf-icons bx bxs-timer'></i>
-                    <div class="d-flex justify-content-between">
-                        <div>Plan d'affaire</div>
-                        @if ($focal_point_area_count > 0)
-                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
-                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
-                                {{ $focal_point_area_count }}
-                            </span>
-                        @endif
-                    </div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item {{ routeItem('pre_commission.in_progress') }}">
-                        <a href="{{ route('pre_commission.in_progress') }}" class="menu-link">
-                            <div>En attente (commission) </div>
-                        </a>
-                    </li>
-                    <li class="menu-item {{ routeItem('pre_commission.validated') }}">
-                        <a href="{{ route('pre_commission.validated') }}" class="menu-link">
-                            <div>Validés</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+        <li
+            class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated']) }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class='menu-icon tf-icons bx bxs-timer'></i>
+                <div class="d-flex justify-content-between">
+                    <div>Plan d'affaire</div>
+                    @if ($focal_point_area_count > 0)
+                        <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                            style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                            {{ $focal_point_area_count }}
+                        </span>
+                    @endif
+                </div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ routeItem('pre_commission.in_progress') }}">
+                    <a href="{{ route('pre_commission.in_progress') }}" class="menu-link">
+                        <div>En attente (commission) </div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeItem('pre_commission.validated') }}">
+                    <a href="{{ route('pre_commission.validated') }}" class="menu-link">
+                        <div>Validés</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
         <li
             class="menu-item {{ routeActive(['commissions.cohorte', 'commissions.create', 'commissions.index', 'commissions.candidat_commission']) }}">
             <a href="{{ route('commissions.cohorte') }}" class="menu-link">
@@ -284,8 +294,11 @@
     </ul>
 @endif
 
-@if (can(
-        'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive') )
+@if (
+        can(
+            'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive'
+        )
+    )
     <li class="menu-item">
         <div class="menu-link text-primary">
             <div>Entreprise privée</div>
@@ -294,7 +307,7 @@
     <ul class="mx-2 p-2 rounded-3">
 
 @endif
-@if (can('conseiller-entreprise-prive') || can('chef-cellule-formation-et-insertion'))
+    @if (can('conseiller-entreprise-prive') || can('chef-cellule-formation-et-insertion'))
 
         <li class="menu-item {{ routeActive(['candidatentreprises.suivie_ep_candidats']) }}">
             <a href="{{ route('candidatentreprises.suivie_ep_candidats') }}" class="menu-link">
@@ -359,40 +372,43 @@
                 <div>Prepa-entretien</div>
             </a>
         </li>
-@endif
-@if (can(
-        'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive') )
-   
-<li
-        class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
-        <a href="{{ route('candidatentreprises.index') }}" class="menu-link">
-            <i class='menu-icon tf-icons bx bx-briefcase'></i>
-            <div>Mise à disposition</div>
-        </a>
-    </li>
+    @endif
+    @if (
+                can(
+                    'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive'
+                )
+            )
 
-    <li class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.candidats_ep']) }}">
-        <a href="{{ route('monitored-evaluation.post_monitored.candidats_ep') }}" class="menu-link">
-            <i class='menu-icon tf-icons bx bx-folder-open'></i>
-            <div class="d-flex justify-content-between">
-                <div>Suivi post-insertion</div>
+            <li
+                class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
+                <a href="{{ route('candidatentreprises.index') }}" class="menu-link">
+                    <i class='menu-icon tf-icons bx bx-briefcase'></i>
+                    <div>Mise à disposition</div>
+                </a>
+            </li>
+
+            <li class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.candidats_ep']) }}">
+                <a href="{{ route('monitored-evaluation.post_monitored.candidats_ep') }}" class="menu-link">
+                    <i class='menu-icon tf-icons bx bx-folder-open'></i>
+                    <div class="d-flex justify-content-between">
+                        <div>Suivi post-insertion</div>
+                    </div>
+                </a>
+            </li>
+
+        </ul>
+
+
+        <li class="menu-item">
+            <div class="menu-link text-primary">
+                <div>Fonction public</div>
             </div>
-        </a>
-    </li>
-    
-    </ul>
+        </li>
+        <ul class="mx-2 p-2 rounded-3">
 
-    
-    <li class="menu-item">
-        <div class="menu-link text-primary">
-            <div>Fonction public</div>
-        </div>
-    </li>
-    <ul class="mx-2 p-2 rounded-3">
+    @endif
 
-@endif
-
-@if (can('conseiller-fonction-public') || can('chef-cellule-formation-et-insertion'))
+    @if (can('conseiller-fonction-public') || can('chef-cellule-formation-et-insertion'))
         <li class="menu-item {{ routeActive(['candidatentreprises.suivie_fp_candidats']) }}">
             <a href="{{ route('candidatentreprises.suivie_fp_candidats') }}" class="menu-link">
                 <i class='menu-icon tf-icons bx bxs-school'></i>
@@ -449,42 +465,42 @@
                 <div>Inscription à un concours</div>
             </a>
         </li>
-@endif
+    @endif
 
-@if (can(
-        'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive') || can('chef-cellule-formation-et-insertion'))
-    <li
-        class="menu-item {{ routeActive(['inscriptionconcours.candidatsadmis', 'inscriptionconcours.candidatsajournes']) }}">
-        <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class='menu-icon tf-icons bx bxs-comment'></i>
-            <div>Resultats aux concours</div>
-        </a>
-        <ul class="menu-sub">
-            <li class="menu-item {{ routeActive('inscriptionconcours.candidatsadmis') }}">
-                <a href="{{ route('inscriptionconcours.candidatsadmis') }}" class="menu-link">
-                    <div>Liste des admis</div>
+    @if (
+                can(
+                    'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive'
+                ) || can('chef-cellule-formation-et-insertion')
+            )
+            <li
+                class="menu-item {{ routeActive(['inscriptionconcours.candidatsadmis', 'inscriptionconcours.candidatsajournes']) }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class='menu-icon tf-icons bx bxs-comment'></i>
+                    <div>Resultats aux concours</div>
                 </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ routeActive('inscriptionconcours.candidatsadmis') }}">
+                        <a href="{{ route('inscriptionconcours.candidatsadmis') }}" class="menu-link">
+                            <div>Liste des admis</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ routeActive('inscriptionconcours.candidatsajournes') }}">
+                        <a href="{{ route('inscriptionconcours.candidatsajournes') }}" class="menu-link">
+                            <div>Liste des ajournés</div>
+                        </a>
+                    </li>
+
+                </ul>
             </li>
 
-            <li class="menu-item {{ routeActive('inscriptionconcours.candidatsajournes') }}">
-                <a href="{{ route('inscriptionconcours.candidatsajournes') }}" class="menu-link">
-                    <div>Liste des ajournés</div>
+            <li class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.candidats_fp']) }}">
+                <a href="{{ route('monitored-evaluation.post_monitored.candidats_fp') }}" class="menu-link">
+                    <i class='menu-icon tf-icons bx bx-folder-open'></i>
+                    <div class="d-flex justify-content-between">
+                        <div>Suivi post-insertion</div>
+                    </div>
                 </a>
             </li>
-
         </ul>
-    </li>
-
-    <li class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.candidats_fp']) }}">
-        <a href="{{ route('monitored-evaluation.post_monitored.candidats_fp') }}" class="menu-link">
-            <i class='menu-icon tf-icons bx bx-folder-open'></i>
-            <div class="d-flex justify-content-between">
-                <div>Suivi post-insertion</div>
-            </div>
-        </a>
-    </li>
-    </ul>
-@endif
-
-
-
+    @endif

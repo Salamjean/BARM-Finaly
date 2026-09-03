@@ -190,6 +190,16 @@
                 </a>
             </li>
 
+            {{-- PV Comité crédit --}}
+            <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
+                <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
+                    <i class='menu-icon tf-icons bx bxs-buildings'></i>
+                    <div class="d-flex justify-content-between">
+                        <div>PV Comité crédit</div>
+                    </div>
+                </a>
+            </li>
+
             {{-- Decaissements --}}
             <li
                 class="menu-item {{ routeActive(['monitored-evaluation.disbursement.cohorts', 'monitored-evaluation.disbursement.cohort', 'monitored-evaluation.disbursement.adherent']) }}">

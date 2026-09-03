@@ -30,9 +30,9 @@ class PAController extends Controller
             ->where('data_collect', true)
             ->where(function ($q) use ($partner) {
                 $q->where('partner_technical_id', $partner->id)
-                  ->orWhereHas('partenaires', function ($p) use ($partner) {
-                      $p->where('partenaire_id', $partner->id);
-                  });
+                    ->orWhereHas('partenaires', function ($p) use ($partner) {
+                        $p->where('partenaire_id', $partner->id);
+                    });
             })
             ->whereDoesntHave('pas')
             ->get();
@@ -41,7 +41,7 @@ class PAController extends Controller
         $partner_financials = [];
         foreach ($partners as $key => $partner_fin) {
             if ($partner_fin->user && in_array('partner-financial', userPermissions($partner_fin->user)))
-                (array)$partner_financials[] = $partner_fin;
+                (array) $partner_financials[] = $partner_fin;
         }
 
         return view('dashboard.cohort.partner.pa.list_pending', [
@@ -71,9 +71,9 @@ class PAController extends Controller
         $attrs['status'] = 'in_progress';
 
         if (isset($attrs['url'])) {
-            $image = $adherent->user->username .'_'. $request->title . '.' . $attrs['url']->getClientOriginalExtension();
+            $image = $adherent->user->username . '_' . $request->title . '.' . $attrs['url']->getClientOriginalExtension();
             $attrs['url']->move(saveByEnv() . "data/docs/pa/", $image);
-            $attrs['url'] =  'data/docs/pa/' . $image;
+            $attrs['url'] = 'data/docs/pa/' . $image;
         }
 
 
@@ -90,6 +90,8 @@ class PAController extends Controller
                 'post_monitored' => true,
                 'partner_financial_id' => null,
                 'other_partner_financial' => $request->other_partner_financial,
+                'resignation' => '0',
+                'pa_resubmitted' => true,
             ]);
         } else {
 
@@ -100,6 +102,11 @@ class PAController extends Controller
             $adherent->update([
                 'partner_financial_id' => $request->partner_financial,
                 'other_partner_financial' => null,
+                'focal_point_area' => null,
+                'pa_decision' => false,
+                'commission_step' => false,
+                'resignation' => '0',
+                'pa_resubmitted' => true,
             ]);
         }
 
@@ -115,6 +122,7 @@ class PAController extends Controller
         ]);
 
         $adherent->pa = true;
+        $adherent->pa_resubmitted = true;
         $adherent->save();
 
         return back()->with('success', 'Plan ajouté avec succès');
@@ -130,9 +138,9 @@ class PAController extends Controller
         $cohorts = Cohort::whereHas('adhrents', function ($query) use ($partner) {
             $query->where(function ($q) use ($partner) {
                 $q->where('partner_technical_id', $partner->id)
-                  ->orWhereHas('partenaires', function ($p) use ($partner) {
-                      $p->where('partenaire_id', $partner->id);
-                  });
+                    ->orWhereHas('partenaires', function ($p) use ($partner) {
+                        $p->where('partenaire_id', $partner->id);
+                    });
             })->where('pa', true);
         })->get();
 
@@ -149,14 +157,14 @@ class PAController extends Controller
         $cohort = Cohort::findOrFail($id);
         $adherents = Candidature::where(function ($q) use ($partner) {
             $q->where('partner_technical_id', $partner->id)
-              ->orWhereHas('partenaires', function ($p) use ($partner) {
-                  $p->where('partenaire_id', $partner->id);
-              });
+                ->orWhereHas('partenaires', function ($p) use ($partner) {
+                    $p->where('partenaire_id', $partner->id);
+                });
         })->where('cohort_id', $cohort->id)->where('pa', true)->get();
 
         $pa = null;
         foreach ($adherents as $adherent) {
-            $adherent->pa_status = in_array('in_progress', $adherent->pas->pluck('status')->toArray())  ? 'En cours' : 'Validé';
+            $adherent->pa_status = in_array('in_progress', $adherent->pas->pluck('status')->toArray()) ? 'En cours' : 'Validé';
             $pa = PA::where('candidature_id', $adherent->id)->where('status', 'in_progress')->first();
             if (!$pa)
                 $pa = PA::where('candidature_id', $adherent->id)->where('status', 'accepted')->first();
@@ -175,11 +183,15 @@ class PAController extends Controller
 
         $adherents = Candidature::where(function ($q) use ($partner) {
             $q->where('partner_technical_id', $partner->id)
-              ->orWhereHas('partenaires', function ($p) use ($partner) {
-                  $p->where('partenaire_id', $partner->id);
-              });
+                ->orWhereHas('partenaires', function ($p) use ($partner) {
+                    $p->where('partenaire_id', $partner->id);
+                });
         })
             ->where('data_collect', true)
+            ->where(function($q) {
+                $q->where('pa_resubmitted', false)
+                  ->orWhereNull('pa_resubmitted');
+            })
             ->whereHas('pas', function ($query) {
                 $query->whereIn('status', ['refused', 'deferred', 'rejected', 'resignation']);
             })
@@ -189,10 +201,13 @@ class PAController extends Controller
         $partner_financials = [];
         foreach ($partners as $key => $partner_fin) {
             if ($partner_fin->user && in_array('partner-financial', userPermissions($partner_fin->user)))
-                (array)$partner_financials[] = $partner_fin;
+                (array) $partner_financials[] = $partner_fin;
         }
 
-        return view('dashboard.cohort.partner.pa.rejected', ['adherents' => $adherents, 'partner_financials' =>
-        $partner_financials,]);
+        return view('dashboard.cohort.partner.pa.rejected', [
+            'adherents' => $adherents,
+            'partner_financials' =>
+                $partner_financials,
+        ]);
     }
 }

@@ -1,0 +1,41 @@
+@extends('pdf.exports.base')
+
+@section('pdf_content')
+    <div style="margin-bottom: 15px; background: #f0f4f8; padding: 10px; border-radius: 4px;">
+        <strong>Session :</strong> {{ $session->title ?? $session->name ?? 'Session ' . $session->id }} |
+        <strong>Lieu :</strong> {{ $session->location ?? $session->lieu ?? 'N/A' }} |
+        <strong>Date :</strong> {{ $session->session_date ? date('d/m/Y', strtotime($session->session_date)) : 'N/A' }}
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 35%;">Nom & Prénoms</th>
+                <th style="width: 20%;">Mécano</th>
+                <th style="width: 20%;">Téléphone</th>
+                <th style="width: 20%;">Présence</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($session->candidatures as $index => $candidat)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td><strong>{{ $candidat->user ? $candidat->user->fullName() : 'N/A' }}</strong></td>
+                    <td>{{ $candidat->user->mecano ?? 'N/A' }}</td>
+                    <td>{{ $candidat->phone_number ?? $candidat->user->phone_number ?? 'N/A' }}</td>
+                    <td>
+                        @if(isset($candidat->pivot->presence_status) && $candidat->pivot->presence_status == '1') Présent
+                        @elseif(isset($candidat->pivot->presence_status) && $candidat->pivot->presence_status == '0') Absent
+                        @else N/A
+                        @endif
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5" style="text-align: center;">Aucun participant dans cette session</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+@endsection

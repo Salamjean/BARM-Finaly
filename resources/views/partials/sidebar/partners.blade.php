@@ -86,7 +86,7 @@
             </li>
             <li class="menu-item {{ routeItem(['cohort.pa.refused']) }}">
                 <a href="{{ route('cohort.pa.refused') }}" class="menu-link">
-                    <div>Différé</div>
+                    <div>Différé / Refusé / Abandon</div>
                 </a>
             </li>
         </ul>

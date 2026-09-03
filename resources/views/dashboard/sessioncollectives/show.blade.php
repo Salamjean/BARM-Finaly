@@ -26,6 +26,9 @@
 
                 </div>
                 <div class="d-flex align-items-center gap-3">
+                    <a href="{{ route('export.pdf.sessioncollective_detail', $sessioncollective->id) }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
                     <div class="text-center">
                         <div class="badge bg-success fs-6 px-3 py-2">
                             {{ $candidatures->where('pivot.presence_status', '1')->count() }}

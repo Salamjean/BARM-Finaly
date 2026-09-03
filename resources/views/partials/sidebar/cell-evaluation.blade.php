@@ -185,7 +185,8 @@
     </li>
 
     {{-- Plan d'affaire --}}
-    <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated']) }}">
+    <li
+        class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated']) }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class='menu-icon tf-icons bx bxs-timer'></i>
             <div class="d-flex justify-content-between">
@@ -336,12 +337,12 @@
     </li>
 
     <li class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.candidats_fp']) }}">
-            <a href="{{ route('monitored-evaluation.post_monitored.candidats_fp') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bx-folder-open'></i>
-                <div class="d-flex justify-content-between">
-                    <div>Suivi post-insertion</div>
-                </div>
-            </a>
-        </li>
+        <a href="{{ route('monitored-evaluation.post_monitored.candidats_fp') }}" class="menu-link">
+            <i class='menu-icon tf-icons bx bx-folder-open'></i>
+            <div class="d-flex justify-content-between">
+                <div>Suivi post-insertion</div>
+            </div>
+        </a>
+    </li>
 
 @endif

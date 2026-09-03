@@ -27,7 +27,7 @@ class CreditCommitteeController extends Controller
                 });
             })->orderByDesc('created_at')->get();
 
-        elseif (can('chef-barm|c2d|responsable-suivi-evaluation|assistant-suivi-evaluation|conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|conseiller-en-reconversion|chef-cellule-formation-et-insertion'))
+        elseif (can('chef-barm|c2d|responsable-suivi-evaluation|assistant-suivi-evaluation|conseiller-auto-emploi|conseiller-entreprise-prive|conseiller-fonction-public|conseiller-en-reconversion|chef-cellule-formation-et-insertion|point-focal'))
             $pv = PvCommittee::orderByDesc('created_at')->get();
 
         return view('dashboard.monitored_evaluation.credit_committee.index', ['committees' => $pv]);
@@ -160,11 +160,33 @@ class CreditCommitteeController extends Controller
 
             $committee = CreditCommittee::findOrFail($request->committee_id);
             
-            // Mise à jour du statut et du motif d'ajournement
+            // Mise à jour du statut et du motif d'ajournement dans le comité de crédit
             $committee->update([
                 'status' => 'ajourne',
                 'motif_ajournement' => $request->motif,
             ]);
+
+            $candidature = $committee->candidature;
+            if ($candidature) {
+                $pa = $candidature->paAccepted ?? $candidature->pas->first();
+                if ($pa) {
+                    $pa->update([
+                        'status' => 'deferred',
+                        'sentence_reason' => $request->motif,
+                        'sentence_at' => now(),
+                        'sentence_by' => auth()->user()->id,
+                    ]);
+                }
+
+                $candidature->update([
+                    'pa_resubmitted' => false,
+                    'pa' => '0',
+                    'focal_point_area' => null,
+                    'pa_decision' => '0',
+                    'commission_step' => '0',
+                    'credit_committee' => false,
+                ]);
+            }
             
             return back()->with('success', 'Le candidat a été ajourné avec succès.');
             

@@ -551,6 +551,24 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('job', JobOfferController::class);
 
     /**
+     * PDF Export routes
+     */
+    Route::prefix('export-pdf')->name('export.pdf.')->group(function () {
+        Route::get('deaths', [ExportController::class, 'exportDeaths'])->name('deaths');
+        Route::get('resignations', [ExportController::class, 'exportResignations'])->name('resignations');
+        Route::get('deferred', [ExportController::class, 'exportDeferred'])->name('deferred');
+        Route::get('cohorts', [ExportController::class, 'exportCohorts'])->name('cohorts');
+        Route::get('cohort/{id}', [ExportController::class, 'exportCohortDetail'])->name('cohort_detail');
+        Route::get('sessioncollectives', [ExportController::class, 'exportSessionCollectives'])->name('sessioncollectives');
+        Route::get('sessioncollective/{id}', [ExportController::class, 'exportSessionCollectiveDetail'])->name('sessioncollective_detail');
+        Route::get('never-profiled', [ExportController::class, 'exportNeverProfiled'])->name('never_profiled');
+        Route::get('candidats-absents', [ExportController::class, 'exportCandidatsAbsents'])->name('candidats_absents');
+        Route::get('candidats-refuses', [ExportController::class, 'exportCandidatsRefuses'])->name('candidats_refuses');
+        Route::get('formations', [ExportController::class, 'exportFormations'])->name('formations');
+        Route::get('formation/{id}', [ExportController::class, 'exportFormationDetail'])->name('formation_detail');
+    });
+
+    /**
      * annual budget routes
      * @model annualbudget
      * @method route<get, post, put, delete>

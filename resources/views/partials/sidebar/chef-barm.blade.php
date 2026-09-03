@@ -14,11 +14,11 @@
                 </a>
             </li>
             @if(can('chef-barm|c2d'))
-            <li class="menu-item {{ routeItem('budget-plans.monitoring.index') }}">
-                <a href="{{ route('budget-plans.monitoring.index') }}" class="menu-link">
-                    <div>Suivi</div>
-                </a>
-            </li>
+                <li class="menu-item {{ routeItem('budget-plans.monitoring.index') }}">
+                    <a href="{{ route('budget-plans.monitoring.index') }}" class="menu-link">
+                        <div>Suivi</div>
+                    </a>
+                </li>
             @endif
         </ul>
     </li>
@@ -38,7 +38,8 @@
         </a>
         <ul class="menu-sub section-content" style="display: none;">
             {{-- Adhérent --}}
-            <li class="menu-item {{ routeActive(['adherent.create', 'adherent.steps', 'adherent.pending', 'adherent.list', 'adherent.resignations', 'adherent.deaths']) }}">
+            <li
+                class="menu-item {{ routeActive(['adherent.create', 'adherent.steps', 'adherent.pending', 'adherent.list', 'adherent.resignations', 'adherent.deaths']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-user'></i>
                     <div>Adhérent</div>
@@ -64,7 +65,8 @@
                             <div>Liste des abandons </div>
                         </a>
                     </li>
-                    <li class="menu-item {{ routeActive(['retired-preregistrations.index', 'retired-preregistrations.show']) }}">
+                    <li
+                        class="menu-item {{ routeActive(['retired-preregistrations.index', 'retired-preregistrations.show']) }}">
                         <a href="{{ route('retired-preregistrations.index') }}" class="menu-link">
                             <div>Préinscriptions</div>
                             @php
@@ -94,7 +96,8 @@
             </li>
 
             {{-- Sessions Collectives --}}
-            <li class="menu-item {{ routeActive(['sessioncollectives.create', 'sessioncollectives.index', 'sessioncollectives.show', 'sessioncollectives.edit', 'candidaturevalidated', 'candidaturepresent', 'listecandidature', 'candidaturevalidated', 'listecandidatureprovisoire']) }}">
+            <li
+                class="menu-item {{ routeActive(['sessioncollectives.create', 'sessioncollectives.index', 'sessioncollectives.show', 'sessioncollectives.edit', 'candidaturevalidated', 'candidaturepresent', 'listecandidature', 'candidaturevalidated', 'listecandidatureprovisoire']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-group'></i>
                     <div>Sessions Collectives</div>
@@ -119,7 +122,8 @@
             </li>
 
             {{-- Profilages --}}
-            <li class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile', 'listecandidaturerefuser', 'listecandidature', 'profilage.candidats_absents', 'profilage.candidats_refuses']) }}">
+            <li
+                class="menu-item {{ routeActive(['profilage.profilage', 'profilage.never_profiled', 'profilage.index_profilage', 'profilage.create_profilage', 'profilage.candidat_profilage', 'profilage.end_candidat_profile', 'listecandidaturerefuser', 'listecandidature', 'profilage.candidats_absents', 'profilage.candidats_refuses']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-cross'></i>
                     <div>Profilages</div>
@@ -167,7 +171,8 @@
             </li>
 
             {{-- Plan d'affaire --}}
-            <li class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated']) }}">
+            <li
+                class="menu-item {{ routeActive(['pre_commission.pending', 'pre_commission.in_progress', 'pre_commission.validated', 'pre_commission.deferred']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bxs-timer'></i>
                     <div class="d-flex justify-content-between">
@@ -191,11 +196,17 @@
                             <div>Validés</div>
                         </a>
                     </li>
+                    <li class="menu-item {{ routeItem('pre_commission.deferred') }}">
+                        <a href="{{ route('pre_commission.deferred') }}" class="menu-link">
+                            <div>Différé / Refusé / Abandon</div>
+                        </a>
+                    </li>
                 </ul>
             </li>
 
             {{-- Commission d'approbation --}}
-            <li class="menu-item {{ routeActive(['commissions.cohorte', 'commissions.create', 'commissions.index', 'commissions.candidat_commission']) }}">
+            <li
+                class="menu-item {{ routeActive(['commissions.cohorte', 'commissions.create', 'commissions.index', 'commissions.candidat_commission']) }}">
                 <a href="{{ route('commissions.cohorte') }}" class="menu-link">
                     <i class='menu-icon tf-icons bx bx-notepad'></i>
                     <div class="d-flex justify-content-between">
@@ -211,7 +222,8 @@
             </li>
 
             {{-- PV Comité crédit --}}
-            <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
+            <li
+                class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
                 <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
                     <i class='menu-icon tf-icons bx bxs-buildings'></i>
                     <div class="d-flex justify-content-between">
@@ -228,7 +240,8 @@
 
 
             {{-- Decaissements --}}
-            <li class="menu-item {{ routeActive(['monitored-evaluation.disbursement.cohorts', 'monitored-evaluation.disbursement.cohort', 'monitored-evaluation.disbursement.adherent']) }}">
+            <li
+                class="menu-item {{ routeActive(['monitored-evaluation.disbursement.cohorts', 'monitored-evaluation.disbursement.cohort', 'monitored-evaluation.disbursement.adherent']) }}">
                 <a href="{{ route('monitored-evaluation.disbursement.cohorts') }}" class="menu-link">
                     <i class='menu-icon tf-icons bx bxs-credit-card'></i>
                     <div class="d-flex justify-content-between">
@@ -244,7 +257,8 @@
             </li>
 
             {{-- Suivi post-financement --}}
-            <li class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.cohorts', 'monitored-evaluation.post_monitored.cohort', 'monitored-evaluation.post_monitored.adherent']) }}">
+            <li
+                class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.cohorts', 'monitored-evaluation.post_monitored.cohort', 'monitored-evaluation.post_monitored.adherent']) }}">
                 <a href="{{ route('monitored-evaluation.post_monitored.cohorts') }}" class="menu-link">
                     <i class='menu-icon tf-icons bx bx-folder-open'></i>
                     <div class="d-flex justify-content-between">
@@ -263,7 +277,8 @@
         </a>
         <ul class="menu-sub section-content" style="display: none;">
             {{-- Mise à disposition --}}
-            <li class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
+            <li
+                class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
                 <a href="{{ route('candidatentreprises.index') }}" class="menu-link">
                     <i class='menu-icon tf-icons bx bx-briefcase'></i>
                     <div>Mise à disposition</div>
@@ -290,7 +305,8 @@
         </a>
         <ul class="menu-sub section-content" style="display: none;">
             {{-- Resultats aux concours --}}
-            <li class="menu-item {{ routeActive(['inscriptionconcours.candidatsadmis', 'inscriptionconcours.candidatsajournes']) }}">
+            <li
+                class="menu-item {{ routeActive(['inscriptionconcours.candidatsadmis', 'inscriptionconcours.candidatsajournes']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bxs-comment'></i>
                     <div>Resultats aux concours</div>

@@ -51,25 +51,28 @@ class DashboardController extends Controller
                 ->groupBy('condition_admin')
                 ->pluck('count', 'condition_admin');
 
-            $pension_count = Candidature::where([
-                ['partner_technical_id', $user->partenaire->id],
-            ])
-                ->whereRaw("JSON_CONTAINS(condition_financiere, ?)", ['"Pension retraite"'])
-                ->count();
+            $candidaturesFinanced = Candidature::where('partner_technical_id', $user->partenaire->id)
+                ->whereHas('selfEmploymentMonitoredPayment.disbursements', function ($query) {
+                    $query->where('status', 'finished');
+                })
+                ->whereNotNull('condition_financiere')
+                ->get();
 
-            $solde_count = Candidature::where([
-                ['partner_technical_id', $user->partenaire->id],
+            $conditions_financial = [];
+            foreach ($candidaturesFinanced as $candidature) {
+                $conditionsArray = is_array($candidature->condition_financiere)
+                    ? $candidature->condition_financiere
+                    : json_decode($candidature->condition_financiere, true);
 
-            ])->whereHas('selfEmploymentMonitoredPayment.disbursements', function ($query) {
-                $query->where('status', 'finished');
-            })
-                ->whereRaw("JSON_CONTAINS(condition_financiere, ?)", ['"Solde de réforme"'])
-                ->count();
-
-            $conditions_financial = [
-                'Pension retraite' => $pension_count,
-                'Solde de réforme' => $solde_count,
-            ];
+                if (is_array($conditionsArray)) {
+                    foreach ($conditionsArray as $condition) {
+                        $conditions_financial[$condition] = ($conditions_financial[$condition] ?? 0) + 1;
+                    }
+                } elseif (is_string($candidature->condition_financiere) && !empty($candidature->condition_financiere)) {
+                    $cond = $candidature->condition_financiere;
+                    $conditions_financial[$cond] = ($conditions_financial[$cond] ?? 0) + 1;
+                }
+            }
 
             $pa_decision = PA::where([
                 ['partner_id', $user->partenaire->id],

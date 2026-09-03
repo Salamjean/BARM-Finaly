@@ -31,12 +31,17 @@
                         <small class="text-muted">Organisez vos groupes d'adhérents</small>
                     </div>
                 </div>
-                @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
-                    <a href="{{ route('cohort.create') }}" class="btn btn-primary d-flex align-items-center">
-                        <i class="bx bx-plus me-2"></i>
-                        Ajouter une cohorte
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('export.pdf.cohorts') }}" class="btn btn-danger btn-sm text-white shadow-sm me-2">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
                     </a>
-                @endif
+                    @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
+                        <a href="{{ route('cohort.create') }}" class="btn btn-primary d-flex align-items-center no-print">
+                            <i class="bx bx-plus me-2"></i>
+                            Ajouter une cohorte
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
 

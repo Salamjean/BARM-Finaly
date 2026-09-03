@@ -58,6 +58,44 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}" />
+    <style>
+        @media print {
+            #layout-menu, .layout-navbar, .footer, .btn, .btn-print-hide,
+            .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate,
+            .no-print {
+                display: none !important;
+            }
+            body, .layout-wrapper, .layout-page, .content-wrapper, .container-fluid, .container-xxl {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #fff !important;
+                width: 100% !important;
+            }
+            .card, .bg-white {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            .table-responsive {
+                overflow: visible !important;
+            }
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+            th, td {
+                border: 1px solid #dee2e6 !important;
+                padding: 6px 10px !important;
+                font-size: 11px !important;
+                color: #000 !important;
+            }
+            .badge {
+                border: 1px solid #666 !important;
+                color: #000 !important;
+                background: transparent !important;
+            }
+        }
+    </style>
     <link rel="stylesheet" href="{{ asset('assets/css/wizard.css') }}" />
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}" />
@@ -253,6 +291,29 @@
 
         function endLoading() {
             document.getElementById('loading_page').style.display = 'none';
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF(filename) {
+            const target = document.querySelector('.container-fluid') || document.querySelector('.content-wrapper') || document.body;
+            const hiddenElements = document.querySelectorAll('.no-print, #layout-menu, .layout-navbar, .footer, .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate');
+            
+            hiddenElements.forEach(el => el.style.visibility = 'hidden');
+            
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     (filename || 'export') + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(target).save().then(function() {
+                hiddenElements.forEach(el => el.style.visibility = 'visible');
+            }).catch(function() {
+                hiddenElements.forEach(el => el.style.visibility = 'visible');
+            });
         }
     </script>
     @include('partials.script.sweetalert')

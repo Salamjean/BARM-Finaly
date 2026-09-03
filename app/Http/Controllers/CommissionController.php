@@ -386,6 +386,10 @@ class CommissionController extends Controller
 
                 $candidature->update([
                     'resignation' => '1',
+                    'pa' => '0',
+                    'commission_step' => '0',
+                    'focal_point_area' => null,
+                    'pa_resubmitted' => false,
                 ]);
             } elseif ($request->decision == 'deferred' || $request->decision == 'refused') {
 
@@ -403,6 +407,7 @@ class CommissionController extends Controller
                     'pa' => '0',
                     'commission_step' => '0',
                     'focal_point_area' => null,
+                    'pa_resubmitted' => false,
                 ]);
             } elseif ($request->decision == 'missing') {
 
@@ -418,10 +423,11 @@ class CommissionController extends Controller
 
                 // Lorsqu'un bénéficiaire est marqué Absent, son dossier n'est pas définitivement écarté :
                 // Son Plan d'Affaires reste valide (pa = '1', pa_decision = '0')
-                // et commission_step est remis à '0' pour qu'il soit reprogrammable lors d'une prochaine session
+                // et focal_point_area est remis à null pour qu'il réapparaisse chez M. KOUAO (En attente point focal)
                 $candidature->update([
                     'commission_step' => '0',
                     'pa_decision' => '0',
+                    'focal_point_area' => null,
                 ]);
             }
 

@@ -25,11 +25,16 @@
                         <p class="text-muted mb-0">Liste des candidats qui n'ont jamais été profilés</p>
                     </div>
                 </div>
-                <div class="text-center">
-                    <div class="badge bg-warning fs-6 px-3 py-2">
-                        {{ $candidatures->count() }}
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{{ route('export.pdf.never_profiled') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
+                    <div class="text-center">
+                        <div class="badge bg-warning fs-6 px-3 py-2">
+                            {{ $candidatures->count() }}
+                        </div>
+                        <div class="text-muted small">Total</div>
                     </div>
-                    <div class="text-muted small">Total</div>
                 </div>
             </div>
         </div>
