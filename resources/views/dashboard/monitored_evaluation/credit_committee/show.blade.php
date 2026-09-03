@@ -98,35 +98,37 @@
                                             @foreach ($pv->creditCommittees->where('status', 'pending') as $committee)
                                                 <tr>
                                                     <td>
-                                                        <div>{{ $committee->candidature->user->fullName() }}</div>
+                                                        <div>{{ $committee->candidature?->user?->fullName() ?? 'N/A' }}</div>
                                                         <div class="fs-7">
                                                             <span
-                                                                class="text-primary">{{ $committee->candidature->user->mecano }}</span>,
-                                                            <span>{{ $committee->candidature->phone_number }}</span>
+                                                                class="text-primary">{{ $committee->candidature?->user?->mecano ?? '' }}</span>,
+                                                            <span>{{ $committee->candidature?->phone_number ?? '' }}</span>
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        {{ $committee->candidature->paAccepted->title }}
+                                                        {{ $committee->candidature?->paAccepted?->title ?? '-' }}
                                                     </td>
-                                                    <td>{{ $committee->candidature->choiceFinal->specialisation }}</td>
+                                                    <td>{{ $committee->candidature?->choiceFinal?->specialisation ?? '-' }}</td>
                                                     <td class="">
-                                                        {{ $committee->candidature->choiceFinal->locality }}
+                                                        {{ $committee->candidature?->choiceFinal?->locality ?? '-' }}
                                                     </td>
-                                                    <td>{{ amount($committee->candidature->paAccepted->credit) }} F CFA
+                                                    <td>{{ amount($committee->candidature?->paAccepted?->credit ?? 0) }} F CFA
                                                     </td>
                                                     <td>
                                                         <div class="d-flex justify-content-around gap-3">
+                                                            @if($committee->candidature?->user)
                                                             <a href="{{ route('adherent.show', $committee->candidature->user->id) }}"
                                                                 class="">
                                                                 <i class=" bx bx-show">
                                                                 </i>
                                                             </a>
+                                                            @endif
 
                                                             @if(can('partner-financial'))
                                                             <button class="btn btn-primary" data-bs-toggle="modal"
                                                                 data-bs-target="#validationModal"
-                                                                data-amount="{{ $committee->candidature->paAccepted->credit }}"
-                                                                data-fullname="{{ $committee->candidature->user->fullName() }}"
+                                                                data-amount="{{ $committee->candidature?->paAccepted?->credit ?? 0 }}"
+                                                                data-fullname="{{ $committee->candidature?->user?->fullName() ?? '' }}"
                                                                 data-id="{{ $committee->id }}">Validation</button>
 
                                                             <button class="btn btn-danger" data-bs-toggle="modal"
@@ -218,20 +220,20 @@
                                             @foreach ($pv->creditCommittees->where('status', 'finished') as $committee)
                                                 <tr>
                                                     <td>
-                                                        <div>{{ $committee->candidature->user->fullName() }}</div>
+                                                        <div>{{ $committee->candidature?->user?->fullName() ?? 'N/A' }}</div>
                                                         <div class="fs-7">
                                                             <span
-                                                                class="text-primary">{{ $committee->candidature->user->mecano }}</span>,
-                                                            <span>{{ $committee->candidature->phone_number }}</span>
+                                                                class="text-primary">{{ $committee->candidature?->user?->mecano ?? '' }}</span>,
+                                                            <span>{{ $committee->candidature?->phone_number ?? '' }}</span>
                                                         </div>
                                                     </td>
-                                                    <td>{{ $committee->candidature->choiceFinal->specialisation }}</td>
-                                                    <td>{{ $committee->candidature->partnerTechnical->user->username }}
+                                                    <td>{{ $committee->candidature?->choiceFinal?->specialisation ?? '-' }}</td>
+                                                    <td>{{ $committee->candidature?->partnerTechnical?->user?->username ?? '-' }}
                                                     </td>
                                                     <td class="">
-                                                        {{ $committee->candidature->choiceFinal->locality }}
+                                                        {{ $committee->candidature?->choiceFinal?->locality ?? '-' }}
                                                     </td>
-                                                    <td>{{ amount($committee->candidature->paAccepted->credit) }} F CFA
+                                                    <td>{{ amount($committee->candidature?->paAccepted?->credit ?? 0) }} F CFA</td>
                                                     <td class="">
                                                         {{ $committee->agency }}
                                                     </td>
@@ -246,12 +248,13 @@
                                                     </td>
                                                     <td>
                                                         <div class="d-flex justify-content-around gap-3">
+                                                            @if($committee->candidature?->user)
                                                             <a href="{{ route('adherent.show', $committee->candidature->user->id) }}"
                                                                 class="">
                                                                 <i class=" bx bx-show">
                                                                 </i>
                                                             </a>
-
+                                                            @endif
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -286,20 +289,20 @@
                                             @foreach ($pv->creditCommittees->where('status', 'ajourne') as $committee)
                                                 <tr>
                                                     <td>
-                                                        <div>{{ $committee->candidature->user->fullName() }}</div>
+                                                        <div>{{ $committee->candidature?->user?->fullName() ?? 'N/A' }}</div>
                                                         <div class="fs-7">
                                                             <span
-                                                                class="text-primary">{{ $committee->candidature->user->mecano }}</span>,
-                                                            <span>{{ $committee->candidature->phone_number }}</span>
+                                                                class="text-primary">{{ $committee->candidature?->user?->mecano ?? '' }}</span>,
+                                                            <span>{{ $committee->candidature?->phone_number ?? '' }}</span>
                                                         </div>
                                                     </td>
-                                                    <td>{{ $committee->candidature->choiceFinal->specialisation }}</td>
-                                                    <td>{{ $committee->candidature->partnerTechnical->user->username }}
+                                                    <td>{{ $committee->candidature?->choiceFinal?->specialisation ?? '-' }}</td>
+                                                    <td>{{ $committee->candidature?->partnerTechnical?->user?->username ?? '-' }}
                                                     </td>
                                                     <td class="">
-                                                        {{ $committee->candidature->choiceFinal->locality }}
+                                                        {{ $committee->candidature?->choiceFinal?->locality ?? '-' }}
                                                     </td>
-                                                    <td>{{ amount($committee->candidature->paAccepted->credit) }} F CFA</td>
+                                                    <td>{{ amount($committee->candidature?->paAccepted?->credit ?? 0) }} F CFA</td>
                                                     <td>
                                                         <span class="badge bg-warning text-dark">
                                                             {{ $committee->motif_ajournement ?? 'Motif non spécifié' }}
@@ -307,10 +310,12 @@
                                                     </td>
                                                     <td>
                                                         <div class="d-flex justify-content-around gap-2">
+                                                            @if($committee->candidature?->user)
                                                             <a href="{{ route('adherent.show', $committee->candidature->user->id) }}"
                                                                 class="btn btn-sm btn-outline-primary">
                                                                 <i class="bx bx-show"></i> Voir
                                                             </a>
+                                                            @endif
                                                             @if(can('partner-financial'))
                                                             <!-- Bouton pour remettre en attente -->
                                                             <button class="btn btn-sm btn-success" 

@@ -43,16 +43,16 @@
                                             <span>{{ $adhrent->phone_number }}</span>
                                         </div>
                                     </td>
-                                    <td>{{ $adhrent->paAccepted->title }}</td>
+                                    <td>{{ $adhrent->paAccepted?->title ?? '-' }}</td>
                                     <td class="">
-                                        {{ $adhrent->paAccepted->location }}
+                                        {{ $adhrent->paAccepted?->location ?? '-' }}
                                     </td>
-                                    <td>{{ amount($adhrent->paAccepted->credit) }} F CFA
+                                    <td>{{ amount($adhrent->paAccepted?->credit ?? 0) }} F CFA</td>
                                     <td class="">
-                                        {{ $adhrent->creditCommittee->agency }}
+                                        {{ $adhrent->creditCommittee?->agency ?? '-' }}
                                     </td>
                                     <td>
-                                        {{ amount($adhrent->creditCommittee->amount_agreed) }} F CFA
+                                        {{ amount($adhrent->creditCommittee?->amount_agreed ?? 0) }} F CFA
                                     </td>
                                     <td class="text-center">
                                         {{ $adhrent->creditCommittee->deferred_months }}
