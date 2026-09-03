@@ -80,7 +80,7 @@
                                 <tr class="align-middle">
                                     <td>
                                         <div class="border-start border-info border-3 ps-2 py-1">
-                                            <div class="fw-bold text-info">{{ $adherent->cohort->title }}</div>
+                                            <div class="fw-bold text-info">{{ $adherent->cohort->title ?? '-' }}</div>
                                         </div>
                                     </td>
                                     <td>
@@ -133,12 +133,16 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="border-start border-success border-3 ps-2 py-1">
-                                            <a href="{{ asset($adherent->paPending->url) }}"
-                                                title="Télécharger le plan d'affaire" target="_blank"
-                                                class="fw-medium text-success" download><i
-                                                    class="bx bx-file-blank me-1"></i></a>
-                                        </div>
+                                        @if ($adherent->paPending && $adherent->paPending->url)
+                                            <div class="border-start border-success border-3 ps-2 py-1">
+                                                <a href="{{ asset($adherent->paPending->url) }}"
+                                                    title="Télécharger le plan d'affaire" target="_blank"
+                                                    class="fw-medium text-success" download><i
+                                                        class="bx bx-file-blank me-1"></i></a>
+                                            </div>
+                                        @else
+                                            <span class="text-muted small">Non disponible</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">

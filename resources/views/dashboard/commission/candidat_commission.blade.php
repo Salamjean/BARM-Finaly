@@ -242,11 +242,11 @@
                                                 <div class="row g-2">
                                                     <div class="col-md-8">
                                                         <small class="text-muted">Titre :</small>
-                                                        <p class="mb-0 fw-medium">{{ $adhrent->paPending->title }}</p>
+                                                        <p class="mb-0 fw-medium">{{ $adhrent->paPending->title ?? ($adhrent->paAccepted->title ?? '-') }}</p>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <small class="text-muted">Coût total :</small>
-                                                        <p class="mb-0 fw-bold text-primary">{{ amount($adhrent->paPending->amount) }}</p>
+                                                        <p class="mb-0 fw-bold text-primary">{{ amount($adhrent->paPending->amount ?? ($adhrent->paAccepted->amount ?? 0)) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -263,7 +263,7 @@
                                                        class="form-control @error('amount') is-invalid @enderror"
                                                        id="amount" 
                                                        name="amount"
-                                                       value="{{ old('amount') ?? $adhrent->paPending->credit }}">
+                                                       value="{{ old('amount') ?? ($adhrent->paPending->credit ?? ($adhrent->paAccepted->credit ?? '')) }}">
                                             </div>
                                             @error('amount')
                                                 <span class="invalid-feedback" role="alert">
