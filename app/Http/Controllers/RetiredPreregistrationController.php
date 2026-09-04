@@ -26,6 +26,17 @@ class RetiredPreregistrationController extends Controller
             $query->where('verified', $request->verified === '1');
         }
 
+        // Filtrage par axe d'insertion
+        if ($request->filled('axe')) {
+            if ($request->axe === 'auto_emploi') {
+                $query->where('axe_auto_emploi', true);
+            } elseif ($request->axe === 'entreprise_privee') {
+                $query->where('axe_entreprise_privee', true);
+            } elseif ($request->axe === 'fonction_publique') {
+                $query->where('axe_fonction_publique', true);
+            }
+        }
+
         // Recherche (Nom, prénom, mécano, etc.)
         if ($request->filled('search')) {
             $search = $request->search;

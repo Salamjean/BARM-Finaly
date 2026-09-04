@@ -16,6 +16,17 @@ class RetiredPreregistration extends Model
         'phone',
         'phone2',
         'residence',
+        'axe_auto_emploi',
+        'auto_emploi_projet1',
+        'auto_emploi_projet2',
+        'axe_entreprise_privee',
+        'entreprise_privee_emploi',
+        'entreprise_privee_formation1',
+        'entreprise_privee_formation2',
+        'axe_fonction_publique',
+        'fonction_publique_diplome',
+        'fonction_publique_emploi1',
+        'fonction_publique_emploi2',
         'verified',
         'retired_date',
         'status',
@@ -27,6 +38,9 @@ class RetiredPreregistration extends Model
 
     protected $casts = [
         'verified' => 'boolean',
+        'axe_auto_emploi' => 'boolean',
+        'axe_entreprise_privee' => 'boolean',
+        'axe_fonction_publique' => 'boolean',
         'processed_at' => 'datetime',
     ];
 

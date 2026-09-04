@@ -178,6 +178,16 @@ public function preregistrationForm()
                 ]);
             }
 
+            // Vérification si la date de retraite est dépassée de plus de 2 ans
+            $twoYearsAgo = \Carbon\Carbon::now()->subYears(2);
+            if ($retired->retired_date && \Carbon\Carbon::parse($retired->retired_date)->lt($twoYearsAgo) && !$retired->forced_authorization) {
+                $dateFormatted = function_exists('dateFr') ? dateFr($retired->retired_date) : $retired->retired_date;
+                return response()->json([
+                    'status' => 'warning',
+                    'message' => "La date de retraite (départ: {$dateFormatted}) est dépassée de plus de 2 ans. Vous ne pouvez pas effectuer de pré-inscription."
+                ]);
+            }
+
             // Vérification si une demande n'existe pas déjà
             $existingRequest = RetiredPreregistration::where('mecano', $request->mecano)
                 ->where('status', 'pending')
@@ -263,6 +273,16 @@ public function preregistrationForm()
                 ]);
             }
 
+            // Vérification si la date de retraite est dépassée de plus de 2 ans
+            $twoYearsAgo = \Carbon\Carbon::now()->subYears(2);
+            if ($retired->retired_date && \Carbon\Carbon::parse($retired->retired_date)->lt($twoYearsAgo) && !$retired->forced_authorization) {
+                $dateFormatted = function_exists('dateFr') ? dateFr($retired->retired_date) : $retired->retired_date;
+                return response()->json([
+                    'status' => 'warning',
+                    'message' => "La date de retraite (départ: {$dateFormatted}) est dépassée de plus de 2 ans. Vous ne pouvez pas effectuer de pré-inscription."
+                ]);
+            }
+
             // Vérification si une demande n'existe pas déjà
             $existingRequest = RetiredPreregistration::where('mecano', $request->mecano)
                 ->where('status', 'pending')
@@ -291,6 +311,21 @@ public function preregistrationForm()
                 'phone' => $request->phone,
                 'phone2' => $request->phone2,
                 'residence' => $request->residence,
+
+                'axe_auto_emploi' => $request->has('axe_auto_emploi') && ($request->axe_auto_emploi == '1' || $request->axe_auto_emploi === 'on' || $request->axe_auto_emploi === true),
+                'auto_emploi_projet1' => $request->auto_emploi_projet1,
+                'auto_emploi_projet2' => $request->auto_emploi_projet2,
+
+                'axe_entreprise_privee' => $request->has('axe_entreprise_privee') && ($request->axe_entreprise_privee == '1' || $request->axe_entreprise_privee === 'on' || $request->axe_entreprise_privee === true),
+                'entreprise_privee_emploi' => $request->entreprise_privee_emploi,
+                'entreprise_privee_formation1' => $request->entreprise_privee_formation1,
+                'entreprise_privee_formation2' => $request->entreprise_privee_formation2,
+
+                'axe_fonction_publique' => $request->has('axe_fonction_publique') && ($request->axe_fonction_publique == '1' || $request->axe_fonction_publique === 'on' || $request->axe_fonction_publique === true),
+                'fonction_publique_diplome' => $request->fonction_publique_diplome,
+                'fonction_publique_emploi1' => $request->fonction_publique_emploi1,
+                'fonction_publique_emploi2' => $request->fonction_publique_emploi2,
+
                 'verified' => true, // Vérifié car le retraité existe
                 'retired_id' => $retired->id,
                 'retired_date' => $retired->retired_date,

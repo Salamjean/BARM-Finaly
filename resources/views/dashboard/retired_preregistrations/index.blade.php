@@ -100,6 +100,15 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label for="axe" class="form-label">Axe d'insertion</label>
+                    <select name="axe" id="axe" class="form-select">
+                        <option value="">Tous les axes</option>
+                        <option value="auto_emploi" {{ request('axe') == 'auto_emploi' ? 'selected' : '' }}>Auto emploi</option>
+                        <option value="entreprise_privee" {{ request('axe') == 'entreprise_privee' ? 'selected' : '' }}>Entreprise privée</option>
+                        <option value="fonction_publique" {{ request('axe') == 'fonction_publique' ? 'selected' : '' }}>Fonction publique</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label for="verified" class="form-label">Vérification</label>
                     <select name="verified" id="verified" class="form-select">
                         <option value="">Toutes</option>
@@ -107,7 +116,7 @@
                         <option value="0" {{ request('verified') == '0' ? 'selected' : '' }}>Non vérifiées</option>
                     </select>
                 </div>
-                <div class="col-md-3 d-flex align-items-end">
+                <div class="col-12 d-flex justify-content-end mt-3">
                     <button type="submit" class="btn btn-primary me-2">
                         <i class="bx bx-search"></i> Filtrer
                     </button>
@@ -134,6 +143,7 @@
                         <tr>
                             <th>Nom & Prénom</th>
                             <th>Mécano</th>
+                            <th>Axe(s) d'insertion</th>
                             <th>Date de retraite</th>
                             <th>Téléphones</th>
                             <th>Résidence</th>
@@ -156,6 +166,22 @@
                             </td>
                             <td>
                                 <code>{{ $preregistration->mecano }}</code>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @if($preregistration->axe_auto_emploi)
+                                        <span class="badge bg-primary">Auto emploi</span>
+                                    @endif
+                                    @if($preregistration->axe_entreprise_privee)
+                                        <span class="badge bg-info text-dark">Entreprise privée</span>
+                                    @endif
+                                    @if($preregistration->axe_fonction_publique)
+                                        <span class="badge bg-dark">Fonction publique</span>
+                                    @endif
+                                    @if(!$preregistration->axe_auto_emploi && !$preregistration->axe_entreprise_privee && !$preregistration->axe_fonction_publique)
+                                        <span class="text-muted small">Aucun</span>
+                                    @endif
+                                </div>
                             </td>
                             <td>
                                 @if($preregistration->retired_date)

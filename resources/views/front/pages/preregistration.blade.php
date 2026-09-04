@@ -108,6 +108,85 @@
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                 placeholder="Votre lieu de résidence">
                         </div>
+
+                        <!-- Axe d'insertion Section -->
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <h3 class="text-xl font-bold text-red-600 text-center mb-6 uppercase tracking-wide">
+                                Axe d'insertion
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-2 border-gray-800 p-4 rounded-xl bg-white shadow-sm">
+                                <!-- 1. Auto emploi -->
+                                <div class="border border-gray-400 rounded-lg p-4 flex flex-col justify-between space-y-4">
+                                    <div class="flex items-center justify-between border-b pb-2 border-gray-300">
+                                        <label for="axe_auto_emploi" class="font-bold text-gray-900 text-base cursor-pointer">Auto emploi</label>
+                                        <input type="checkbox" id="axe_auto_emploi" name="axe_auto_emploi" value="1" class="w-5 h-5 text-blue-600 rounded border-gray-400 focus:ring-blue-500 cursor-pointer">
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="auto_emploi_projet1" class="block text-xs font-bold text-gray-800 mb-1">Projet 1 :</label>
+                                            <textarea id="auto_emploi_projet1" name="auto_emploi_projet1" rows="3" class="w-full p-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Description du projet 1"></textarea>
+                                        </div>
+                                        <div>
+                                            <label for="auto_emploi_projet2" class="block text-xs font-bold text-gray-800 mb-1">Projet 2 :</label>
+                                            <textarea id="auto_emploi_projet2" name="auto_emploi_projet2" rows="3" class="w-full p-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Description du projet 2"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Entreprise privée -->
+                                <div class="border border-gray-400 rounded-lg p-4 flex flex-col justify-between space-y-4">
+                                    <div class="flex items-center justify-between border-b pb-2 border-gray-300">
+                                        <label for="axe_entreprise_privee" class="font-bold text-gray-900 text-base cursor-pointer">Entreprise privée</label>
+                                        <input type="checkbox" id="axe_entreprise_privee" name="axe_entreprise_privee" value="1" class="w-5 h-5 text-blue-600 rounded border-gray-400 focus:ring-blue-500 cursor-pointer">
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="entreprise_privee_emploi" class="block text-xs font-bold text-gray-800 mb-1">Emploi souhaité :</label>
+                                            <textarea id="entreprise_privee_emploi" name="entreprise_privee_emploi" rows="2" class="w-full p-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Emploi souhaité"></textarea>
+                                        </div>
+                                        <div>
+                                            <span class="block text-xs font-bold text-gray-800 mb-1">Formation souhaitée :</span>
+                                            <div class="space-y-2">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-xs font-bold mt-2">1.</span>
+                                                    <textarea id="entreprise_privee_formation1" name="entreprise_privee_formation1" rows="2" class="w-full p-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Formation 1"></textarea>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-xs font-bold mt-2">2.</span>
+                                                    <textarea id="entreprise_privee_formation2" name="entreprise_privee_formation2" rows="2" class="w-full p-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Formation 2"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Fonction publique -->
+                                <div class="border border-gray-400 rounded-lg p-4 flex flex-col justify-between space-y-4">
+                                    <div class="flex items-center justify-between border-b pb-2 border-gray-300">
+                                        <label for="axe_fonction_publique" class="font-bold text-gray-900 text-base cursor-pointer">Fonction publique</label>
+                                        <input type="checkbox" id="axe_fonction_publique" name="axe_fonction_publique" value="1" class="w-5 h-5 text-blue-600 rounded border-gray-400 focus:ring-blue-500 cursor-pointer">
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="fonction_publique_diplome" class="block text-xs font-bold text-gray-800 mb-1">Diplôme civil :</label>
+                                            <input type="text" id="fonction_publique_diplome" name="fonction_publique_diplome" class="w-full p-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Diplôme civil">
+                                        </div>
+                                        <div>
+                                            <label for="fonction_publique_emploi1" class="block text-xs font-bold text-gray-800 mb-1">Emploi 1 :</label>
+                                            <textarea id="fonction_publique_emploi1" name="fonction_publique_emploi1" rows="2" class="w-full p-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Emploi 1"></textarea>
+                                        </div>
+                                        <div>
+                                            <label for="fonction_publique_emploi2" class="block text-xs font-bold text-gray-800 mb-1">Emploi 2 :</label>
+                                            <textarea id="fonction_publique_emploi2" name="fonction_publique_emploi2" rows="2" class="w-full p-2 border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Emploi 2"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Alert Messages -->

@@ -83,6 +83,74 @@
     </div>
 </div>
 
+<div class="row mt-4">
+    <div class="col-12">
+        <h6 class="text-danger fw-bold text-center mb-3">
+            <i class="bx bx-target-lock me-2"></i>Axe d'insertion
+        </h6>
+        <div class="row g-3">
+            <!-- Auto Emploi -->
+            <div class="col-md-4">
+                <div class="card h-100 border shadow-none">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                        <strong class="text-dark">Auto emploi</strong>
+                        @if($preregistration->axe_auto_emploi)
+                            <span class="badge bg-success"><i class="bx bx-check"></i> Coché</span>
+                        @else
+                            <span class="badge bg-secondary">Non coché</span>
+                        @endif
+                    </div>
+                    <div class="card-body p-3 text-sm">
+                        <p class="mb-2"><strong>Projet 1 :</strong> {{ $preregistration->auto_emploi_projet1 ?: '-' }}</p>
+                        <p class="mb-0"><strong>Projet 2 :</strong> {{ $preregistration->auto_emploi_projet2 ?: '-' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entreprise Privée -->
+            <div class="col-md-4">
+                <div class="card h-100 border shadow-none">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                        <strong class="text-dark">Entreprise privée</strong>
+                        @if($preregistration->axe_entreprise_privee)
+                            <span class="badge bg-success"><i class="bx bx-check"></i> Coché</span>
+                        @else
+                            <span class="badge bg-secondary">Non coché</span>
+                        @endif
+                    </div>
+                    <div class="card-body p-3 text-sm">
+                        <p class="mb-2"><strong>Emploi souhaité :</strong> {{ $preregistration->entreprise_privee_emploi ?: '-' }}</p>
+                        <p class="mb-1"><strong>Formation souhaitée :</strong></p>
+                        <ul class="ps-3 mb-0">
+                            <li>1. {{ $preregistration->entreprise_privee_formation1 ?: '-' }}</li>
+                            <li>2. {{ $preregistration->entreprise_privee_formation2 ?: '-' }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fonction Publique -->
+            <div class="col-md-4">
+                <div class="card h-100 border shadow-none">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                        <strong class="text-dark">Fonction publique</strong>
+                        @if($preregistration->axe_fonction_publique)
+                            <span class="badge bg-success"><i class="bx bx-check"></i> Coché</span>
+                        @else
+                            <span class="badge bg-secondary">Non coché</span>
+                        @endif
+                    </div>
+                    <div class="card-body p-3 text-sm">
+                        <p class="mb-2"><strong>Diplôme civil :</strong> {{ $preregistration->fonction_publique_diplome ?: '-' }}</p>
+                        <p class="mb-2"><strong>Emploi 1 :</strong> {{ $preregistration->fonction_publique_emploi1 ?: '-' }}</p>
+                        <p class="mb-0"><strong>Emploi 2 :</strong> {{ $preregistration->fonction_publique_emploi2 ?: '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @if($preregistration->admin_notes)
 <div class="mt-4">
     <h6 class="text-primary mb-3">
