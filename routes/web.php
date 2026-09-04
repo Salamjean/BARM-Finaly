@@ -566,6 +566,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('candidats-refuses', [ExportController::class, 'exportCandidatsRefuses'])->name('candidats_refuses');
         Route::get('formations', [ExportController::class, 'exportFormations'])->name('formations');
         Route::get('formation/{id}', [ExportController::class, 'exportFormationDetail'])->name('formation_detail');
+        Route::get('retired-preregistrations', [ExportController::class, 'exportRetiredPreregistrations'])->name('retired_preregistrations');
+        Route::get('account-openings/{idCohort}', [ExportController::class, 'exportAccountOpenings'])->name('account_openings');
+        Route::get('adherents', [ExportController::class, 'exportAdherents'])->name('adherents');
+        Route::get('session-presents', [ExportController::class, 'exportSessionCollectivePresents'])->name('session_presents');
     });
 
     /**

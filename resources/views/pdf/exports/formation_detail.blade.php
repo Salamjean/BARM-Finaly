@@ -2,9 +2,10 @@
 
 @section('pdf_content')
     <div style="margin-bottom: 15px; background: #f0f4f8; padding: 10px; border-radius: 4px;">
-        <strong>Formation :</strong> {{ $formation->title ?? $formation->name ?? 'Formation ' . $formation->id }} |
-        <strong>Lieu :</strong> {{ $formation->location ?? $formation->center ?? 'N/A' }} |
-        <strong>Période :</strong> {{ $formation->date_debut ? date('d/m/Y', strtotime($formation->date_debut)) : 'N/A' }} au {{ $formation->date_fin ? date('d/m/Y', strtotime($formation->date_fin)) : 'N/A' }}
+        <strong>Intitulé :</strong> {{ $formation->intitule ?? $formation->title ?? $formation->name ?? ('Formation #' . $formation->id) }} |
+        <strong>Entreprise / Organisme :</strong> {{ $formation->entreprise ?? $formation->partner?->user?->username ?? 'N/A' }} |
+        <strong>Lieu :</strong> {{ $formation->lieu ?? $formation->location ?? 'N/A' }} |
+        <strong>Période :</strong> {{ $formation->date_db ? \Carbon\Carbon::parse($formation->date_db)->format('d/m/Y') : ($formation->beging_date ? date('d/m/Y', strtotime($formation->beging_date)) : 'N/A') }} au {{ $formation->date_fin ? \Carbon\Carbon::parse($formation->date_fin)->format('d/m/Y') : ($formation->end_date ? date('d/m/Y', strtotime($formation->end_date)) : 'N/A') }}
     </div>
 
     <table class="data-table">

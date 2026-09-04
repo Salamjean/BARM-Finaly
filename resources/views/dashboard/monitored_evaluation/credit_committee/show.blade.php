@@ -47,8 +47,8 @@
         <div class="mb-10">
             <div class="card-body">
                 <!-- Nav -->
-                <div class="text-center">
-                    <ul id="myTab" class="nav nav-segment nav-pills scrollbar-horizontal mb-2" role="tablist">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <ul id="myTab" class="nav nav-segment nav-pills scrollbar-horizontal mb-0" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active" id="pills-one-code-features-example1-tab" data-bs-toggle="pill"
                                 href="#pills-one-code-features-example1" role="tab"
@@ -74,6 +74,9 @@
                             </a>
                         </li>
                     </ul>
+                    <a href="{{ route('export.pdf.session_presents') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
                 </div>
                 <!-- Tab Content -->
                 <div class="tab-content">

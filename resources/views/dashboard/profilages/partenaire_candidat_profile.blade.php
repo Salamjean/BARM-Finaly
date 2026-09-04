@@ -6,8 +6,13 @@
         <span class="text-muted fw-light">Profilages/</span> {{ $title }}
     </h4>
     <div class="card">
-        <div class="card-body mt-4">
-            <h5 class="card-header">{{ $title }}</h5>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{{ $title }}</h5>
+            <a href="{{ route('export.pdf.session_presents') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+            </a>
+        </div>
+        <div class="card-body mt-2">
             <div class="card-datatable table-responsive text-nowrap">
                 <table class="dt-responsive table table-striped" id="datatable--barm" style="width:100%">
                     <thead class="table-dark">

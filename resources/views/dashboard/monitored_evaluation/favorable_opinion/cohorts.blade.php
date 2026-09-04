@@ -11,7 +11,12 @@
                     <li class="ms-2 active" aria-current="page">Cohortes</li>
                 </ol>
             </nav>
-            <h1 class="h2 fw-bold text-primary">Avis favorable - Cohortes</h1>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h2 fw-bold text-primary mb-0">Avis favorable - Cohortes</h1>
+                <a href="{{ route('export.pdf.cohorts') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                    <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                </a>
+            </div>
         </div>
     </div>
 

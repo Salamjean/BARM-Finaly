@@ -130,11 +130,14 @@
 
     <!-- Main Content -->
     <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="mb-0">
                 <i class="bx bx-user-plus me-2"></i>
                 Gestion des Préinscriptions Retraités
             </h5>
+            <a href="{{ route('export.pdf.retired_preregistrations') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+            </a>
         </div>
         <div class="card-body">
             <div class="table-responsive">

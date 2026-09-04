@@ -11,8 +11,20 @@
             </nav>
         </div>
 
-        <div class="ms-auto">
-         @if(!can('chef-barm'))
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <a href="{{ route('export.pdf.deferred') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+            </a>
+            @php
+                $totalMontantValides = $planaffaires->filter(function($p) { return $p->status === 'accepted'; })->sum(function($p) { return $p->credit ?? $p->amount ?? 0; });
+            @endphp
+            <div class="text-center">
+                <div class="badge bg-success fs-6 px-3 py-2">
+                    {{ amount($totalMontantValides, true) }}
+                </div>
+                <small class="text-muted d-block">Montant des projets validés</small>
+            </div>
+            @if(!can('chef-barm'))
             <div class="btn-group">
                 <a href="{{ route('plan_affaire.create') }}" type="button" class="btn btn-primary">Créer un plan d'affaire</a>
             </div>

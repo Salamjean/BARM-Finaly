@@ -55,24 +55,24 @@ class DashboardController extends Controller
                 ->whereHas('selfEmploymentMonitoredPayment.disbursements', function ($query) {
                     $query->where('status', 'finished');
                 })
-                ->whereNotNull('condition_financiere')
                 ->get();
 
-            $conditions_financial = [];
-            foreach ($candidaturesFinanced as $candidature) {
-                $conditionsArray = is_array($candidature->condition_financiere)
-                    ? $candidature->condition_financiere
-                    : json_decode($candidature->condition_financiere, true);
+            $pensionDeRetraite = 0;
+            $soldeDeReforme = 0;
 
-                if (is_array($conditionsArray)) {
-                    foreach ($conditionsArray as $condition) {
-                        $conditions_financial[$condition] = ($conditions_financial[$condition] ?? 0) + 1;
-                    }
-                } elseif (is_string($candidature->condition_financiere) && !empty($candidature->condition_financiere)) {
-                    $cond = $candidature->condition_financiere;
-                    $conditions_financial[$cond] = ($conditions_financial[$cond] ?? 0) + 1;
+            foreach ($candidaturesFinanced as $candidature) {
+                $pensionnaire = trim(strtolower($candidature->pensionnaire_cgrae ?? ''));
+                if (in_array($pensionnaire, ['oui', '1', 'true'])) {
+                    $pensionDeRetraite++;
+                } else {
+                    $soldeDeReforme++;
                 }
             }
+
+            $conditions_financial = [
+                'Pension de retraite' => $pensionDeRetraite,
+                'Solde de réforme' => $soldeDeReforme,
+            ];
 
             $pa_decision = PA::where([
                 ['partner_id', $user->partenaire->id],
@@ -295,24 +295,26 @@ class DashboardController extends Controller
             }
 
             
-            $conditions_financieres = [];
+            $candidaturesFinanced = Candidature::whereHas('selfEmploymentMonitoredPayment.disbursements', function ($query) {
+                $query->where('status', 'finished');
+            })->get();
 
-            $candidatures = Candidature::whereNotNull('condition_financiere')
-                ->where('condition_financiere', '!=', '')
-                ->get();
+            $pensionDeRetraite = 0;
+            $soldeDeReforme = 0;
 
-            foreach ($candidatures as $candidature) {
-                $conditionsArray = json_decode($candidature->condition_financiere, true);
-
-                if (is_array($conditionsArray)) {
-                    foreach ($conditionsArray as $condition) {
-                        if (!isset($conditions_financieres[$condition])) {
-                            $conditions_financieres[$condition] = 0;
-                        }
-                        $conditions_financieres[$condition]++;
-                    }
+            foreach ($candidaturesFinanced as $candidature) {
+                $pensionnaire = trim(strtolower($candidature->pensionnaire_cgrae ?? ''));
+                if (in_array($pensionnaire, ['oui', '1', 'true'])) {
+                    $pensionDeRetraite++;
+                } else {
+                    $soldeDeReforme++;
                 }
             }
+
+            $conditions_financieres = [
+                'Pension de retraite' => $pensionDeRetraite,
+                'Solde de réforme' => $soldeDeReforme,
+            ];
 
             return view('dashboard', [
                 'adherents_by_condition' => $conditions,
@@ -546,24 +548,26 @@ class DashboardController extends Controller
         }
 
         
-        $conditions_financieres = [];
+        $candidaturesFinanced = Candidature::whereHas('selfEmploymentMonitoredPayment.disbursements', function ($query) {
+            $query->where('status', 'finished');
+        })->get();
 
-        $candidatures = Candidature::whereNotNull('condition_financiere')
-            ->where('condition_financiere', '!=', '')
-            ->get();
+        $pensionDeRetraite = 0;
+        $soldeDeReforme = 0;
 
-        foreach ($candidatures as $candidature) {
-            $conditionsArray = json_decode($candidature->condition_financiere, true);
-
-            if (is_array($conditionsArray)) {
-                foreach ($conditionsArray as $condition) {
-                    if (!isset($conditions_financieres[$condition])) {
-                        $conditions_financieres[$condition] = 0;
-                    }
-                    $conditions_financieres[$condition]++;
-                }
+        foreach ($candidaturesFinanced as $candidature) {
+            $pensionnaire = trim(strtolower($candidature->pensionnaire_cgrae ?? ''));
+            if (in_array($pensionnaire, ['oui', '1', 'true'])) {
+                $pensionDeRetraite++;
+            } else {
+                $soldeDeReforme++;
             }
         }
+
+        $conditions_financieres = [
+            'Pension de retraite' => $pensionDeRetraite,
+            'Solde de réforme' => $soldeDeReforme,
+        ];
 
         return [
             'adherents_by_condition' => $conditions,

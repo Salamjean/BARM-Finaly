@@ -194,14 +194,7 @@
                 new Chart(document.getElementById('conditionsFinancialChart').getContext('2d'), {
                     type: 'pie',
                     data: {
-                        labels: Object.keys(conditionsFinancial).map(key => {
-                            try {
-                                const parsed = JSON.parse(key);
-                                return Array.isArray(parsed) ? parsed.join(', ') : key;
-                            } catch {
-                                return key;
-                            }
-                        }),
+                        labels: Object.keys(conditionsFinancial),
                         datasets: [{
                             label: 'Conditions financières',
                             data: Object.values(conditionsFinancial),

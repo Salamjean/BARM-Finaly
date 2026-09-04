@@ -25,10 +25,20 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
+                    <a href="{{ route('export.pdf.deferred') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
                     <div class="text-center">
                         <div class="badge bg-info fs-6 px-3 py-2">
                             {{ $candidats->whereNotNull('partnerTechnical')->count() }}
                         </div>
+                        <div class="small text-muted">Total candidats</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="badge bg-warning fs-6 px-3 py-2 text-dark">
+                            {{ amount($candidats->sum(function($c) { return $c->paAccepted->credit ?? $c->paAccepted->amount ?? ($c->pas->first()->credit ?? $c->pas->first()->amount ?? 0); }), true) }}
+                        </div>
+                        <div class="small text-muted">Montant des projets</div>
                     </div>
                 </div>
             </div>

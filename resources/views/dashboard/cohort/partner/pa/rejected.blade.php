@@ -23,6 +23,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ route('export.pdf.deferred') }}" class="btn btn-danger btn-sm text-white shadow-sm me-2">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
                     @php
                         $countDeferred = $adherents->filter(function ($a) {
                             $lp = $a->pas->whereIn('status', ['refused', 'deferred', 'rejected', 'resignation'])->sortByDesc('created_at')->first();

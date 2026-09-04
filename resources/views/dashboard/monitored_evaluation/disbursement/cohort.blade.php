@@ -33,6 +33,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
+                    <a href="{{ route('export.pdf.cohort_detail', $cohort->id) }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
                     <div class="text-center">
                         <div class="badge bg-warning fs-6 px-3 py-2">
                             {{ count($adherents_pending) }}

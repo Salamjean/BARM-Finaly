@@ -10,7 +10,10 @@
             </nav>
         </div>
 
-        <div class="ms-auto">
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <a href="{{ route('export.pdf.cohort_detail', $cohort->id) }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+            </a>
             @if(can('chef-cellule-formation-et-insertion|responsable-preparation-a-la-reconversion|conseiller-preparation-a-la-reconversion|conseiller-en-reconversion'))
             
                 @if (!$profilages->isEmpty())

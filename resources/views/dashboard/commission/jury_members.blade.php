@@ -30,13 +30,15 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
+                    <a href="{{ route('export.pdf.session_presents') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
                     <div class="text-center">
                         <div class="badge bg-info fs-6 px-3 py-2">
                             {{ $commissions->count() }}
                         </div>
                         <small class="text-muted d-block">Sessions</small>
                     </div>
-                    
                 </div>
             </div>
         </div>

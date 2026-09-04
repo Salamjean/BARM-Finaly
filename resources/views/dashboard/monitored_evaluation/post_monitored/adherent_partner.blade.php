@@ -32,10 +32,15 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#reportModal">
-                    <i class="bx bx-plus me-2"></i>
-                    Ajouter un rapport
-                </button>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('export.pdf.adherent', $adherent->user->id) }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
+                    <button type="button" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#reportModal">
+                        <i class="bx bx-plus me-2"></i>
+                        Ajouter un rapport
+                    </button>
+                </div>
             </div>
         </div>
 

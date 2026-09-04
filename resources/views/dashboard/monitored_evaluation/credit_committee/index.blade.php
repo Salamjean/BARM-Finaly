@@ -43,12 +43,13 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <div class="btn-group d-flex justify-content-end">
-                    <div class="d-flex">
-                        <a href="{{ route('monitored-evaluation.credit_committee.create') }}" type="button"
-                            class="btn btn-primary text-end">Organiser
-                        </a>
-                    </div>
+                <div class="btn-group d-flex justify-content-end align-items-center gap-2 mb-3">
+                    <a href="{{ route('export.pdf.session_presents') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
+                    <a href="{{ route('monitored-evaluation.credit_committee.create') }}" type="button"
+                        class="btn btn-primary text-end">Organiser
+                    </a>
                 </div>
                 <div class="card-datatable table-responsive text-nowrap">
                     <table class="dt-responsive table table-striped" id="datatable--barm" style="width:100%">

@@ -154,15 +154,87 @@ class ExportController extends Controller
     {
         $title = 'Gestion des Formations Professionnelles';
         $items = Formation::orderByDESC('created_at')->get();
+
+        if ($items->isEmpty()) {
+            $items = \App\Models\Training::with('partner.user')->orderByDESC('created_at')->get();
+        }
+
         $pdf = PDF::loadView('pdf.exports.formations', compact('title', 'items'));
         return $pdf->download('liste_des_formations.pdf');
     }
 
     public function exportFormationDetail($id)
     {
-        $formation = Formation::with('candidatures.user')->findOrFail($id);
-        $title = 'Détail de la Formation : ' . ($formation->title ?? $formation->name ?? $formation->id);
+        $formation = Formation::with('candidatures.user')->find($id);
+
+        if (!$formation) {
+            $training = \App\Models\Training::with(['participations.candidature.user', 'partner.user', 'cohort'])->findOrFail($id);
+            $title = 'Détail de la Formation : ' . ($training->title ?? ('Formation #' . $training->id));
+            $pdf = PDF::loadView('pdf.exports.training_detail', compact('title', 'training'));
+            return $pdf->download('detail_formation_' . $training->id . '.pdf');
+        }
+
+        $title = 'Détail de la Formation : ' . ($formation->intitule ?? $formation->title ?? ('Formation #' . $formation->id));
         $pdf = PDF::loadView('pdf.exports.formation_detail', compact('title', 'formation'));
         return $pdf->download('detail_formation_' . $formation->id . '.pdf');
+    }
+
+    public function exportRetiredPreregistrations()
+    {
+        $title = 'Liste des Préinscriptions Retraités';
+        $items = \App\Models\RetiredPreregistration::with('retired')->orderByDESC('created_at')->get();
+        $pdf = PDF::loadView('pdf.exports.retired_preregistrations', compact('title', 'items'));
+        return $pdf->download('liste_preinscriptions_retraites.pdf');
+    }
+
+    public function exportAccountOpenings($idCohort)
+    {
+        $cohort = Cohort::findOrFail($idCohort);
+        $title = 'Ouvertures de comptes - Cohorte ' . ($cohort->reference ?? $cohort->title);
+        $items = Candidature::where('cohort_id', $cohort->id)
+            ->whereStep('completed')
+            ->with(['user', 'partnerFinancial.user'])
+            ->get();
+        $pdf = PDF::loadView('pdf.exports.account_openings', compact('title', 'cohort', 'items'));
+        return $pdf->download('ouvertures_comptes_cohorte_' . $cohort->id . '.pdf');
+    }
+
+    public function exportAdherents()
+    {
+        $title = 'Liste Complète des Adhérents';
+        $items = Candidature::whereStep('completed')
+            ->with(['user', 'cohort'])
+            ->orderByDESC('created_at')
+            ->get();
+        $pdf = PDF::loadView('pdf.exports.adherents', compact('title', 'items'));
+        return $pdf->download('liste_des_adherents.pdf');
+    }
+
+    public function exportSessionCollectivePresents()
+    {
+        $title = 'Liste des Candidats Présents aux Sessions Collectives';
+        
+        if (auth()->check() && auth()->user()->roles->first()?->name == 'POINTS FOCAUX') {
+            $items = Candidature::whereHas('createdBy.personnel', function ($query) {
+                $query->where('ville_barm', '=', auth()->user()->personnel->ville_barm);
+            })->where('resignation', '0')->where('death', '0')
+                ->where('orientation', 'auto-emploi')
+                ->whereNotNull('session_id')
+                ->where('session_collective', '1')
+                ->where('status', 'pending')
+                ->with(['user', 'cohort', 'sessionCollective'])
+                ->get();
+        } else {
+            $items = Candidature::where('death', '0')
+                ->whereNotNull('session_id')
+                ->where('orientation', 'auto-emploi')
+                ->where('session_collective', '1')
+                ->where('status', 'pending')
+                ->with(['user', 'cohort', 'sessionCollective'])
+                ->get();
+        }
+
+        $pdf = PDF::loadView('pdf.exports.session_presents', compact('title', 'items'));
+        return $pdf->download('candidats_presents_sessions.pdf');
     }
 }

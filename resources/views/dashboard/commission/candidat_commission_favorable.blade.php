@@ -11,8 +11,9 @@
         </div>
 
         <div class="ms-auto">
-            <div class="btn-group">
-            </div>
+            <a href="{{ route('export.pdf.session_presents') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+            </a>
         </div>
 
     </div>

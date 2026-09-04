@@ -419,10 +419,10 @@
     </style>
 
     <div class="container-fuild">
-        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-            <div class="ps-3 w-100">
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center justify-content-between mb-3">
+            <div class="ps-3">
                 <nav aria-label="breadcrumb">
-                    <h4 class="py-3 text-muted fw-light mb-4">
+                    <h4 class="py-3 text-muted fw-light mb-0">
                         <span class="text-muted fw-light">
                             Suivi-Evaluation / Décaissement / Cohorte /
                             {{ $adherent->cohort->reference }} / Adhérent /
@@ -431,6 +431,9 @@
                     </h4>
                 </nav>
             </div>
+            <a href="{{ route('export.pdf.adherent', $adherent->user->id) }}" class="btn btn-danger btn-sm text-white shadow-sm me-3">
+                <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+            </a>
         </div>
 
         <div class="mb-10">

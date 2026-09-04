@@ -32,13 +32,28 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
+                    <a href="{{ route('export.pdf.cohorts') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                    </a>
                     <div class="text-center">
                         <div class="badge bg-primary fs-6 px-3 py-2">
                             {{ $cohorts->count() }}
                         </div>
                         <small class="text-muted d-block">Cohortes</small>
                     </div>
-                    
+                    @php
+                        $totalAmountAllCohorts = $cohorts->sum(function($cohort) {
+                            return $cohort->adhrents->sum(function($adherent) {
+                                return $adherent->paAccepted->credit ?? $adherent->paAccepted->amount ?? 0;
+                            });
+                        });
+                    @endphp
+                    <div class="text-center">
+                        <div class="badge bg-success fs-6 px-3 py-2">
+                            {{ amount($totalAmountAllCohorts, true) }}
+                        </div>
+                        <small class="text-muted d-block">Montant total des projets</small>
+                    </div>
                 </div>
             </div>
         </div>

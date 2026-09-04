@@ -2,15 +2,20 @@
 
 @section('content')
 <div class="container-fluid px-4">
-    <div class="row mb-4">
-        <div class="col-12">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item me-2"><a href="#" class="text-decoration-none">Commissions d'approbations</a></li> /
                     <li class="ms-2 active" aria-current="page">{{ $title }}</li>
                 </ol>
             </nav>
-            <h1 class="h2 fw-bold text-primary">{{ $title }}</h1>
+            <h1 class="h2 fw-bold text-primary mb-0">{{ $title }}</h1>
+        </div>
+        <div class="col-auto">
+            <a href="{{ route('export.pdf.session_presents') }}" class="btn btn-danger btn-sm text-white shadow-sm">
+                <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+            </a>
         </div>
     </div>
 
