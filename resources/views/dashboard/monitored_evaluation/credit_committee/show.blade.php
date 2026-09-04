@@ -44,17 +44,35 @@
             </div>
         </div>
 
+        @php
+            $pendingCommittees = $pv->creditCommittees->where('status', 'pending');
+            $finishedCommittees = $pv->creditCommittees->where('status', 'finished');
+            $ajourneCommittees = $pv->creditCommittees->where('status', 'ajourne');
+
+            $totalPending = $pendingCommittees->sum(function($c) {
+                return $c->candidature?->paAccepted?->credit ?? 0;
+            });
+
+            $totalFinished = $finishedCommittees->sum(function($c) {
+                return $c->amount_agreed ?: ($c->candidature?->paAccepted?->credit ?? 0);
+            });
+
+            $totalAjourne = $ajourneCommittees->sum(function($c) {
+                return $c->candidature?->paAccepted?->credit ?? 0;
+            });
+        @endphp
+
         <div class="mb-10">
             <div class="card-body">
                 <!-- Nav -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <ul id="myTab" class="nav nav-segment nav-pills scrollbar-horizontal mb-0" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active" id="pills-one-code-features-example1-tab" data-bs-toggle="pill"
                                 href="#pills-one-code-features-example1" role="tab"
                                 aria-controls="pills-one-code-features-example1" aria-selected="true">
                                 En attente <span
-                                    class="text-info px-2">{{ count($pv->creditCommittees->where('status', 'pending')) }}</span>
+                                    class="text-info px-2">{{ count($pendingCommittees) }}</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -62,7 +80,7 @@
                                 href="#pills-two-code-features-example1" role="tab"
                                 aria-controls="pills-two-code-features-example1" aria-selected="false">
                                 Approuvé <span
-                                    class="text-info px-2">{{ count($pv->creditCommittees->where('status', 'finished')) }}</span>
+                                    class="text-info px-2">{{ count($finishedCommittees) }}</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -70,13 +88,25 @@
                                 href="#pills-three-code-features-example1" role="tab"
                                 aria-controls="pills-three-code-features-example1" aria-selected="false">
                                 Ajournés <span
-                                    class="text-warning px-2">{{ count($pv->creditCommittees->where('status', 'ajourne')) }}</span>
+                                    class="text-warning px-2">{{ count($ajourneCommittees) }}</span>
                             </a>
                         </li>
                     </ul>
-                    <a href="{{ route('export.pdf.session_presents') }}" class="btn btn-danger btn-sm text-white shadow-sm">
-                        <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
-                    </a>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="card bg-primary text-white mb-0 shadow-sm px-3 py-1 border-0 rounded-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bx bx-wallet fs-5"></i>
+                                <div>
+                                    <small class="d-block text-white-50 lh-1" style="font-size: 11px;">Montant Total</small>
+                                    <strong id="currentTotalAmount" class="fs-6">{{ amount($totalPending) }} F CFA</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ route('export.pdf.session_presents') }}" class="btn btn-danger btn-sm text-white shadow-sm py-2">
+                            <i class="bx bxs-file-pdf me-1"></i> Télécharger en PDF
+                        </a>
+                    </div>
                 </div>
                 <!-- Tab Content -->
                 <div class="tab-content">
@@ -476,6 +506,26 @@
                     form.submit();
                 }
             }
+
+            // Mettre à jour dynamiquement le montant total selon l'onglet actif
+            document.addEventListener('DOMContentLoaded', function() {
+                var totalAmountEl = document.getElementById('currentTotalAmount');
+                var tabTotals = {
+                    'pills-one-code-features-example1-tab': '{{ amount($totalPending) }} F CFA',
+                    'pills-two-code-features-example1-tab': '{{ amount($totalFinished) }} F CFA',
+                    'pills-three-code-features-example1-tab': '{{ amount($totalAjourne) }} F CFA'
+                };
+
+                var tabLinks = document.querySelectorAll('#myTab a[data-bs-toggle="pill"]');
+                tabLinks.forEach(function(tab) {
+                    tab.addEventListener('shown.bs.tab', function(e) {
+                        var tabId = e.target.id;
+                        if (tabTotals[tabId] && totalAmountEl) {
+                            totalAmountEl.textContent = tabTotals[tabId];
+                        }
+                    });
+                });
+            });
         </script>
     @endpush
 @endsection

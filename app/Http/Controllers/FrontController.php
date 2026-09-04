@@ -13,6 +13,7 @@ use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FrontController extends Controller
 {
@@ -189,14 +190,15 @@ public function preregistrationForm()
             }
 
             // Vérification si une demande n'existe pas déjà
-            $existingRequest = RetiredPreregistration::where('mecano', $request->mecano)
-                ->where('status', 'pending')
-                ->first();
+            $existingRequest = RetiredPreregistration::where(function($q) use ($request, $retired) {
+                $q->where('mecano', $request->mecano)
+                  ->orWhere('retired_id', $retired->id);
+            })->first();
 
             if ($existingRequest) {
                 return response()->json([
-                    'status' => 'warning',
-                    'message' => 'Une demande de préinscription est déjà en cours de traitement pour ce mécano.'
+                    'status' => 'already_registered',
+                    'message' => 'Une pré-inscription a déjà été enregistrée pour votre mécano.'
                 ]);
             }
 
@@ -287,14 +289,15 @@ public function preregistrationForm()
             }
 
             // Vérification si une demande n'existe pas déjà
-            $existingRequest = RetiredPreregistration::where('mecano', $request->mecano)
-                ->where('status', 'pending')
-                ->first();
+            $existingRequest = RetiredPreregistration::where(function($q) use ($request, $retired) {
+                $q->where('mecano', $request->mecano)
+                  ->orWhere('retired_id', $retired->id);
+            })->first();
 
             if ($existingRequest) {
                 return response()->json([
-                    'status' => 'warning',
-                    'message' => 'Une demande de préinscription est déjà en cours de traitement pour ce mécano.'
+                    'status' => 'already_registered',
+                    'message' => 'Une demande de préinscription est déjà enregistrée pour ce mécano.'
                 ]);
             }
 
@@ -360,5 +363,15 @@ public function preregistrationForm()
                 'message' => 'Une erreur technique est survenue. Veuillez réessayer plus tard.'
             ], 500);
         }
+    }
+
+    /**
+     * Télécharger la fiche d'information et dossiers de préinscription en PDF
+     */
+    public function downloadPreregistrationPdf()
+    {
+        $title = 'Informations de Pré-inscription BARM';
+        $pdf = Pdf::loadView('pdf.exports.preregistration_info', compact('title'));
+        return $pdf->download('pre_inscription_barm_informations.pdf');
     }
 }

@@ -37,7 +37,7 @@
             
 
 
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+            <div id="formCardContainer" class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
                 <div class="text-center mb-8">
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">
                         Formulaire de Pré-inscription
@@ -222,8 +222,157 @@
                 </form>
             </div>
 
+            <!-- Success View Container -->
+            <div id="successView" class="hidden space-y-8 bg-white rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8">
+                <!-- Banner Success -->
+                <div class="bg-emerald-50 border-2 border-emerald-500 rounded-2xl p-6 text-center shadow-sm">
+                    <div class="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-md">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h2 id="successBannerTitle" class="text-2xl md:text-3xl font-extrabold text-emerald-800 mb-2">
+                        Pré-inscription terminée !
+                    </h2>
+                    <p id="successBannerSubtitle" class="text-base md:text-lg font-semibold text-emerald-700 max-w-2xl mx-auto">
+                        Merci de vous rapprocher du bureau BARM le plus proche pour votre inscription.
+                    </p>
+                </div>
+
+                <!-- Points Focaux Table Card -->
+                <div class="bg-white rounded-xl border border-gray-300 shadow-sm overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white px-6 py-4 flex items-center justify-between">
+                        <h3 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-red-500"></i>
+                            Bureaux BARM et Points Focaux
+                        </h3>
+                        <span class="text-xs bg-blue-600 px-3 py-1 rounded-full font-semibold">Contacts</span>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 border-b border-gray-300 text-gray-800 font-bold uppercase text-xs">
+                                    <th class="py-3 px-4 w-12 text-center">N°</th>
+                                    <th class="py-3 px-4">ZONE DE COMPÉTENCE</th>
+                                    <th class="py-3 px-4">CONTACTS</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="py-3 px-4 text-center font-bold text-gray-500">1</td>
+                                    <td class="py-3 px-4 font-semibold text-gray-900">POINT FOCAL MAN</td>
+                                    <td class="py-3 px-4 text-blue-700 font-medium">0709106274 / 0101427374</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="py-3 px-4 text-center font-bold text-gray-500">2</td>
+                                    <td class="py-3 px-4 font-semibold text-gray-900">POINT FOCAL KORHOGO</td>
+                                    <td class="py-3 px-4 text-blue-700 font-medium">0777976090 / 0759365610</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="py-3 px-4 text-center font-bold text-gray-500">3</td>
+                                    <td class="py-3 px-4 font-semibold text-gray-900">POINT FOCAL BOUAKE</td>
+                                    <td class="py-3 px-4 text-blue-700 font-medium">0103476391</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="py-3 px-4 text-center font-bold text-gray-500">4</td>
+                                    <td class="py-3 px-4 font-semibold text-gray-900">POINT FOCAL ABENGOUROU</td>
+                                    <td class="py-3 px-4 text-blue-700 font-medium">0102798715</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="py-3 px-4 text-center font-bold text-gray-500">5</td>
+                                    <td class="py-3 px-4 font-semibold text-gray-900">POINT FOCAL DALOA</td>
+                                    <td class="py-3 px-4 text-blue-700 font-medium">0140098122</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="py-3 px-4 text-center font-bold text-gray-500">6</td>
+                                    <td class="py-3 px-4 font-semibold text-gray-900">POINT FOCAL SAN-PEDRO</td>
+                                    <td class="py-3 px-4 text-blue-700 font-medium">0709094077 / 0102470800</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="py-3 px-4 text-center font-bold text-gray-500">7</td>
+                                    <td class="py-3 px-4 font-semibold text-gray-900">POINT FOCAL EGS MARCORY</td>
+                                    <td class="py-3 px-4 text-blue-700 font-medium">0747642888</td>
+                                </tr>
+                                <tr class="bg-blue-50/50 hover:bg-blue-50 transition-colors">
+                                    <td class="py-3 px-4 text-center font-bold text-blue-600">8</td>
+                                    <td class="py-3 px-4 font-bold text-gray-900">
+                                        BARM ABIDJAN (Siège) Cocody Angré pont Soro
+                                    </td>
+                                    <td class="py-3 px-4 text-blue-700 font-semibold">
+                                        0504423153 / 0747709955<br>
+                                        0152441468 / 0556499851
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Dossiers d'inscription Card -->
+                <div class="bg-white rounded-xl border border-gray-300 shadow-sm p-6">
+                    <h3 class="text-base md:text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200 flex items-center gap-2">
+                        <i class="fas fa-folder-open text-amber-600"></i>
+                        DOSSIERS D’INSCRIPTION AU BUREAU D’ACCOMPAGNEMENT A LA RECONVERSION DES MILITAIRES (BARM)
+                    </h3>
+
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-800 font-medium">
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Demande manuscrite adressée au Chef BARM</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Fiche d’inscription à retirer au BARM (pré-profilage)</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Curriculum Vitae (CV)</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Fiche d’engagement légalisée (à télécharger par le candidat)</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Fiche individuelle (DORH / BRH) ou L’Etat signalétique des services (Troupe) pour les Gendarmes</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Copie d’une pièce d’identité (CNI ou carte de retraité ou passeport)</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Arrêté de radiation</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Quatre (04) photos d’identité</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Chemise à rabat</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <i class="fas fa-check-square text-emerald-600 mt-1"></i>
+                            <span>Certificat médical (pathologies spécifiques)</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+                    <a href="{{ route('preregistration.pdf') }}" target="_blank" class="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fas fa-file-pdf"></i>
+                        Télécharger les informations (PDF)
+                    </a>
+                    <a href="{{ route('acceuil') }}" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fas fa-home"></i>
+                        Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+
             <!-- Information Cards (Moved to bottom) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div id="infoCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
                 <div class="bg-blue-50 p-6 rounded-xl text-center">
                     <i class="fas fa-shield-check text-3xl text-blue-600 mb-4"></i>
                     <h3 class="font-semibold text-gray-900 mb-2">Vérification Automatique</h3>
@@ -385,6 +534,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 btnVerify.classList.add('hidden');
                 btnSubmit.classList.remove('hidden');
                 
+            } else if (data.status === 'already_registered') {
+                showSuccessView(true);
             } else if (data.status === 'error') {
                 showAlert('error', data.message);
             } else if (data.status === 'warning') {
@@ -439,12 +590,9 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                showAlert('success', data.message);
-                
-                // Redirect to home after 3 seconds
-                setTimeout(() => {
-                    window.location.href = '{{ route("acceuil") }}';
-                }, 3000);
+                showSuccessView(false);
+            } else if (data.status === 'already_registered') {
+                showSuccessView(true);
             } else if (data.status === 'error') {
                 showAlert('error', data.message);
             } else if (data.status === 'warning') {
@@ -499,6 +647,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function hideAlert() {
         alertDiv.classList.add('hidden');
+    }
+
+    function showSuccessView(isAlreadyRegistered = false) {
+        hideAlert();
+        
+        const formCard = document.getElementById('formCardContainer');
+        if (formCard) formCard.classList.add('hidden');
+        
+        const infoCards = document.getElementById('infoCardsContainer');
+        if (infoCards) infoCards.classList.add('hidden');
+
+        const titleEl = document.getElementById('successBannerTitle');
+        const subtitleEl = document.getElementById('successBannerSubtitle');
+
+        if (isAlreadyRegistered) {
+            if (titleEl) titleEl.textContent = "Vous êtes déjà pré-inscrit !";
+            if (subtitleEl) subtitleEl.textContent = "Votre demande de pré-inscription est déjà enregistrée dans nos services. Vous pouvez télécharger la fiche d'informations ci-dessous.";
+        } else {
+            if (titleEl) titleEl.textContent = "Pré-inscription terminée !";
+            if (subtitleEl) subtitleEl.textContent = "Merci de vous rapprocher du bureau BARM le plus proche pour votre inscription.";
+        }
+
+        const successView = document.getElementById('successView');
+        if (successView) {
+            successView.classList.remove('hidden');
+            successView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 });
 </script>
