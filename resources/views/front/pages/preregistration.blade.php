@@ -270,7 +270,7 @@
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="py-3 px-4 text-center font-bold text-gray-500">3</td>
                                     <td class="py-3 px-4 font-semibold text-gray-900">POINT FOCAL BOUAKE</td>
-                                    <td class="py-3 px-4 text-blue-700 font-medium">0103476391</td>
+                                    <td class="py-3 px-4 text-blue-700 font-medium">0103476391 / 07 58 48 41 93</td>
                                 </tr>
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="py-3 px-4 text-center font-bold text-gray-500">4</td>
@@ -360,9 +360,13 @@
 
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-                    <a href="{{ route('preregistration.pdf') }}" target="_blank" class="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+                    <a id="btnDownloadInfo" href="{{ route('preregistration.pdf') }}" target="_blank" class="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-sm">
                         <i class="fas fa-file-pdf"></i>
                         Télécharger les informations (PDF)
+                    </a>
+                    <a id="btnDownloadFicheEngagement" href="{{ route('preregistration.fiche_engagement.pdf') }}" target="_blank" class="bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fas fa-file-contract"></i>
+                        Télécharger la Fiche d'Engagement (PDF)
                     </a>
                     <a href="{{ route('acceuil') }}" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm">
                         <i class="fas fa-home"></i>
@@ -667,6 +671,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             if (titleEl) titleEl.textContent = "Pré-inscription terminée !";
             if (subtitleEl) subtitleEl.textContent = "Merci de vous rapprocher du bureau BARM le plus proche pour votre inscription.";
+        }
+
+        const mecanoVal = document.getElementById('mecano') ? document.getElementById('mecano').value.trim() : '';
+        const btnEngagement = document.getElementById('btnDownloadFicheEngagement');
+        if (btnEngagement && mecanoVal) {
+            const baseUrl = '{{ route("preregistration.fiche_engagement.pdf") }}';
+            btnEngagement.href = `${baseUrl}?mecano=${encodeURIComponent(mecanoVal)}`;
         }
 
         const successView = document.getElementById('successView');

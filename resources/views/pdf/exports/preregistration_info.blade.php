@@ -180,7 +180,7 @@
             <tr>
                 <td style="text-align: center; font-weight: bold;">3</td>
                 <td>POINT FOCAL BOUAKE</td>
-                <td>0103476391</td>
+                <td>0103476391 / 07 58 48 41 93</td>
             </tr>
             <tr>
                 <td style="text-align: center; font-weight: bold;">4</td>

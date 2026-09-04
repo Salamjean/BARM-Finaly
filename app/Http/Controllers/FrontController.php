@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ad;
+use App\Models\Candidature;
 use App\Models\JobOffer;
 use App\Models\NewsCast;
 use App\Models\Partner;
@@ -10,6 +11,7 @@ use App\Models\Retired;
 use App\Models\RetiredPreregistration;
 use App\Models\Setting;
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -373,5 +375,177 @@ public function preregistrationForm()
         $title = 'Informations de Pré-inscription BARM';
         $pdf = Pdf::loadView('pdf.exports.preregistration_info', compact('title'));
         return $pdf->download('pre_inscription_barm_informations.pdf');
+    }
+
+    /**
+     * Télécharger la fiche individuelle d'engagement en PDF
+     */
+    public function downloadFicheEngagementPdf(Request $request)
+    {
+        $mecano = trim($request->get('mecano', ''));
+        $preregistration = null;
+        $retired = null;
+        $user = null;
+        $candidature = null;
+
+        if ($mecano) {
+            $mecanoDigits = preg_replace('/[^0-9]/', '', $mecano);
+            $mecanoSuffix = (strlen($mecanoDigits) >= 4) ? substr($mecanoDigits, -4) : $mecanoDigits;
+
+            // 1. Recherche dans RetiredPreregistration
+            $preregistration = RetiredPreregistration::with('retired')->where('mecano', $mecano)->latest()->first();
+            if (!$preregistration && $mecanoSuffix) {
+                $preregistration = RetiredPreregistration::with('retired')->where('mecano', 'LIKE', '%' . $mecanoSuffix)->latest()->first();
+            }
+
+            // 2. Recherche dans Retired
+            $retired = $preregistration?->retired;
+            if (!$retired) {
+                $retired = Retired::where('mecano', $mecano)
+                    ->orWhere('matricule', $mecano)
+                    ->orWhere('personal_id', $mecano)
+                    ->first();
+
+                if (!$retired && $mecanoSuffix) {
+                    $retireds = Retired::where('mecano', 'LIKE', '%' . $mecanoSuffix)
+                        ->orWhere('matricule', 'LIKE', '%' . $mecanoSuffix)
+                        ->get();
+                    $retired = $retireds->first();
+                }
+            }
+
+            // 3. Recherche dans User
+            $user = User::with('candidate')->where('mecano', $mecano)
+                ->orWhere('matricule', $mecano)
+                ->orWhere('username', $mecano)
+                ->first();
+
+            if (!$user && $mecanoSuffix) {
+                $user = User::with('candidate')->where('mecano', 'LIKE', '%' . $mecanoSuffix)
+                    ->orWhere('matricule', 'LIKE', '%' . $mecanoSuffix)
+                    ->first();
+            }
+
+            if (!$user && $retired) {
+                $user = User::with('candidate')->where('mecano', $retired->mecano)
+                    ->orWhere('matricule', $retired->matricule)
+                    ->first();
+            }
+
+            // 4. Recherche dans Candidature
+            if ($user && $user->candidate) {
+                $candidature = $user->candidate;
+            } else {
+                $candidature = Candidature::where('no_card', $mecano)
+                    ->orWhere('cgrae_no', $mecano)
+                    ->first();
+
+                if (!$candidature && $retired) {
+                    $candidature = Candidature::where('cgrae_no', $retired->matricule)
+                        ->orWhere('no_card', $retired->personal_id)
+                        ->orWhere('no_card', $retired->mecano)
+                        ->first();
+                }
+            }
+
+            // Liens croisés de secours
+            if ($candidature && !$user && $candidature->user_id) {
+                $user = User::find($candidature->user_id);
+            }
+        } else {
+            // Fallback si aucun mécano n'est spécifié
+            $preregistration = RetiredPreregistration::with('retired')->latest()->first();
+            $retired = $preregistration?->retired;
+            if ($retired) {
+                $user = User::with('candidate')->where('mecano', $retired->mecano)->orWhere('matricule', $retired->matricule)->first();
+                $candidature = $user?->candidate;
+            }
+        }
+
+        // Résolution de la photo d'identité
+        $photoPath = null;
+        $candidateImg = $candidature?->image;
+        $retiredImg = $retired?->file_authorization;
+        if ($candidateImg && file_exists(public_path(ltrim($candidateImg, '/')))) {
+            $photoPath = ltrim($candidateImg, '/');
+        } elseif ($retiredImg && file_exists(public_path(ltrim($retiredImg, '/')))) {
+            $photoPath = ltrim($retiredImg, '/');
+        }
+
+        // Résolution exhaustive des informations personnelles
+        $nom = strtoupper(
+            $preregistration?->lastname 
+            ?? $retired?->lastname 
+            ?? $user?->lastname 
+            ?? $candidature?->user?->lastname 
+            ?? ''
+        );
+
+        $prenoms = ucwords(strtolower(
+            $preregistration?->firstname 
+            ?? $retired?->firstname 
+            ?? $user?->firstname 
+            ?? $candidature?->user?->firstname 
+            ?? ''
+        ));
+        
+        $rawGender = $candidature?->gender ?? $retired?->gender ?? '';
+        $sexe = '';
+        if (in_array(strtoupper($rawGender), ['M', 'MALE', 'MASCULIN'])) {
+            $sexe = 'M';
+        } elseif (in_array(strtoupper($rawGender), ['F', 'FEMALE', 'FEMININ'])) {
+            $sexe = 'F';
+        } else {
+            $sexe = strtoupper($rawGender);
+        }
+
+        $matriculeCgrae = $candidature?->cgrae_no 
+            ?? $retired?->matricule 
+            ?? $retired?->mecano 
+            ?? $preregistration?->mecano 
+            ?? $user?->mecano 
+            ?? $user?->matricule 
+            ?? '';
+
+        $noCard = $candidature?->no_card 
+            ?? $candidature?->id_card 
+            ?? $candidature?->carte_pro 
+            ?? $retired?->personal_id 
+            ?? $retired?->matricule 
+            ?? '';
+
+        $adresse = $preregistration?->residence 
+            ?? $candidature?->residence 
+            ?? $candidature?->address 
+            ?? '';
+        
+        $telephone = $preregistration?->phone 
+            ?? $candidature?->phone_number 
+            ?? $user?->phone 
+            ?? '';
+        $phone2 = $preregistration?->phone2 
+            ?? $candidature?->phone_number2 
+            ?? '';
+        if ($phone2 && $phone2 !== $telephone) {
+            $telephone .= ' / ' . $phone2;
+        }
+
+        $email = $user?->email ?? $preregistration?->email ?? '';
+
+        $urgenceNom = $candidature?->sos_person_fullname ?? '';
+        $urgencePhone = $candidature?->sos_person_phone_number ?? '';
+        $urgencePhone2 = $candidature?->sos_person_phone_number2 ?? '';
+        if ($urgencePhone2 && $urgencePhone2 !== $urgencePhone) {
+            $urgencePhone .= ' / ' . $urgencePhone2;
+        }
+        $urgenceEmail = $preregistration?->emergency_contact_email ?? '';
+
+        $pdf = Pdf::loadView('pdf.exports.fiche_engagement', compact(
+            'nom', 'prenoms', 'sexe', 'matriculeCgrae', 'noCard', 'adresse',
+            'telephone', 'email', 'urgenceNom', 'urgencePhone', 'urgenceEmail',
+            'photoPath'
+        ));
+
+        return $pdf->download('fiche_individuelle_engagement_barm.pdf');
     }
 }

@@ -119,6 +119,7 @@ Route::middleware('guest')->group(function () {
 Route::get('/', [FrontController::class, 'acceuil'])->name('acceuil');
 Route::get('/preregistration', [FrontController::class, 'preregistrationForm'])->name('preregistration.form');
 Route::get('/preregistration/pdf', [FrontController::class, 'downloadPreregistrationPdf'])->name('preregistration.pdf');
+Route::get('/preregistration/fiche-engagement/pdf', [FrontController::class, 'downloadFicheEngagementPdf'])->name('preregistration.fiche_engagement.pdf');
 Route::post('/retired/preregistration/verify', [FrontController::class, 'verifyRetired'])->name('retired.preregistration.verify');
 Route::post('/retired/preregistration', [FrontController::class, 'submitPreregistration'])->name('retired.preregistration.submit');
 Route::get('/about', [FrontController::class, 'about'])->name('about');
