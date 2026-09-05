@@ -499,45 +499,53 @@ public function preregistrationForm()
             $sexe = strtoupper($rawGender);
         }
 
-        $matriculeCgrae = $candidature?->cgrae_no 
-            ?? $retired?->matricule 
-            ?? $retired?->mecano 
-            ?? $preregistration?->mecano 
-            ?? $user?->mecano 
-            ?? $user?->matricule 
-            ?? '';
+        // Formatage helper pour garantir des numéros de téléphone à 10 chiffres
+        $formatPhone = function($phone) {
+            if (!$phone) return '';
+            $parts = preg_split('/[\/]+/', $phone);
+            $formattedParts = [];
+            foreach ($parts as $part) {
+                $digits = preg_replace('/[^0-9]/', '', $part);
+                if (strlen($digits) === 12 && str_starts_with($digits, '225')) {
+                    $digits = substr($digits, 3);
+                }
+                if (!empty($digits)) {
+                    $formattedParts[] = $digits;
+                }
+            }
+            return implode(' / ', array_unique($formattedParts));
+        };
 
-        $noCard = $candidature?->no_card 
-            ?? $candidature?->id_card 
-            ?? $candidature?->carte_pro 
-            ?? $retired?->personal_id 
-            ?? $retired?->matricule 
-            ?? '';
+        // Conformément à la demande : laisser les colonnes Matricule CGRAE et N° CNI vides
+        $matriculeCgrae = '';
+        $noCard = '';
 
         $adresse = $preregistration?->residence 
             ?? $candidature?->residence 
             ?? $candidature?->address 
             ?? '';
         
-        $telephone = $preregistration?->phone 
+        $rawPhone = $preregistration?->phone 
             ?? $candidature?->phone_number 
             ?? $user?->phone 
             ?? '';
         $phone2 = $preregistration?->phone2 
             ?? $candidature?->phone_number2 
             ?? '';
-        if ($phone2 && $phone2 !== $telephone) {
-            $telephone .= ' / ' . $phone2;
+        if ($phone2 && $phone2 !== $rawPhone) {
+            $rawPhone .= ' / ' . $phone2;
         }
+        $telephone = $formatPhone($rawPhone);
 
         $email = $user?->email ?? $preregistration?->email ?? '';
 
         $urgenceNom = $candidature?->sos_person_fullname ?? '';
-        $urgencePhone = $candidature?->sos_person_phone_number ?? '';
+        $rawUrgencePhone = $candidature?->sos_person_phone_number ?? '';
         $urgencePhone2 = $candidature?->sos_person_phone_number2 ?? '';
-        if ($urgencePhone2 && $urgencePhone2 !== $urgencePhone) {
-            $urgencePhone .= ' / ' . $urgencePhone2;
+        if ($urgencePhone2 && $urgencePhone2 !== $rawUrgencePhone) {
+            $rawUrgencePhone .= ' / ' . $urgencePhone2;
         }
+        $urgencePhone = $formatPhone($rawUrgencePhone);
         $urgenceEmail = $preregistration?->emergency_contact_email ?? '';
 
         $pdf = Pdf::loadView('pdf.exports.fiche_engagement', compact(

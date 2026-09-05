@@ -243,7 +243,7 @@
             <td class="val-col">{{ $noCard }}</td>
         </tr>
         <tr>
-            <td class="label-col">Adresse postale</td>
+            <td class="label-col">Lieu de résidence</td>
             <td class="colon-col">:</td>
             <td class="val-col">{{ $adresse }}</td>
         </tr>
