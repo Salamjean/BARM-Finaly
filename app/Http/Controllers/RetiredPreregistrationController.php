@@ -60,7 +60,17 @@ class RetiredPreregistrationController extends Controller
     {
         $preregistration = RetiredPreregistration::with(['retired', 'processedBy'])->findOrFail($id);
         
-        return view('dashboard.retired_preregistrations.show', compact('preregistration'));
+        $mecano = $preregistration->mecano;
+        $user = null;
+        $candidature = null;
+        if ($mecano) {
+            $user = \App\Models\User::with('candidate')->where('mecano', $mecano)
+                ->orWhere('matricule', $mecano)
+                ->first();
+            $candidature = $user?->candidate ?? \App\Models\Candidature::where('no_card', $mecano)->orWhere('cgrae_no', $mecano)->first();
+        }
+
+        return view('dashboard.retired_preregistrations.show', compact('preregistration', 'candidature', 'user'));
     }
 
     /**

@@ -145,9 +145,9 @@
                                     <td>
                                         @if ($adherent->paPending && $adherent->paPending->url)
                                             <div class="border-start border-success border-3 ps-2 py-1">
-                                                <a href="{{ asset($adherent->paPending->url) }}"
-                                                    title="Télécharger le plan d'affaire" target="_blank"
-                                                    class="fw-medium text-success" download><i
+                                                <a href="{{ route('pa.download', $adherent->paPending->id) }}"
+                                                    title="Télécharger le plan d'affaire"
+                                                    class="fw-medium text-success"><i
                                                         class="bx bx-file-blank me-1"></i></a>
                                             </div>
                                         @else

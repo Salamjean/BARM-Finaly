@@ -71,8 +71,16 @@ class PAController extends Controller
         $attrs['status'] = 'in_progress';
 
         if (isset($attrs['url'])) {
-            $image = $adherent->user->username . '_' . $request->title . '.' . $attrs['url']->getClientOriginalExtension();
-            $attrs['url']->move(saveByEnv() . "data/docs/pa/", $image);
+            $username = \Illuminate\Support\Str::slug($adherent->user?->username ?? 'user');
+            $titleSlug = \Illuminate\Support\Str::slug($request->title ?? 'pa');
+            $extension = $attrs['url']->getClientOriginalExtension();
+            $image = $username . '_' . $titleSlug . '_' . time() . '.' . $extension;
+            
+            $destinationFolder = public_path('data/docs/pa');
+            if (!file_exists($destinationFolder)) {
+                mkdir($destinationFolder, 0755, true);
+            }
+            $attrs['url']->move($destinationFolder, $image);
             $attrs['url'] = 'data/docs/pa/' . $image;
         }
 
@@ -208,6 +216,54 @@ class PAController extends Controller
             'adherents' => $adherents,
             'partner_financials' =>
                 $partner_financials,
+        ]);
+    }
+
+    /**
+     * Télécharger le fichier du plan d'affaires
+     */
+    public function downloadFile($id)
+    {
+        $pa = PA::with('candidature.user')->findOrFail($id);
+        $rawUrl = $pa->url;
+
+        if (!$rawUrl) {
+            return back()->with('error', 'Aucun fichier n\'est associé à ce plan d\'affaires.');
+        }
+
+        // Nettoyage du chemin de fichier
+        $cleanUrl = ltrim(str_replace(['public/', '\\'], ['', '/'], $rawUrl), '/');
+        $fileName = basename($cleanUrl);
+
+        // Liste des chemins potentiels sur le disque
+        $possiblePaths = [
+            public_path($cleanUrl),
+            public_path('data/docs/pa/' . $fileName),
+            base_path($cleanUrl),
+            base_path('public/' . $cleanUrl),
+            base_path('data/docs/pa/' . $fileName),
+        ];
+
+        $filePath = null;
+        foreach ($possiblePaths as $path) {
+            if ($path && file_exists($path) && !is_dir($path)) {
+                $filePath = $path;
+                break;
+            }
+        }
+
+        if (!$filePath) {
+            return back()->with('error', 'Le fichier du plan d\'affaires est introuvable sur le serveur (404).');
+        }
+
+        $extension = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
+        
+        $userName = $pa->candidature?->user?->username ?? 'beneficiaire';
+        $title = $pa->title ?? 'plan_d_affaires';
+        $downloadName = \Illuminate\Support\Str::slug($userName . '_' . $title) . '.' . $extension;
+
+        return response()->download($filePath, $downloadName, [
+            'Content-Type' => strtolower($extension) === 'pdf' ? 'application/pdf' : 'application/octet-stream',
         ]);
     }
 }

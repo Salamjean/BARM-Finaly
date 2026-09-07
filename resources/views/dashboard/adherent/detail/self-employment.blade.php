@@ -16,7 +16,7 @@
                                     <div class="d-flex align-items-center justify-content-between mb-3">
                                         <span class="badge bg-warning text-dark fs-6 px-3 py-2">PA
                                             {{ $key + 1 }}</span>
-                                        <a href="{{ asset($pa->url) }}" class="btn btn-primary btn-sm" download>
+                                        <a href="{{ route('pa.download', $pa->id) }}" class="btn btn-primary btn-sm">
                                             <i class="bx bx-download me-1"></i> Télécharger
                                         </a>
                                     </div>

@@ -149,7 +149,7 @@
                                                                         {{ amount($lastPa->amount, true) }}
                                                                     </div>
                                                                     @if($lastPa->url)
-                                                                        <a href="{{ asset($lastPa->url) }}" target="_blank"
+                                                                        <a href="{{ route('pa.download', $lastPa->id) }}"
                                                                             class="btn btn-outline-primary btn-sm mt-1">
                                                                             <i class="bx bx-download me-1"></i>
                                                                             Télécharger

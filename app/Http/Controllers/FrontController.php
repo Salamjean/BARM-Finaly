@@ -525,15 +525,21 @@ public function preregistrationForm()
             ?? $candidature?->address 
             ?? '';
         
-        $rawPhone = $preregistration?->phone 
-            ?? $candidature?->phone_number 
-            ?? $user?->phone 
-            ?? '';
-        $phone2 = $preregistration?->phone2 
-            ?? $candidature?->phone_number2 
-            ?? '';
-        if ($phone2 && $phone2 !== $rawPhone) {
-            $rawPhone .= ' / ' . $phone2;
+        if ($preregistration) {
+            $rawPhone = $preregistration->phone ?? '';
+            $phone2 = $preregistration->phone2 ?? '';
+            if ($phone2 && $phone2 !== $rawPhone) {
+                $rawPhone .= ' / ' . $phone2;
+            }
+        } else {
+            $rawPhone = $candidature?->phone_number 
+                ?? $user?->phone 
+                ?? '';
+            $phone2 = $candidature?->phone_number2 
+                ?? '';
+            if ($phone2 && $phone2 !== $rawPhone) {
+                $rawPhone .= ' / ' . $phone2;
+            }
         }
         $telephone = $formatPhone($rawPhone);
 

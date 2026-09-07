@@ -13,13 +13,33 @@
                 <th>Mécano</th>
                 <td><code>{{ $preregistration->mecano }}</code></td>
             </tr>
+            @php
+                $formatPhone = function($phone) {
+                    if (!$phone) return '';
+                    $parts = preg_split('/[\/]+/', $phone);
+                    $formattedParts = [];
+                    foreach ($parts as $part) {
+                        $digits = preg_replace('/[^0-9]/', '', $part);
+                        if (strlen($digits) === 12 && str_starts_with($digits, '225')) {
+                            $digits = substr($digits, 3);
+                        }
+                        if (!empty($digits)) {
+                            $formattedParts[] = $digits;
+                        }
+                    }
+                    return implode(' / ', array_unique($formattedParts));
+                };
+
+                $phone1 = $formatPhone($preregistration->phone ?: ($candidature?->phone_number ?? $user?->phone ?? ''));
+                $phone2 = $formatPhone($preregistration->phone2 ?: ($candidature?->phone_number2 ?? ''));
+            @endphp
             <tr>
                 <th>Téléphone 1</th>
-                <td>{{ $preregistration->phone }}</td>
+                <td>{{ $phone1 ?: '-' }}</td>
             </tr>
             <tr>
                 <th>Téléphone 2</th>
-                <td>{{ $preregistration->phone2 ?? '-' }}</td>
+                <td>{{ $phone2 ?: '-' }}</td>
             </tr>
             <tr>
                 <th>Lieu de résidence</th>

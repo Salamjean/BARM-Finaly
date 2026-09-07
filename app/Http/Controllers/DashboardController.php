@@ -295,26 +295,42 @@ class DashboardController extends Controller
             }
 
             
-            $candidaturesFinanced = Candidature::whereHas('selfEmploymentMonitoredPayment.disbursements', function ($query) {
-                $query->where('status', 'finished');
-            })->get();
+            $allCandidatures = Candidature::all();
 
-            $pensionDeRetraite = 0;
-            $soldeDeReforme = 0;
+            $categoriesCount = [
+                'Pension de retraite' => 0,
+                'Solde de réforme' => 0,
+            ];
 
-            foreach ($candidaturesFinanced as $candidature) {
+            foreach ($allCandidatures as $candidature) {
+                $financials = [];
+                if (!empty($candidature->condition_financiere)) {
+                    $decoded = json_decode($candidature->condition_financiere, true);
+                    if (is_array($decoded)) {
+                        $financials = array_map('trim', $decoded);
+                    } elseif (is_string($candidature->condition_financiere)) {
+                        $financials = [trim($candidature->condition_financiere)];
+                    }
+                }
+
                 $pensionnaire = trim(strtolower($candidature->pensionnaire_cgrae ?? ''));
-                if (in_array($pensionnaire, ['oui', '1', 'true'])) {
-                    $pensionDeRetraite++;
+
+                if (!empty($financials)) {
+                    foreach ($financials as $fin) {
+                        if (!empty($fin)) {
+                            $categoriesCount[$fin] = ($categoriesCount[$fin] ?? 0) + 1;
+                        }
+                    }
                 } else {
-                    $soldeDeReforme++;
+                    if (in_array($pensionnaire, ['oui', '1', 'true'])) {
+                        $categoriesCount['Pension de retraite']++;
+                    } else {
+                        $categoriesCount['Solde de réforme']++;
+                    }
                 }
             }
 
-            $conditions_financieres = [
-                'Pension de retraite' => $pensionDeRetraite,
-                'Solde de réforme' => $soldeDeReforme,
-            ];
+            $conditions_financieres = $categoriesCount;
 
             return view('dashboard', [
                 'adherents_by_condition' => $conditions,
@@ -548,26 +564,42 @@ class DashboardController extends Controller
         }
 
         
-        $candidaturesFinanced = Candidature::whereHas('selfEmploymentMonitoredPayment.disbursements', function ($query) {
-            $query->where('status', 'finished');
-        })->get();
+        $allCandidatures = Candidature::all();
 
-        $pensionDeRetraite = 0;
-        $soldeDeReforme = 0;
+        $categoriesCount = [
+            'Pension de retraite' => 0,
+            'Solde de réforme' => 0,
+        ];
 
-        foreach ($candidaturesFinanced as $candidature) {
+        foreach ($allCandidatures as $candidature) {
+            $financials = [];
+            if (!empty($candidature->condition_financiere)) {
+                $decoded = json_decode($candidature->condition_financiere, true);
+                if (is_array($decoded)) {
+                    $financials = array_map('trim', $decoded);
+                } elseif (is_string($candidature->condition_financiere)) {
+                    $financials = [trim($candidature->condition_financiere)];
+                }
+            }
+
             $pensionnaire = trim(strtolower($candidature->pensionnaire_cgrae ?? ''));
-            if (in_array($pensionnaire, ['oui', '1', 'true'])) {
-                $pensionDeRetraite++;
+
+            if (!empty($financials)) {
+                foreach ($financials as $fin) {
+                    if (!empty($fin)) {
+                        $categoriesCount[$fin] = ($categoriesCount[$fin] ?? 0) + 1;
+                    }
+                }
             } else {
-                $soldeDeReforme++;
+                if (in_array($pensionnaire, ['oui', '1', 'true'])) {
+                    $categoriesCount['Pension de retraite']++;
+                } else {
+                    $categoriesCount['Solde de réforme']++;
+                }
             }
         }
 
-        $conditions_financieres = [
-            'Pension de retraite' => $pensionDeRetraite,
-            'Solde de réforme' => $soldeDeReforme,
-        ];
+        $conditions_financieres = $categoriesCount;
 
         return [
             'adherents_by_condition' => $conditions,

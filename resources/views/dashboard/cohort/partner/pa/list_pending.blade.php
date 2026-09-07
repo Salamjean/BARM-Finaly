@@ -295,9 +295,9 @@
                                             </div>
                                         @elseif (can('partner-financial'))
                                             @php($count = $adherent->pas->count())
-                                            <a href="{{ asset($adherent->pas[$count - 1]->url) }}" download>
-                                                <i class='bx bx-cloud-download fs-2'></i>
-                                            </a>
+                                             <a href="{{ route('pa.download', $adherent->pas[$count - 1]->id) }}" title="Télécharger le plan d'affaires">
+                                                 <i class='bx bx-cloud-download fs-2'></i>
+                                             </a>
                                         @endif
                                     </td>
                                 </tr>

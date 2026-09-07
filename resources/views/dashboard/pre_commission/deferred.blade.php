@@ -219,8 +219,8 @@
                                     <td>
                                         @if ($pa->url)
                                             <div class="border-start border-primary border-3 ps-2 py-1">
-                                                <a href="{{ asset($pa->url) }}" title="Télécharger le plan d'affaire"
-                                                    target="_blank" class="text-primary text-decoration-none fw-medium">
+                                                <a href="{{ route('pa.download', $pa->id) }}" title="Télécharger le plan d'affaire"
+                                                    class="text-primary text-decoration-none fw-medium">
                                                     <i class="bx bx-download me-1"></i>Télécharger
                                                 </a>
                                                 @if ($pa->credit ?? $pa->amount)

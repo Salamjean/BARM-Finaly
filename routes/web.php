@@ -343,11 +343,14 @@ Route::group(['middleware' => ['auth']], function () {
             // Route::get('list_accepted', [PAController::class, 'list_accepted'])->name('list_accepted');
             // Route::get('list_new', [PAController::class, 'list_new_partner_financial'])->name('list_new');
 
+            Route::get('download/{id}', [PAController::class, 'downloadFile'])->name('download');
             Route::get('refused', [PAController::class, 'refused'])->name('refused');
             Route::post('create/{idAdherent}', [PAController::class, 'store'])->name('store');
             Route::put('update/{id}', [PAController::class, 'update'])->name('update');
         });
     });
+
+    Route::get('pa/download/{id}', [PAController::class, 'downloadFile'])->name('pa.download');
 
     /**
      * route monitored-evaluation

@@ -181,9 +181,9 @@
                                                 <div class="d-flex align-items-center">
                                                     <div>
                                                         <div class="fw-medium text-success">
-                                                            <a href="{{ asset($adherent->paAccepted->url) }}"
-                                                                title="Télécharger le plan d'affaire" target="_blank"
-                                                                class="text-success text-decoration-none">
+                                                             <a href="{{ route('pa.download', $adherent->paAccepted->id) }}"
+                                                                 title="Télécharger le plan d'affaire"
+                                                                 class="text-success text-decoration-none">
                                                                 <i class="bx bx-download me-1"></i>
                                                                 Télécharger
                                                             </a>
