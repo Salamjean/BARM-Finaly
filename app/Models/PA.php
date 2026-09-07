@@ -55,4 +55,35 @@ class PA extends Model
     {
         return $this->belongsTo(User::class, 'sentence_by', 'id');
     }
+
+    public function getFilePath(): ?string
+    {
+        if (!$this->url) {
+            return null;
+        }
+
+        $cleanUrl = ltrim(str_replace(['public/', '\\'], ['', '/'], $this->url), '/');
+        $fileName = basename($cleanUrl);
+
+        $possiblePaths = [
+            public_path($cleanUrl),
+            public_path('data/docs/pa/' . $fileName),
+            base_path($cleanUrl),
+            base_path('public/' . $cleanUrl),
+            base_path('data/docs/pa/' . $fileName),
+        ];
+
+        foreach ($possiblePaths as $path) {
+            if ($path && file_exists($path) && !is_dir($path)) {
+                return $path;
+            }
+        }
+
+        return null;
+    }
+
+    public function fileExists(): bool
+    {
+        return $this->getFilePath() !== null;
+    }
 }

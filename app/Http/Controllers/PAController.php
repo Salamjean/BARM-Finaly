@@ -225,35 +225,11 @@ class PAController extends Controller
     public function downloadFile($id)
     {
         $pa = PA::with('candidature.user')->findOrFail($id);
-        $rawUrl = $pa->url;
 
-        if (!$rawUrl) {
-            return back()->with('error', 'Aucun fichier n\'est associé à ce plan d\'affaires.');
-        }
-
-        // Nettoyage du chemin de fichier
-        $cleanUrl = ltrim(str_replace(['public/', '\\'], ['', '/'], $rawUrl), '/');
-        $fileName = basename($cleanUrl);
-
-        // Liste des chemins potentiels sur le disque
-        $possiblePaths = [
-            public_path($cleanUrl),
-            public_path('data/docs/pa/' . $fileName),
-            base_path($cleanUrl),
-            base_path('public/' . $cleanUrl),
-            base_path('data/docs/pa/' . $fileName),
-        ];
-
-        $filePath = null;
-        foreach ($possiblePaths as $path) {
-            if ($path && file_exists($path) && !is_dir($path)) {
-                $filePath = $path;
-                break;
-            }
-        }
+        $filePath = $pa->getFilePath();
 
         if (!$filePath) {
-            return back()->with('error', 'Le fichier du plan d\'affaires est introuvable sur le serveur (404).');
+            return back()->with('error', 'Le fichier physique du plan d\'affaires est introuvable sur le serveur. L\'enregistrement existe bien dans la base de données (table p_a_s), mais le fichier PDF n\'est pas présent dans le dossier public du serveur.');
         }
 
         $extension = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
