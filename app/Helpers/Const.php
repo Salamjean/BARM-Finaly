@@ -24,7 +24,7 @@ const FINANCIAL_CONDITIONS = [
     ],
     [
         'id' => 'pension_retraite',
-        'value' => 'Pension retraite',
+        'value' => 'Pension de retraite',
     ],
     [
         'id' => 'pension_reforme',

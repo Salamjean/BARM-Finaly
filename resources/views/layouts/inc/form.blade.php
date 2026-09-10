@@ -615,8 +615,8 @@
                       <label class="form-check-label" for="perm">Plan épagne retraite mutualiste (PERM)</label>
                   </div><br>
                   <div class="form-check form-check-inline mt-3">
-                      <input class="form-check-input" type="checkbox" id="pension_retraite" value="Pension retraite" />
-                      <label class="form-check-label" for="pension_retraite">Pension retraite</label>
+                      <input class="form-check-input" type="checkbox" id="pension_retraite" value="Pension de retraite" />
+                      <label class="form-check-label" for="pension_retraite">Pension de retraite</label>
                   </div>
                   <div class="form-check form-check-inline mt-3">
                       <input class="form-check-input" type="checkbox" id="pension_reforme"

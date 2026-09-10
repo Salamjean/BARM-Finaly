@@ -318,6 +318,9 @@ class DashboardController extends Controller
                 if (!empty($financials)) {
                     foreach ($financials as $fin) {
                         if (!empty($fin)) {
+                            if ($fin === 'Pension retraite') {
+                                $fin = 'Pension de retraite';
+                            }
                             $categoriesCount[$fin] = ($categoriesCount[$fin] ?? 0) + 1;
                         }
                     }
@@ -587,6 +590,9 @@ class DashboardController extends Controller
             if (!empty($financials)) {
                 foreach ($financials as $fin) {
                     if (!empty($fin)) {
+                        if ($fin === 'Pension retraite') {
+                            $fin = 'Pension de retraite';
+                        }
                         $categoriesCount[$fin] = ($categoriesCount[$fin] ?? 0) + 1;
                     }
                 }

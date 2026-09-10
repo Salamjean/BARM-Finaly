@@ -26,6 +26,7 @@
                             <th>#</th>
                             <th>Partenaires Techniques</th>
                             <th>Partenaires Financiers</th>
+                            <th>Membres du jury</th>
                             <th>Date de tenue</th>
                             <th>Lieu</th>
                             <th>Rapport</th>
@@ -58,6 +59,19 @@
                                 @endif
                                 @endif
                                 @endforeach
+                            </td>
+                            <td>
+                                @foreach ($commission->juries as $jury)
+                                    @if ($jury->partner && $jury->partner->user)
+                                        <span class="badge bg-dark mb-2">{{ $jury->partner->user->username }}</span>
+                                        @if (!$loop->last)
+                                        &nbsp;
+                                        @endif
+                                    @endif
+                                @endforeach
+                                @if ($commission->juries->isEmpty())
+                                    <span class="text-muted small">Aucun membre</span>
+                                @endif
                             </td>
                             <td>{{ dateFr($commission->date) }}</td>
                             <td>{{$commission->lieu}}</td>

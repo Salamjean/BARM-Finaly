@@ -71,6 +71,10 @@
                                     Partenaires Financiers
                                 </th>
                                 <th class="border-0">
+                                    <i class="bx bx-user-check text-primary me-1"></i>
+                                    Membres du jury
+                                </th>
+                                <th class="border-0">
                                     <i class="bx bx-calendar text-primary me-1"></i>
                                     Date & Lieu
                                 </th>
@@ -117,6 +121,20 @@
                                             @endforeach
                                             @if ($commission->partenaires->where('pivot.type', 'partner_financial')->isEmpty())
                                                 <span class="text-muted small">Aucun partenaire financier</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            @foreach ($commission->juries as $jury)
+                                                @if ($jury->partner && $jury->partner->user)
+                                                    <span class="badge bg-dark">
+                                                        {{ $jury->partner->user->username }}
+                                                    </span>
+                                                @endif
+                                            @endforeach
+                                            @if ($commission->juries->isEmpty())
+                                                <span class="text-muted small">Aucun membre</span>
                                             @endif
                                         </div>
                                     </td>

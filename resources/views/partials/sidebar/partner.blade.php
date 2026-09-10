@@ -77,23 +77,22 @@
         </ul>
     </li>
 
-    <li class="menu-item {{ routeActive(['commissions.cohorte']) }}">
+    <li class="menu-item {{ routeActive(['commissions.cohorte', 'commissions.jury_members', 'commissions.commissionpartner']) }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class='menu-icon tf-icons bx bxs-timer'></i>
             <div class="d-flex justify-content-between">
                 <div>Commission d'approbation</div>
-
             </div>
         </a>
         <ul class="menu-sub">
-            {{-- <li class="menu-item {{ routeItem('commissions.in_progress') }}">
-                <a href="{{ route('commissions.in_progress') }}" class="menu-link">
-                    <div>Sur moi</div>
-                </a>
-            </li> --}}
             <li class="menu-item {{ routeItem('commissions.jury_members') }}">
                 <a href="{{ route('commissions.jury_members') }}" class="menu-link">
-                    <div>Membres du jury</div>
+                    <div>Liste des commissions</div>
+                </a>
+            </li>
+            <li class="menu-item {{ routeItem('commissions.cohorte') }}">
+                <a href="{{ route('commissions.cohorte') }}" class="menu-link">
+                    <div>Par cohorte</div>
                 </a>
             </li>
         </ul>
@@ -126,14 +125,25 @@
 
 @if (can('partner-financial'))
 
-    <li
-        class="menu-item {{ routeActive(['commissions.jury_members']) }}">
-        <a href="{{ route('commissions.jury_members') }}" class="menu-link">
+    <li class="menu-item {{ routeActive(['commissions.cohorte', 'commissions.jury_members', 'commissions.commissionpartner']) }}">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class='menu-icon tf-icons bx bx-folder-open'></i>
             <div class="d-flex justify-content-between">
                 <div>Commission d'approbation</div>
             </div>
         </a>
+        <ul class="menu-sub">
+            <li class="menu-item {{ routeItem('commissions.jury_members') }}">
+                <a href="{{ route('commissions.jury_members') }}" class="menu-link">
+                    <div>Liste des commissions</div>
+                </a>
+            </li>
+            <li class="menu-item {{ routeItem('commissions.cohorte') }}">
+                <a href="{{ route('commissions.cohorte') }}" class="menu-link">
+                    <div>Par cohorte</div>
+                </a>
+            </li>
+        </ul>
     </li>
 
     <li

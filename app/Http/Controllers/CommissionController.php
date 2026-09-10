@@ -22,7 +22,7 @@ class CommissionController extends Controller
      */
     public function index(Cohort $cohort)
     {
-        $commissions = Commission::orderByDESC('created_at')->where('cohort_id', $cohort->id)->get();
+        $commissions = Commission::with(['partenaires.user', 'juries.partner.user'])->orderByDESC('created_at')->where('cohort_id', $cohort->id)->get();
 
         $title = 'Liste des commissions - BARM';
 
@@ -48,14 +48,18 @@ class CommissionController extends Controller
                 $partner_id = Auth::user()->partenaire->id;
 
                 if (in_array('partner-technical', userPermissions(Auth::user()))) {
-                    // Vérifier si le partenaire connecté est rattaché à cette commission (table commissionpartenaires)
+                    // Vérifier si le partenaire connecté est rattaché à cette commission (technique, jury ou ayant des candidatures)
                     $is_commission_partner = $commission->partenaires()
                         ->where('partenaire_id', $partner_id)
                         ->where('type', 'partner_technique')
                         ->exists();
 
-                    if ($is_commission_partner) {
-                        // Si le partenaire est rattaché à la commission, tous les candidats sélectionnés
+                    $is_jury_partner = $commission->juries()
+                        ->where('partner_id', $partner_id)
+                        ->exists();
+
+                    if ($is_commission_partner || $is_jury_partner) {
+                        // Si le partenaire est rattaché à la commission ou membre du jury, tous les candidats sélectionnés
                         // pour cette commission lui sont entièrement accessibles.
                         $candidatures = $commission->candidatures()->get();
                     } else {
@@ -149,15 +153,30 @@ class CommissionController extends Controller
         authPermission('partner-technical|partner-financial');
         $title = 'Commissions d\'approbation - BARM';
 
+        $user = Auth::user();
+        if ($user->partenaire) {
+            $partner_id = $user->partenaire->id;
+            $commissions = Commission::with(['partenaires.user', 'juries.partner.user', 'cohort'])
+                ->where(function ($query) use ($partner_id) {
+                    $query->whereHas('partenaires', function ($q) use ($partner_id) {
+                        $q->where('partenaire_id', $partner_id);
+                    })
+                    ->orWhereHas('juries', function ($q) use ($partner_id) {
+                        $q->where('partner_id', $partner_id);
+                    })
+                    ->orWhereHas('candidatures', function ($q) use ($partner_id) {
+                        $q->where('candidatures.partner_technical_id', $partner_id)
+                          ->orWhere('candidatures.partner_financial_id', $partner_id);
+                    });
+                })
+                ->orderByDESC('created_at')
+                ->get();
+        } else {
+            $commissions = Commission::with(['partenaires.user', 'juries.partner.user', 'cohort'])
+                ->orderByDESC('created_at')
+                ->get();
+        }
 
-        if (can('partner-technical'))
-            $commissions = Commission::whereHas('juries', function ($query) {
-                $query->where('partner_id', Auth::user()->partenaire->id);
-            })->get();
-        elseif (can('partner-financial'))
-            $commissions = Commission::all();
-        else
-            $commissions = [];
         return view('dashboard.commission.jury_members', compact('title', 'commissions'));
     }
 
@@ -490,11 +509,28 @@ class CommissionController extends Controller
         $partenaire = Partenaire::where('user_id', $user_id)->first();
 
         if ($partenaire) {
-            $commissions = Commission::whereHas('partenaires', function ($query) use ($partenaire) {
-                $query->where('partenaire_id', $partenaire->id);
-            })->orderByDESC('created_at')->where('cohort_id', $cohort->id)->get();
+            $partner_id = $partenaire->id;
+            $commissions = Commission::with(['partenaires.user', 'juries.partner.user'])
+                ->where('cohort_id', $cohort->id)
+                ->where(function ($query) use ($partner_id) {
+                    $query->whereHas('partenaires', function ($q) use ($partner_id) {
+                        $q->where('partenaire_id', $partner_id);
+                    })
+                    ->orWhereHas('juries', function ($q) use ($partner_id) {
+                        $q->where('partner_id', $partner_id);
+                    })
+                    ->orWhereHas('candidatures', function ($q) use ($partner_id) {
+                        $q->where('candidatures.partner_technical_id', $partner_id)
+                          ->orWhere('candidatures.partner_financial_id', $partner_id);
+                    });
+                })
+                ->orderByDESC('created_at')
+                ->get();
         } else {
-            $commissions = collect();
+            $commissions = Commission::with(['partenaires.user', 'juries.partner.user'])
+                ->where('cohort_id', $cohort->id)
+                ->orderByDESC('created_at')
+                ->get();
         }
 
         $title = 'Liste des commissions - BARM';
