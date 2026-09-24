@@ -20,6 +20,7 @@ use App\Models\Cvlm;
 use App\Models\Prepaentretien;
 use App\Models\Techrechercheemploi;
 use App\Models\Candidatformation;
+use App\Models\ConcourSuivi;
 use Illuminate\Support\Facades\DB;
 use App\Models\CandidatureControl;
 
@@ -598,6 +599,7 @@ class CandidatentrepriseController extends Controller
     public function suivie_fp_candidats(Request $request)
     {
         $selectedCohort = $request->get('cohort_id');
+        $selectedConcours = $request->get('concours');
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
 
@@ -625,7 +627,9 @@ class CandidatentrepriseController extends Controller
             $q->where('gender', 'Feminin')->orWhere('gender', 'F')->orWhere('gender', 'Femme')->orWhere('gender', 'femme');
         })->count();
 
+        // 1. Profilage
         $rdv1Count = Candidatentretien::whereIn('candidature_id', $candidatsIds)->where('presence', 1)->distinct('candidature_id')->count('candidature_id');
+        $rdv1Absents = Candidatentretien::whereIn('candidature_id', $candidatsIds)->where('presence', 0)->distinct('candidature_id')->count('candidature_id');
         $rdv2Count = Bilancompetence::whereIn('candidature_id', $candidatsIds)->where('presence', 1)->distinct('candidature_id')->count('candidature_id');
         $rdv3Valides = (clone $query)->where('profilage_decision', 1)->count();
         $rdv3Eligibles = (clone $query)->where(function ($q) {
@@ -637,26 +641,100 @@ class CandidatentrepriseController extends Controller
                 $q->where('presence', 1);
             })->count();
 
-        $dossiersSoumis = Candidature::whereIn('id', $candidatsIds)->whereHas('soumissiondossiers')->count();
-        $concoursInscrits = Candidature::whereIn('id', $candidatsIds)->whereHas('concours')->count();
-        $candidatsAdmis = (clone $query)->where('admissionconcours', '1')->count();
+        // 2. Concours (ConcourSuivi)
+        $suivisFP = ConcourSuivi::whereIn('candidature_id', $candidatsIds)->get();
+        if ($selectedConcours) {
+            $suivisFP = $suivisFP->where('intitule_concours', $selectedConcours);
+        }
+
+        $choixConcoursCount = $suivisFP->whereNotNull('intitule_concours')->count();
+        $prepaConcoursCount = $suivisFP->whereNotNull('prepa_statut')->count();
+        $prepaPresentsCount = $suivisFP->where('prepa_statut', 'present')->count();
+        $prepaAbsentsCount = $suivisFP->where('prepa_statut', 'absent')->count();
+        $prepaAbandonsCount = $suivisFP->where('prepa_statut', 'abandon')->count();
+        
+        $dossierR1Count = $suivisFP->whereNotNull('dossier_r1_date')->count();
+        $dossierR2Count = $suivisFP->whereNotNull('dossier_r2_date')->count();
+        $dossierCompletCount = $suivisFP->whereNotNull('dossier_r1_date')->whereNotNull('dossier_r2_date')->count();
+
+        $dossiersDeposesCount = $suivisFP->where('choix_final_statut', 'depose')->count();
+        $candidatsAdmis = $suivisFP->where('resultat_statut', 'admis')->count();
+        $candidatsAjournes = $suivisFP->where('resultat_statut', 'ajourne')->count();
+        $candidatsEnAttente = $suivisFP->where('choix_final_statut', 'depose')->where(function($item) {
+            return empty($item->resultat_statut) || $item->resultat_statut === 'en_attente';
+        })->count();
+
+        // Taux
+        $tauxProfilage = $totalCandidats > 0 ? round(($rdv3Valides / $totalCandidats) * 100, 1) : 0;
+        $tauxAdmission = $dossiersDeposesCount > 0 ? round(($candidatsAdmis / $dossiersDeposesCount) * 100, 1) : 0;
+        $tauxDepot = $totalCandidats > 0 ? round(($dossiersDeposesCount / $totalCandidats) * 100, 1) : 0;
+
+        // Statistiques par Intitulé de concours
+        $concoursStats = ConcourSuivi::whereIn('candidature_id', $candidatsIds)
+            ->whereNotNull('intitule_concours')
+            ->select(
+                'intitule_concours',
+                'type_concours',
+                DB::raw('count(*) as total_candidats'),
+                DB::raw('SUM(CASE WHEN prepa_statut = "present" THEN 1 ELSE 0 END) as total_prepa'),
+                DB::raw('SUM(CASE WHEN dossier_r1_date IS NOT NULL AND dossier_r2_date IS NOT NULL THEN 1 ELSE 0 END) as total_dossiers_prets'),
+                DB::raw('SUM(CASE WHEN choix_final_statut = "depose" THEN 1 ELSE 0 END) as total_deposes'),
+                DB::raw('SUM(CASE WHEN resultat_statut = "admis" THEN 1 ELSE 0 END) as total_admis'),
+                DB::raw('SUM(CASE WHEN resultat_statut = "ajourne" THEN 1 ELSE 0 END) as total_ajournes')
+            )
+            ->groupBy('intitule_concours', 'type_concours')
+            ->orderByDesc('total_candidats')
+            ->get();
+
+        // Liste complète des candidats pour l'onglet individuel
+        $candidats = (clone $query)->with([
+            'user',
+            'cohort',
+            'candidatentretiens',
+            'bilancompetences',
+            'concourSuivi',
+            'candidatformations.formation',
+        ])->get()->sortBy(function ($candidat) {
+            return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+        }, SORT_NATURAL | SORT_FLAG_CASE);
 
         $cohortes = Cohort::orderBy('title')->get();
-        $title = 'Suivi des Candidats - Récapitulatif Statistique (Fonction Publique)';
+        $allConcours = ConcourSuivi::whereNotNull('intitule_concours')->pluck('intitule_concours')->unique()->values();
+
+        $activeTab = $request->get('tab', 'stats');
+        $title = 'Suivi des Candidats (Fonction Publique)';
 
         return view('dashboard.candidatentreprise.suivie_fp_candidats', compact(
+            'candidats',
+            'activeTab',
             'totalCandidats',
             'totalHommes',
             'totalFemmes',
             'rdv1Count',
+            'rdv1Absents',
             'rdv2Count',
             'rdv3Valides',
             'rdv3Eligibles',
-            'dossiersSoumis',
-            'concoursInscrits',
+            'choixConcoursCount',
+            'prepaConcoursCount',
+            'prepaPresentsCount',
+            'prepaAbsentsCount',
+            'prepaAbandonsCount',
+            'dossierR1Count',
+            'dossierR2Count',
+            'dossierCompletCount',
+            'dossiersDeposesCount',
             'candidatsAdmis',
+            'candidatsAjournes',
+            'candidatsEnAttente',
+            'tauxProfilage',
+            'tauxAdmission',
+            'tauxDepot',
+            'concoursStats',
             'cohortes',
+            'allConcours',
             'selectedCohort',
+            'selectedConcours',
             'dateFrom',
             'dateTo',
             'title'
