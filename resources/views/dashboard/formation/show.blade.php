@@ -48,7 +48,19 @@
                         <small class="text-muted d-block">Présents</small>
                     </div>
                     <div class="text-center">
-                        <div class="badge bg-warning fs-6 px-3 py-2">
+                        <div class="badge bg-danger fs-6 px-3 py-2">
+                            {{ $formation->candidatures->where('pivot.presence', '0')->count() }}
+                        </div>
+                        <small class="text-muted d-block">Absents</small>
+                    </div>
+                    <div class="text-center">
+                        <div class="badge bg-warning text-dark fs-6 px-3 py-2">
+                            {{ $formation->candidatures->where('pivot.presence', '2')->count() }}
+                        </div>
+                        <small class="text-muted d-block">Abandons</small>
+                    </div>
+                    <div class="text-center">
+                        <div class="badge bg-info fs-6 px-3 py-2">
                             {{ $formation->candidatures->whereNotNull('pivot.attestation')->count() }}
                         </div>
                         <small class="text-muted d-block">Attestations</small>
@@ -66,106 +78,98 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nom & Prénoms</th>
-                                <th>Présence</th>
+                                <th>Statut / Présence</th>
                                 <th class="text-start">Attestation</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($formation->candidatures as $candidat)
-                                <tr>
+                                <tr class="align-middle">
                                     <td>{{ $loop->index + 1 }}</td>
                                     <td>
                                         <div>{{ $candidat->user->fullName() }}</div>
                                         <div class="fs-7">
-                                                                                                <span class="badge bg-secondary me-1">{{ $candidat->user->mecano }}</span>
-
+                                            <span class="badge bg-secondary me-1">{{ $candidat->user->mecano }}</span>
                                             <span>{{ $candidat->phone_number }}</span>
                                         </div>
                                     </td>
-                                    @if ($candidat->pivot->presence == '0')
-                                        <td class="text-danger">Abscent</td>
-                                    @else
-                                        <td class="text-success">Présent</td>
-                                    @endif
+                                    <td>
+                                        @if ($candidat->pivot->presence == '1')
+                                            <span class="badge bg-success"><i class="bx bx-check me-1"></i> Présent</span>
+                                        @elseif ($candidat->pivot->presence == '2')
+                                            <span class="badge bg-warning text-dark"><i class="bx bx-error-circle me-1"></i> Abandon</span>
+                                        @else
+                                            <span class="badge bg-danger"><i class="bx bx-x me-1"></i> Absent</span>
+                                        @endif
+                                    </td>
                                     @if ($candidat->pivot->attestation != null)
                                         <td class="text-start"><a href="{{ asset($candidat->pivot->attestation) }}"
-                                                download><i class="bx bx-cloud-download fs-2"></i></a></td>
+                                                download><i class="bx bx-cloud-download fs-2 text-primary"></i></a></td>
                                     @else
-                                        <td class="text-start"><a href="#"><i class="bx bx-cloud-download fs-2"
-                                                    style="color:darkgray"></i></a></td>
+                                        <td class="text-start"><i class="bx bx-cloud-download fs-2" style="color:darkgray"></i></td>
                                     @endif
                                     <td style="text-align: center">
-                                        <a href="{{ route('adherent.show', $candidat->user->id) }}">
-                                            <i class='bx bxs-show'></i>
-                                        </a>
+                                        <div class="d-flex align-items-center justify-content-center gap-1">
+                                            <a href="{{ route('candidatentreprises.synthese_parcours', $candidat->id) }}" class="btn btn-sm btn-outline-info" title="Voir le dossier du candidat">
+                                                <i class='bx bx-folder-open me-1'></i> Dossier
+                                            </a>
+                                            <a href="{{ route('adherent.show', $candidat->user->id) }}" class="btn btn-sm btn-outline-secondary" title="Fiche profil adhérent">
+                                                <i class='bx bxs-show'></i>
+                                            </a>
+                                        </div>
 
                                         @if ($candidat->pivot->commentaire != null)
                                             <a href="#" data-bs-toggle="modal"
                                                 data-bs-target="#commentModal{{ $candidat->id }}"
-                                                class="badge bg-warning mb-2">Voir
-                                                commentaire</a>
+                                                class="badge bg-warning mb-2">Voir commentaire</a>
                                             <div id="commentModal{{ $candidat->id }}" class="modal fade" tabindex="-1"
                                                 role="dialog">
-                                                <div class="modal-dialog" role="document">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
                                                     <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Compte rendu de l'entretien</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        <div class="modal-header bg-info text-white">
+                                                            <h5 class="modal-title text-white">Compte rendu de la formation</h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
-                                                        <form action="{{ route('formations.presence') }}" method="POST"
-                                                            class="row g-3" enctype="multipart/form-data">
-                                                            @csrf
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-12 mb-3">
-                                                                        <label class="form-label">commentaire: </label>
-                                                                        <textarea name="commentaire" class="form-control" id="" cols="10" rows="5" readonly>{{ $candidat->pivot->commentaire }}</textarea>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="reset"
-                                                                    class="btn btn-label-danger btn-reset"
-                                                                    data-bs-dismiss="modal"
-                                                                    aria-label="Close">Retour</button>
-                                                            </div>
-                                                        </form>
+                                                        <div class="modal-body p-4">
+                                                            <label class="form-label fw-semibold text-dark">Commentaire / Observations : </label>
+                                                            <textarea name="commentaire" class="form-control" rows="5" readonly>{{ $candidat->pivot->commentaire }}</textarea>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         @endif
 
-                                        @if ($candidat->pivot->presence == '0')
-                                            <a href="#" data-bs-toggle="modal"
-                                                data-bs-target="#rapportModal{{ $candidat->id }}"
-                                                class="badge bg-success mb-2">Marquer présent</a>
+                                        <a href="#" data-bs-toggle="modal"
+                                            data-bs-target="#rapportModal{{ $candidat->id }}"
+                                            class="btn btn-sm btn-outline-primary ms-1"><i class="bx bx-edit me-1"></i> Évaluer</a>
 
-                                            <div id="rapportModal{{ $candidat->id }}" class="modal fade" tabindex="-1"
-                                                role="dialog">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Compte rendu de la formation</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                        </div>
-                                                        <form action="{{ route('formations.presence') }}" method="POST"
-                                                            class="row g-3" enctype="multipart/form-data">
-                                                            @csrf
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label class="form-label">Présence : </label>
-                                                                        <select class="form-select select2"
-                                                                            data-placeholder="Choisir une option"
-                                                                            name="presence">
-                                                                            <option value="1">Présent</option>
-                                                                            <option value="0">Abscent</option>
-                                                                        </select>
-                                                                    </div>
+                                        <div id="rapportModal{{ $candidat->id }}" class="modal fade" tabindex="-1"
+                                            role="dialog">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content border-0 shadow">
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title text-white">Évaluation de la formation</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('formations.presence') }}" method="POST"
+                                                        class="row g-3" enctype="multipart/form-data">
+                                                        @csrf
+                                                        <div class="modal-body p-4">
+                                                            <div class="row">
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label class="form-label fw-semibold text-dark">Statut / Présence <span class="text-danger">*</span> : </label>
+                                                                    <select class="form-select" name="presence" required>
+                                                                        <option value="1" {{ $candidat->pivot->presence == '1' ? 'selected' : '' }}>🟢 Présent</option>
+                                                                        <option value="0" {{ $candidat->pivot->presence == '0' ? 'selected' : '' }}>🔴 Absent</option>
+                                                                        <option value="2" {{ $candidat->pivot->presence == '2' ? 'selected' : '' }}>🟠 Abandon</option>
+                                                                    </select>
+                                                                </div>
                                                                     <div class="col-md-6 mb-3">
                                                                         <label class="form-label">Attestation : </label>
                                                                         <input class="form-control" type="file"
@@ -193,7 +197,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endif
 
                                     </td>
                                 </tr>

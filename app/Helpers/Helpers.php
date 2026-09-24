@@ -100,16 +100,28 @@ function deleteSpace(string $character): string
 
 function chartMonthFrensh($date)
 {
-    $carbon = Carbon::parse($date)->locale('fr_FR');
-    $date_fr = $carbon->isoFormat('MMMM YYYY');
-    return $date_fr;
+    if (empty($date)) {
+        return '';
+    }
+    try {
+        $carbon = Carbon::parse($date)->locale('fr_FR');
+        return $carbon->isoFormat('MMMM YYYY');
+    } catch (\Exception $e) {
+        return '';
+    }
 }
 
 function chartDayFrensh($date)
 {
-    $carbon = Carbon::parse($date)->locale('fr_FR');
-    $date_fr = $carbon->isoFormat('D/M');
-    return $date_fr;
+    if (empty($date)) {
+        return '';
+    }
+    try {
+        $carbon = Carbon::parse($date)->locale('fr_FR');
+        return $carbon->isoFormat('D/M');
+    } catch (\Exception $e) {
+        return '';
+    }
 }
 
 function pointingStatus(): string
@@ -395,27 +407,37 @@ function status(string $status, string $type = 'text'): string
 
 function dateFr($date, $type = 'dayMonthYear')
 {
-    $carbon = Carbon::parse($date)->locale('fr_FR');
-
-    if (!$date)
+    if (empty($date)) {
         return '';
+    }
 
-    if ($type == 'standard')
+    try {
+        $carbon = Carbon::parse($date)->locale('fr_FR');
+    } catch (\Exception $e) {
+        return '';
+    }
+
+    $date_fr = '';
+
+    if ($type == 'standard') {
         $date_fr = $carbon->isoFormat('ddd D MMMM YYYY');
-    elseif ($type == 'hour')
+    } elseif ($type == 'hour') {
         $date_fr = $carbon->isoFormat('HH:mm');
-    elseif ($type == 'year')
+    } elseif ($type == 'year') {
         $date_fr = $carbon->isoFormat('YYYY');
-    elseif ($type == 'day')
+    } elseif ($type == 'day') {
         $date_fr = $carbon->isoFormat('dddd');
-    elseif ($type == 'monthYear')
+    } elseif ($type == 'monthYear') {
         $date_fr = $carbon->isoFormat('MMMM YYYY');
-    elseif ($type == 'dayMonthYear')
+    } elseif ($type == 'dayMonthYear') {
         $date_fr = $carbon->isoFormat('DD/MM/Y');
-    elseif ($type == 'letter')
+    } elseif ($type == 'letter') {
         $date_fr = $carbon->isoFormat('dddd D MMMM YYYY');
-    elseif ($type == 'complet')
+    } elseif ($type == 'complet') {
         $date_fr = $carbon->isoFormat('DD/MM/Y à HH:mm');
+    } else {
+        $date_fr = $carbon->isoFormat('DD/MM/Y');
+    }
 
     return $date_fr;
 }

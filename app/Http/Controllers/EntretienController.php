@@ -17,50 +17,91 @@ class EntretienController extends Controller
 
     public function candidats(Entretien $entretien)
     {
-        $candidats = Candidatentretien::orderByDESC('created_at')->where('entretien_id', $entretien->id)->get();
+        $candidats = Candidatentretien::orderByDESC('created_at')
+            ->where('entretien_id', $entretien->id)
+            ->with(['candidature.user'])
+            ->get();
 
         $title = 'Liste des candidats - BARM';
 
-        return view('dashboard.entretien.candidats', compact('candidats', 'title','entretien'));
+        return view('dashboard.entretien.candidats', compact('candidats', 'title', 'entretien'));
     }
 
     public function index(Request $request, String $type)
     {
-
-        $entretiens = Entretien::orderByDESC('created_at')->where('parcours','entreprise_privee')->where('type',$type)->get();
+        $entretiens = Entretien::orderByDESC('created_at')
+            ->where('parcours', 'entreprise_privee')
+            ->where('type', $type)
+            ->whereHas('candidatentretiens', function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNull('presence')->orWhere('presence', '!=', 1);
+                });
+            })
+            ->with(['candidatentretiens' => function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNull('presence')->orWhere('presence', '!=', 1);
+                });
+            }])
+            ->get();
 
         $title = 'Liste des pré-entretien - BARM';
 
-        return view('dashboard.entretien.index', compact('entretiens','title', 'type'));
+        return view('dashboard.entretien.index', compact('entretiens', 'title', 'type'));
     }
 
     public function indexfp(Request $request, String $type)
     {
-        $entretiens = Entretien::orderByDESC('created_at')->where('parcours','fonction_public')->where('type',$type)->get();
+        $entretiens = Entretien::orderByDESC('created_at')
+            ->where('parcours', 'fonction_public')
+            ->where('type', $type)
+            ->whereHas('candidatentretiens', function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNull('presence')->orWhere('presence', '!=', 1);
+                });
+            })
+            ->with(['candidatentretiens' => function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNull('presence')->orWhere('presence', '!=', 1);
+                });
+            }])
+            ->get();
 
         $title = 'Liste des pré-entretien - BARM';
 
-        return view('dashboard.entretien.indexfp', compact('entretiens','title', 'type'));
+        return view('dashboard.entretien.indexfp', compact('entretiens', 'title', 'type'));
     }
 
     public function create(Request $request, String $type)
     {
         $title = 'Programmer un pré-entretien - BARM';
 
-        $candidats = Candidature::where('death','0')->where('resignation','0')->where('orientation','entreprise-privee')->get();
+        $candidats = Candidature::where('death', '0')
+            ->where('resignation', '0')
+            ->where('orientation', 'entreprise-privee')
+            ->with(['user', 'candidatentretiens'])
+            ->get()
+            ->sortBy(function ($candidat) {
+                return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+            }, SORT_NATURAL | SORT_FLAG_CASE);
 
-        return view('dashboard.entretien.create', compact('title','candidats', 'type'));
+        return view('dashboard.entretien.create', compact('title', 'candidats', 'type'));
     }
 
     // create entretien fonction public
     public function createfp(Request $request, String $type)
     {
-
         $title = 'Programmer un pré-entretien - BARM';
 
-        $candidats = Candidature::where('death','0')->where('resignation','0')->where('orientation','fonction-publique')->get();
+        $candidats = Candidature::where('death', '0')
+            ->where('resignation', '0')
+            ->where('orientation', 'fonction-publique')
+            ->with(['user', 'candidatentretiens'])
+            ->get()
+            ->sortBy(function ($candidat) {
+                return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+            }, SORT_NATURAL | SORT_FLAG_CASE);
 
-        return view('dashboard.entretien.createfp', compact('title','candidats', 'type'));
+        return view('dashboard.entretien.createfp', compact('title', 'candidats', 'type'));
     }
 
     public function store(Request $request)
@@ -86,6 +127,11 @@ class EntretienController extends Controller
                 $candidatentretien = Candidatentretien::create([
                     'entretien_id' => $entretien->id,
                     'candidature_id' => $candidature,
+                ]);
+
+                // Réinitialiser le profilage pour permettre une nouvelle décision suite à ce nouvel entretien
+                Candidature::where('id', $candidature)->update([
+                    'profilage_decision' => false,
                 ]);
             }
 
@@ -122,6 +168,11 @@ class EntretienController extends Controller
                 $candidatentretien = Candidatentretien::create([
                     'entretien_id' => $entretien->id,
                     'candidature_id' => $candidature,
+                ]);
+
+                // Réinitialiser le profilage pour permettre une nouvelle décision suite à ce nouvel entretien
+                Candidature::where('id', $candidature)->update([
+                    'profilage_decision' => false,
                 ]);
             }
 

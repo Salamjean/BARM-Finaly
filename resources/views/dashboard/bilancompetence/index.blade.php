@@ -19,17 +19,19 @@
                     </div>
                 </nav>
             </div>
-            <div class="ms-auto">
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="{{ route('candidatentreprises.synthese_parcours', $candidat->id) }}" class="btn btn-outline-info">
+                    <i class="bx bx-folder-open me-1"></i>
+                    Voir le dossier / parcours
+                </a>
                 @if (can('conseiller-fonction-public') ||
                         can('chef-cellule-formation-et-insertion') ||
                         can('conseiller-entreprise-prive'))
-                    <div class="btn-group">
-                        <a href="{{ route('bilancompetences.create', $candidat->id) }}" type="button"
-                            class="btn btn-primary">
-                            <i class="bx bx-plus me-1"></i>
-                            Faire un bilan
-                        </a>
-                    </div>
+                    <a href="{{ route('bilancompetences.create', $candidat->id) }}"
+                        class="btn btn-primary">
+                        <i class="bx bx-plus me-1"></i>
+                        Faire un bilan
+                    </a>
                 @endif
             </div>
         </div>
@@ -78,135 +80,114 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($bilancompetences as $bilancompetence)
-                                <tr>
+                        <tbod                            @foreach ($bilancompetences as $bilancompetence)
+                                <tr class="align-middle">
                                     <td>{{ $loop->index + 1 }}</td>
                                     <td>{{ dateFr($bilancompetence->date, 'letter') }}</td>
-                                    @if ($bilancompetence->presence == null)
-                                        <td class="text-warning">A venir</td>
-                                    @elseif($bilancompetence->presence == '0')
-                                        <td class="text-danger">Abscent</td>
-                                    @elseif ($bilancompetence->presence == '1')
-                                        <td class="text-success">Présent</td>
-                                    @endif
-                                    @if ($bilancompetence->rapport != null)
-                                        <td style="text-align: center">
+                                    <td>
+                                        @if ($bilancompetence->presence == null)
+                                            <span class="badge bg-light text-muted border">À venir</span>
+                                        @elseif($bilancompetence->presence == '0')
+                                            <span class="badge bg-danger"><i class="bx bx-x me-1"></i> Absent</span>
+                                        @elseif ($bilancompetence->presence == '1')
+                                            <span class="badge bg-success"><i class="bx bx-check me-1"></i> Présent</span>
+                                        @elseif ($bilancompetence->presence == '2')
+                                            <span class="badge bg-warning text-dark"><i class="bx bx-error-circle me-1"></i> Abandon</span>
+                                        @endif
+                                    </td>
+                                    <td style="text-align: center">
+                                        @if ($bilancompetence->rapport != null)
                                             <a href="{{ asset($bilancompetence->rapport) }}" download><i
-                                                    class="bx bx-cloud-download fs-2"></i></a>
-                                        </td>
-                                    @else
-                                        <td style="text-align: center">
-                                            <a href="#"><i class="bx bx-cloud-download fs-2"
-                                                    style="color:gray"></i></a>
-                                        </td>
-                                    @endif
-                                    <td style="">
+                                                    class="bx bx-cloud-download fs-2 text-primary"></i></a>
+                                        @else
+                                            <i class="bx bx-cloud-download fs-2" style="color:gray"></i>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-1">
+                                            @if ($bilancompetence->comment)
+                                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#commentModal{{ $bilancompetence->id }}"
+                                                    title="Voir commentaire">
+                                                    <i class="bx bx-message-square-detail"></i>
+                                                </button>
+                                            @endif
 
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#rapportModal{{ $bilancompetence->id }}">
+                                                <i class="bx bx-edit me-1"></i> Évaluer / Statut
+                                            </button>
+                                        </div>
+
+                                        <!-- Modal Commentaire -->
                                         @if ($bilancompetence->comment)
-                                            <a href="#" data-bs-toggle="modal"
-                                                data-bs-target="#commentModal{{ $bilancompetence->id }}"
-                                                class="badge bg-warning mb-2">Voir
-                                                commentaire</a>
                                             <div id="commentModal{{ $bilancompetence->id }}" class="modal fade"
                                                 tabindex="-1" role="dialog">
-                                                <div class="modal-dialog" role="document">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
                                                     <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Cmmentaire du bilan de competence</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        <div class="modal-header bg-info text-white">
+                                                            <h5 class="modal-title text-white">Commentaire du bilan de compétences</h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
-                                                        <form action="#" method="POST" class="row g-3"
-                                                            enctype="multipart/form-data">
-                                                            @csrf
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-12 mb-3">
-                                                                        <label class="form-label">commentaire: </label>
-                                                                        <textarea name="comment" class="form-control" id="" cols="10" rows="5">{{ $bilancompetence->comment }}</textarea>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="reset"
-                                                                    class="btn btn-label-danger btn-reset"
-                                                                    data-bs-dismiss="modal"
-                                                                    aria-label="Close">Retour</button>
-                                                            </div>
-                                                        </form>
+                                                        <div class="modal-body p-4">
+                                                            <label class="form-label fw-semibold text-dark">Commentaire / Observations : </label>
+                                                            <textarea class="form-control" rows="5" readonly>{{ $bilancompetence->comment }}</textarea>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         @endif
 
-                                        @if ($bilancompetence->presence == null)
-                                            <a href="#" data-bs-toggle="modal"
-                                                data-bs-target="#rapportModal{{ $candidat->id }}"
-                                                class="badge bg-success mb-2">Marquer présent</a>
-
-                                            <div id="rapportModal{{ $candidat->id }}" class="modal fade" tabindex="-1"
-                                                role="dialog">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Compte rendu du bilan</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                        </div>
-                                                        <form action="{{ route('bilancompetences.presence') }}"
-                                                            method="POST" class="row g-3" enctype="multipart/form-data">
-                                                            @csrf
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-12 mb-3">
-                                                                        <label class="form-label">Rapport</label>
-                                                                        <input type="file" name="rapport"
-                                                                            class="form-control">
-                                                                    </div>
-
-                                                                    <div class="col-md-12 mb-3">
-                                                                        <label class="form-label">commentaire : </label>
-                                                                        <textarea name="comment" class="form-control" id="" cols="10" rows="5"></textarea>
-                                                                    </div>
-                                                                    <input type="text" name="presence" value="1"
-                                                                        hidden>
-                                                                    <input type="text" name="candidat_id"
-                                                                        value="{{ $candidat->id }}" hidden>
-                                                                    <input type="text" name="bilancompetence_id"
-                                                                        value="{{ $bilancompetence->id }}" hidden>
-                                                                </div>
-
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="submit"
-                                                                    class="btn btn-label-info me-sm-3 me-1">Enregistrer</button>
-                                                                <button type="reset"
-                                                                    class="btn btn-label-danger btn-reset"
-                                                                    data-bs-dismiss="modal"
-                                                                    aria-label="Close">Retour</button>
-                                                            </div>
-                                                        </form>
+                                        <!-- Modal Évaluation & Statut (Présent / Absent / Abandon) -->
+                                        <div id="rapportModal{{ $bilancompetence->id }}" class="modal fade" tabindex="-1"
+                                            role="dialog">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content border-0 shadow">
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title text-white">Évaluation & Statut du Bilan</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
                                                     </div>
+                                                    <form action="{{ route('bilancompetences.presence') }}"
+                                                        method="POST" enctype="multipart/form-data">
+                                                        @csrf
+                                                        <div class="modal-body p-4">
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold text-dark">Statut du Bilan <span class="text-danger">*</span></label>
+                                                                <select name="presence" class="form-select" required>
+                                                                    <option value="1" {{ $bilancompetence->presence == '1' ? 'selected' : '' }}>🟢 Présent (Bilan effectué)</option>
+                                                                    <option value="0" {{ $bilancompetence->presence === '0' ? 'selected' : '' }}>🔴 Absent</option>
+                                                                    <option value="2" {{ $bilancompetence->presence == '2' ? 'selected' : '' }}>🟠 Abandon</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold text-dark">Rapport (Fichier)</label>
+                                                                <input type="file" name="rapport" class="form-control">
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold text-dark">Observations / Synthèse : </label>
+                                                                <textarea name="comment" class="form-control" rows="4" placeholder="Conclusions et observations du bilan...">{{ $bilancompetence->comment }}</textarea>
+                                                            </div>
+
+                                                            <input type="hidden" name="candidat_id" value="{{ $candidat->id }}">
+                                                            <input type="hidden" name="bilancompetence_id" value="{{ $bilancompetence->id }}">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                            <button type="submit" class="btn btn-primary px-4">Enregistrer</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
-
-                                            <a style="cursor: pointer" class="refused"
-                                                data-candidat-id="{{ $candidat->id }}">
-                                                <span class="badge bg-danger mb-2">Marquer absent</span>
-                                            </a>
-
-                                            <form id="refusedForm-{{ $candidat->id }}"
-                                                action="{{ route('bilancompetences.presence') }}" method="post">
-                                                @csrf
-                                                <input type="text" name="presence" value="0" hidden>
-                                                <input type="text" name="candidat_id" value="{{ $candidat->id }}"
-                                                    hidden>
-                                                <input type="text" name="bilancompetence_id"
-                                                    value="{{ $bilancompetence->id }}" hidden>
-                                            </form>
-                                        @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

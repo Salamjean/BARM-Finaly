@@ -44,10 +44,10 @@
                             enctype="multipart/form-data">
                             @csrf
                             <div class="col-md-6 mb-3">
-                                <label class="form-label" for="entreprise">Entreprise :</label>
-                                <select class="form-select select2" data-placeholder="Choisir une entreprise"
+                                <label class="form-label fw-semibold text-dark" for="entreprise">Entreprise de Formation :</label>
+                                <select class="form-select select2" data-placeholder="Choisir une entreprise de formation"
                                     name="entreprise" id="entreprise" onchange="toggleNomEntreprise()">
-                                    <option selected>Choisir une entreprise</option>
+                                    <option selected>Choisir une entreprise de formation</option>
                                     @foreach ($entreprises as $entreprise)
                                         <option value="{{ $entreprise->nom }}">{{ $entreprise->nom }}</option>
                                     @endforeach
@@ -55,10 +55,10 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3" id="nom-entreprise-div" style="display: none;">
-                                <label for="nom" class="form-label">Nom de l'entreprise: </label>
+                                <label for="nom" class="form-label fw-semibold text-dark">Nom de l'entreprise de formation :</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control @error('nom') is-invalid @enderror"
-                                        id="nom" name="nom" />
+                                        id="nom" name="nom" placeholder="Saisir le nom de l'entreprise de formation" />
                                 </div>
                                 @error('nom')
                                     <span class="invalid-feedback" role="alert">
@@ -67,9 +67,9 @@
                                 @enderror
                             </div>
                             <div class="col-md-12 mb-3">
-                                <label for="intitule" class="form-label">Intitulé</label>
+                                <label for="intitule" class="form-label fw-semibold text-dark">Intitulé de formation :</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="intitule" placeholder="Intitule"
+                                    <input type="text" class="form-control" id="intitule" placeholder="Intitulé de formation"
                                         name="intitule" value="{{ old('intitule') }}" />
                                 </div>
                                 @error('intitule')

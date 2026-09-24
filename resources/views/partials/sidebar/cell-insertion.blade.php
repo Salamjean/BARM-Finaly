@@ -311,36 +311,39 @@
 
         <li class="menu-item {{ routeActive(['candidatentreprises.suivie_ep_candidats']) }}">
             <a href="{{ route('candidatentreprises.suivie_ep_candidats') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxs-school'></i>
+                <i class='menu-icon tf-icons bx bx-bar-chart-alt-2'></i>
                 <div>Suivie des candidats</div>
             </a>
         </li>
 
         <li
-            class="menu-item {{ routeActive(['entretiens.index', 'entretiens.create', 'entretiens.presence', 'entretiens.candidats']) }}">
+            class="menu-item {{ routeActive(['entretiens.index', 'entretiens.create', 'entretiens.presence', 'entretiens.candidats', 'bilancompetences.candidats', 'candidatentreprises.decision_ep', 'candidatentreprises.historique_ep']) }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class='menu-icon tf-icons bx bxs-comment'></i>
-                <div>Entretien candidat</div>
+                <i class='menu-icon tf-icons bx bx-user-check'></i>
+                <div>Profilage</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('entretiens/index/collectif') ? 'active' : '' }}">
+                <li class="menu-item {{ routeActive(['entretiens.index', 'entretiens.create', 'entretiens.presence']) }}">
                     <a href="{{ route('entretiens.index', 'collectif') }}" class="menu-link">
-                        <div>Entretiens collectif</div>
+                        <div>Rendez-vous 1 : Entretien</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('entretiens/index/perso') ? 'active' : '' }}">
-                    <a href="{{ route('entretiens.index', 'perso') }}" class="menu-link">
-                        <div>Entretiens individuel</div>
+                <li class="menu-item {{ routeActive(['bilancompetences.candidats']) }}">
+                    <a href="{{ route('bilancompetences.candidats') }}" class="menu-link">
+                        <div>Rendez-vous 2 : Bilan de compétence</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive(['candidatentreprises.decision_ep']) }}">
+                    <a href="{{ route('candidatentreprises.decision_ep') }}" class="menu-link">
+                        <div>Rendez-vous 3 : Validation / Décision</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive(['candidatentreprises.historique_ep']) }}">
+                    <a href="{{ route('candidatentreprises.historique_ep') }}" class="menu-link">
+                        <div>Historique</div>
                     </a>
                 </li>
             </ul>
-        </li>
-
-        <li class="menu-item {{ routeActive(['bilancompetences.candidats']) }}">
-            <a href="{{ route('bilancompetences.candidats') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxs-graduation'></i>
-                <div>Bilan de compétence</div>
-            </a>
         </li>
 
         <li
@@ -358,19 +361,28 @@
             </a>
         </li>
 
-        <li class="menu-item {{ routeActive(['cvlms.candidats', 'cvlms.index', 'cvlms.create']) }}">
-            <a href="{{ route('cvlms.candidats') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bx-user-circle'></i>
-                <div>CV et LM</div>
+        <li class="menu-item {{ routeActive(['cvlms.candidats', 'cvlms.index', 'cvlms.create', 'prepaentretiens.index', 'prepaentretiens.candidats', 'prepaentretiens.create', 'techrechercheemplois.candidats']) }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class='menu-icon tf-icons bx bx-briefcase-alt-2'></i>
+                <div>Prépa à l'insertion</div>
             </a>
-        </li>
-
-        <li
-            class="menu-item {{ routeActive(['prepaentretiens.index', 'prepaentretiens.candidats', 'prepaentretiens.create']) }}">
-            <a href="{{ route('prepaentretiens.candidats') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxl-kubernetes'></i>
-                <div>Prepa-entretien</div>
-            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ routeActive(['cvlms.candidats', 'cvlms.index', 'cvlms.create']) }}">
+                    <a href="{{ route('cvlms.candidats') }}" class="menu-link">
+                        <div>CV et LM</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive(['prepaentretiens.index', 'prepaentretiens.candidats', 'prepaentretiens.create']) }}">
+                    <a href="{{ route('prepaentretiens.candidats') }}" class="menu-link">
+                        <div>Prepa-entretien</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive(['techrechercheemplois.candidats']) }}">
+                    <a href="{{ route('techrechercheemplois.candidats') }}" class="menu-link">
+                        <div>Tech recherche d'emploi</div>
+                    </a>
+                </li>
+            </ul>
         </li>
     @endif
     @if (
@@ -380,20 +392,23 @@
             )
 
             <li
-                class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
-                <a href="{{ route('candidatentreprises.index') }}" class="menu-link">
+                class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.envoi', 'candidatentreprises.integres', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-briefcase'></i>
                     <div>Mise à disposition</div>
                 </a>
-            </li>
-
-            <li class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.candidats_ep']) }}">
-                <a href="{{ route('monitored-evaluation.post_monitored.candidats_ep') }}" class="menu-link">
-                    <i class='menu-icon tf-icons bx bx-folder-open'></i>
-                    <div class="d-flex justify-content-between">
-                        <div>Suivi post-insertion</div>
-                    </div>
-                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ routeActive(['candidatentreprises.envoi', 'candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
+                        <a href="{{ route('candidatentreprises.envoi') }}" class="menu-link">
+                            <div>Envoi en entreprise</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ routeActive(['candidatentreprises.integres']) }}">
+                        <a href="{{ route('candidatentreprises.integres') }}" class="menu-link">
+                            <div>Intégrer</div>
+                        </a>
+                    </li>
+                </ul>
             </li>
 
         </ul>
@@ -411,96 +426,76 @@
     @if (can('conseiller-fonction-public') || can('chef-cellule-formation-et-insertion'))
         <li class="menu-item {{ routeActive(['candidatentreprises.suivie_fp_candidats']) }}">
             <a href="{{ route('candidatentreprises.suivie_fp_candidats') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxs-school'></i>
+                <i class='menu-icon tf-icons bx bx-bar-chart-alt-2'></i>
                 <div>Suivie des candidats</div>
             </a>
         </li>
 
         <li
-            class="menu-item {{ routeActive(['entretiens.indexfp', 'entretiens.createfp', 'entretiens.presence', 'entretiens.candidats']) }}">
+            class="menu-item {{ routeActive(['entretiens.indexfp', 'entretiens.createfp', 'entretiens.presence', 'entretiens.candidats', 'bilancompetences.candidatsfp', 'candidatentreprises.decision_fp', 'candidatentreprises.historique_fp']) }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class='menu-icon tf-icons bx bxs-comment'></i>
-                <div>Entretien candidat</div>
+                <i class='menu-icon tf-icons bx bx-user-check'></i>
+                <div>Profilage</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('entretiens/indexfp/collectif') ? 'active' : '' }}">
+                <li class="menu-item {{ routeActive(['entretiens.indexfp', 'entretiens.createfp', 'entretiens.presence']) }}">
                     <a href="{{ route('entretiens.indexfp', 'collectif') }}" class="menu-link">
-                        <div>Entretiens collectif</div>
+                        <div>Rendez-vous 1 : Entretien</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('entretiens/indexfp/perso') ? 'active' : '' }}">
-                    <a href="{{ route('entretiens.indexfp', 'perso') }}" class="menu-link">
-                        <div>Entretiens individuel</div>
+                <li class="menu-item {{ routeActive(['bilancompetences.candidatsfp']) }}">
+                    <a href="{{ route('bilancompetences.candidatsfp') }}" class="menu-link">
+                        <div>Rendez-vous 2 : Bilan de compétence</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive(['candidatentreprises.decision_fp']) }}">
+                    <a href="{{ route('candidatentreprises.decision_fp') }}" class="menu-link">
+                        <div>Rendez-vous 3 : Validation / Décision</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive(['candidatentreprises.historique_fp']) }}">
+                    <a href="{{ route('candidatentreprises.historique_fp') }}" class="menu-link">
+                        <div>Historique</div>
                     </a>
                 </li>
             </ul>
         </li>
 
-        <li class="menu-item {{ routeActive(['bilancompetences.candidatsfp']) }}">
-            <a href="{{ route('bilancompetences.candidatsfp') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxs-graduation'></i>
-                <div>Bilan de compétence</div>
+        {{-- Module Concours (Fonction Publique) : 4 sous-onglets --}}
+        <li class="menu-item {{ routeActive(['concours.choix', 'concours.prepa', 'concours.dossier', 'concours.final']) }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class='menu-icon tf-icons bx bx-award'></i>
+                <div>Concours</div>
             </a>
-        </li>
-
-        <li
-            class="menu-item {{ routeActive(['soumissiondossiers.candidats', 'soumissiondossiers.index', 'soumissiondossiers.create']) }}">
-            <a href="{{ route('soumissiondossiers.candidats') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxs-file-doc'></i>
-                <div>Dépots de dossiers</div>
-            </a>
-        </li>
-
-        <li class="menu-item {{ routeActive(['soumissiondossiers.choixconcours']) }}">
-            <a href="{{ route('soumissiondossiers.choixconcours') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxs-file-doc'></i>
-                <div>Choix final</div>
-            </a>
-        </li>
-
-        <li
-            class="menu-item {{ routeActive(['inscriptionconcours.candidats', 'inscriptionconcours.index', 'inscriptionconcours.create']) }}">
-            <a href="{{ route('inscriptionconcours.candidats') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxl-kubernetes'></i>
-                <div>Inscription à un concours</div>
-            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ routeActive('concours.choix') }}">
+                    <a href="{{ route('concours.choix') }}" class="menu-link">
+                        <div>1. Choix du concours</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive('concours.prepa') }}">
+                    <a href="{{ route('concours.prepa') }}" class="menu-link">
+                        <div>2. Prépa Concours</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive('concours.dossier') }}">
+                    <a href="{{ route('concours.dossier') }}" class="menu-link">
+                        <div>3. Prépa de dossier</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ routeActive('concours.final') }}">
+                    <a href="{{ route('concours.final') }}" class="menu-link">
+                        <div>4. Choix final</div>
+                    </a>
+                </li>
+                {{-- Liste des inscrits aux concours --}}
+                <li class="menu-item {{ routeActive(['concours.inscrits']) }}">
+                    <a href="{{ route('concours.inscrits') }}" class="menu-link">
+                        <i class='menu-icon tf-icons bx bx-list-check'></i>
+                        <div>Liste des inscrits</div>
+                    </a>
+                </li>
+            </ul>
         </li>
     @endif
-
-    @if (
-                can(
-                    'chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive'
-                ) || can('chef-cellule-formation-et-insertion')
-            )
-            <li
-                class="menu-item {{ routeActive(['inscriptionconcours.candidatsadmis', 'inscriptionconcours.candidatsajournes']) }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class='menu-icon tf-icons bx bxs-comment'></i>
-                    <div>Resultats aux concours</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item {{ routeActive('inscriptionconcours.candidatsadmis') }}">
-                        <a href="{{ route('inscriptionconcours.candidatsadmis') }}" class="menu-link">
-                            <div>Liste des admis</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item {{ routeActive('inscriptionconcours.candidatsajournes') }}">
-                        <a href="{{ route('inscriptionconcours.candidatsajournes') }}" class="menu-link">
-                            <div>Liste des ajournés</div>
-                        </a>
-                    </li>
-
-                </ul>
-            </li>
-
-            <li class="menu-item {{ routeActive(['monitored-evaluation.post_monitored.candidats_fp']) }}">
-                <a href="{{ route('monitored-evaluation.post_monitored.candidats_fp') }}" class="menu-link">
-                    <i class='menu-icon tf-icons bx bx-folder-open'></i>
-                    <div class="d-flex justify-content-between">
-                        <div>Suivi post-insertion</div>
-                    </div>
-                </a>
-            </li>
-        </ul>
-    @endif
+@endif

@@ -38,4 +38,9 @@ class Candidatformation extends Model
     {
         return $this->belongsTo(Formation::class);
     }
+
+    public function candidature(): BelongsTo
+    {
+        return $this->belongsTo(Candidature::class, 'candidature_id');
+    }
 }

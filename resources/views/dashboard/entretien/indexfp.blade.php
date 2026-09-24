@@ -64,6 +64,22 @@
         </div>
     </div>
 
+    <!-- Onglets de basculement entre Collectif et Individuel -->
+    <div class="mb-4">
+        <ul class="nav nav-pills nav-fill bg-white p-2 rounded-3 shadow-sm border">
+            <li class="nav-item me-2">
+                <a class="nav-link fw-semibold py-2 px-3 {{ $type == 'collectif' ? 'active bg-primary text-white' : 'text-secondary bg-light' }}" href="{{ route('entretiens.indexfp', 'collectif') }}">
+                    <i class="bx bx-group me-2 fs-5 align-middle"></i> Sessions d'entretiens collectifs
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link fw-semibold py-2 px-3 {{ $type == 'perso' ? 'active bg-primary text-white' : 'text-secondary bg-light' }}" href="{{ route('entretiens.indexfp', 'perso') }}">
+                    <i class="bx bx-user me-2 fs-5 align-middle"></i> Entretiens individuels
+                </a>
+            </li>
+        </ul>
+    </div>
+
     @if ($type == 'collectif')
     <!-- Vue Entretiens Collectifs -->
     <div class="bg-white rounded-3 shadow-sm">
@@ -181,15 +197,20 @@
                                 </div>
                             </td>
                             <td>
-                                @if ($candidat->presence == '0')
+                                @if ($candidat->presence === 0 || $candidat->presence === '0')
                                 <div class="d-flex align-items-center">
                                     <div class="bg-danger rounded-circle me-2" style="width: 8px; height: 8px;"></div>
                                     <span class="badge bg-danger">Absent</span>
                                 </div>
-                                @else
+                                @elseif ($candidat->presence === 1 || $candidat->presence === '1')
                                 <div class="d-flex align-items-center">
                                     <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
                                     <span class="badge bg-success">Présent</span>
+                                </div>
+                                @else
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                                    <span class="badge bg-warning text-dark">En attente</span>
                                 </div>
                                 @endif
                             </td>
@@ -201,6 +222,7 @@
                                         <i class="bx bx-show"></i>
                                     </a>
 
+                                    @if ($candidat->comment)
                                     <button type="button"
                                         class="btn btn-outline-info btn-sm"
                                         data-bs-toggle="modal"
@@ -208,16 +230,17 @@
                                         title="Voir commentaire">
                                         <i class="bx bx-message-square-detail"></i>
                                     </button>
+                                    @endif
 
-                                    @if ($candidat->presence == '0')
                                     <button type="button"
                                         class="btn btn-outline-success btn-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#rapportModal{{ $candidat->id }}"
-                                        title="Marquer présent">
+                                        title="Marquer présent (Valider l'entretien)">
                                         <i class="bx bx-check"></i>
                                     </button>
-                                    @else
+
+                                    @if ($candidat->presence !== 0 && $candidat->presence !== '0')
                                     <button type="button"
                                         class="btn btn-outline-danger btn-sm refused"
                                         data-candidat-id="{{ $candidat->id }}"
@@ -228,6 +251,7 @@
                                 </div>
 
                                 <!-- Modal Commentaire -->
+                                @if ($candidat->comment)
                                 <div id="commentModal{{ $candidat->id }}" class="modal fade" tabindex="-1" role="dialog">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">
@@ -244,7 +268,7 @@
                                                         <i class="bx bx-comment text-primary me-1"></i>
                                                         Commentaire
                                                     </label>
-                                                    <textarea class="form-control" readonly rows="5">{{ $candidat->comment ?: 'Aucun commentaire disponible' }}</textarea>
+                                                    <textarea class="form-control" readonly rows="5">{{ $candidat->comment }}</textarea>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -256,29 +280,32 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
 
                                 <!-- Modal Marquer Présent -->
-                                @if ($candidat->presence == '0')
                                 <div id="rapportModal{{ $candidat->id }}" class="modal fade" tabindex="-1" role="dialog">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">
-                                            <div class="modal-header text-white">
-                                                <h5 class="modal-title">
+                                            <div class="modal-header text-white bg-success">
+                                                <h5 class="modal-title text-white">
                                                     <i class="bx bx-check-circle me-2"></i>
-                                                    Marquer présent
+                                                    Valider la présence à l'entretien
                                                 </h5>
                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <form action="{{ route('entretiens.presence') }}" method="POST">
                                                 @csrf
                                                 <div class="modal-body">
+                                                    <div class="alert alert-info py-2 px-3 small mb-3">
+                                                        <i class="bx bx-info-circle me-1"></i> En validant la présence, ce candidat sera transféré à l'étape suivante (<strong>Bilan de compétences</strong>).
+                                                    </div>
                                                     <div class="mb-3">
                                                         <label class="form-label fw-medium">
                                                             <i class="bx bx-comment text-primary me-1"></i>
-                                                            Commentaire sur l'entretien
+                                                            Compte-rendu / Observations sur l'entretien
                                                         </label>
-                                                        <textarea name="comment" class="form-control" rows="5"
-                                                            placeholder="Ajoutez vos observations sur l'entretien..."></textarea>
+                                                        <textarea name="comment" class="form-control" rows="4"
+                                                            placeholder="Ajoutez vos observations sur l'entretien...">{{ $candidat->comment }}</textarea>
                                                     </div>
                                                     <input type="hidden" name="presence" value="1">
                                                     <input type="hidden" name="candidatentretien_id" value="{{ $candidat->id }}">
@@ -291,15 +318,14 @@
                                                         Annuler
                                                     </button>
                                                     <button type="submit" class="btn btn-success">
-                                                        <i class="bx bx-save me-1"></i>
-                                                        Enregistrer
+                                                        <i class="bx bx-check me-1"></i>
+                                                        Valider l'entretien
                                                     </button>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
-                                @endif
 
                                 <!-- Form pour marquer absent -->
                                 <form id="refusedForm-{{ $candidat->id }}" action="{{ route('entretiens.presence') }}" method="post" style="display: none;">

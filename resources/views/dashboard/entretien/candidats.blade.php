@@ -50,6 +50,12 @@
                         </div>
                         <small class="text-muted d-block">Absents</small>
                     </div>
+                    <div class="text-center">
+                        <div class="badge bg-warning text-dark fs-6 px-3 py-2">
+                            {{ $candidats->where('presence', '2')->count() }}
+                        </div>
+                        <small class="text-muted d-block">Abandons</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -70,7 +76,7 @@
                                 </th>
                                 <th class="border-0">
                                     <i class="bx bx-check-circle text-primary me-1"></i>
-                                    Présence
+                                    Statut / Présence
                                 </th>
                                 <th class="border-0 text-center">
                                     <i class="bx bx-cog text-primary me-1"></i>
@@ -98,43 +104,73 @@
                                         </div>
                                     </td>
                                     <td>
-                                        @if ($candidat->presence == '0')
+                                        @if ($candidat->presence == 1 || $candidat->presence === '1')
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                                                <span class="badge bg-success"><i class="bx bx-check me-1"></i> Présent</span>
+                                            </div>
+                                        @elseif ($candidat->presence == 2 || $candidat->presence === '2')
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-warning rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                                                <span class="badge bg-warning text-dark"><i class="bx bx-error-circle me-1"></i> Abandon</span>
+                                            </div>
+                                        @elseif ($candidat->presence === 0 || $candidat->presence === '0')
                                             <div class="d-flex align-items-center">
                                                 <div class="bg-danger rounded-circle me-2" style="width: 8px; height: 8px;"></div>
-                                                <span class="badge bg-danger">Absent</span>
+                                                <span class="badge bg-danger"><i class="bx bx-x me-1"></i> Absent</span>
                                             </div>
                                         @else
                                             <div class="d-flex align-items-center">
-                                                <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
-                                                <span class="badge bg-success">Présent</span>
+                                                <div class="bg-secondary rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                                                <span class="badge bg-light text-muted border">En attente</span>
                                             </div>
                                         @endif
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                            <a href="{{ route('candidatentreprises.synthese_parcours', $candidat->candidature->id) }}" 
+                                               class="btn btn-outline-info btn-sm" 
+                                               title="Voir le dossier / synthèse du parcours">
+                                                <i class="bx bx-folder-open me-1"></i> Dossier
+                                            </a>
+
                                             <a href="{{ route('adherent.show', $candidat->candidature->user->id) }}" 
-                                               class="btn btn-outline-primary btn-sm" 
+                                               class="btn btn-outline-secondary btn-sm" 
                                                title="Voir le profil">
                                                 <i class="bx bx-show"></i>
                                             </a>
                                             
+                                            @if ($candidat->comment)
+                                                <button type="button" 
+                                                        class="btn btn-outline-info btn-sm" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#commentModal{{ $candidat->id }}"
+                                                        title="Voir commentaire">
+                                                    <i class="bx bx-message-square-detail"></i>
+                                                </button>
+                                            @endif
+
+                                            <!-- Bouton Évaluer / Changer statut -->
                                             <button type="button" 
-                                                    class="btn btn-outline-info btn-sm" 
+                                                    class="btn btn-outline-success btn-sm" 
                                                     data-bs-toggle="modal" 
-                                                    data-bs-target="#commentModal{{ $candidat->id }}"
-                                                    title="Voir commentaire">
-                                                <i class="bx bx-message-square-detail"></i>
+                                                    data-bs-target="#rapportModal{{ $candidat->id }}"
+                                                    title="Évaluer / Marquer la présence ou l'abandon">
+                                                <i class="bx bx-check-double"></i> Évaluer
                                             </button>
 
-                                            @if ($candidat->presence == '0')
+                                            <!-- Bouton rapide Abandon -->
+                                            @if ($candidat->presence != 2 && $candidat->presence !== '2')
                                                 <button type="button" 
-                                                        class="btn btn-outline-success btn-sm" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#rapportModal{{ $candidat->id }}"
-                                                        title="Marquer présent">
-                                                    <i class="bx bx-check"></i>
+                                                        class="btn btn-outline-warning btn-sm abandon-btn" 
+                                                        data-candidat-id="{{ $candidat->id }}"
+                                                        title="Marquer comme abandon">
+                                                    <i class="bx bx-error-circle"></i>
                                                 </button>
-                                            @else
+                                            @endif
+
+                                            <!-- Bouton rapide Absent -->
+                                            @if ($candidat->presence !== 0 && $candidat->presence !== '0')
                                                 <button type="button" 
                                                         class="btn btn-outline-danger btn-sm refused" 
                                                         data-candidat-id="{{ $candidat->id }}"
@@ -145,91 +181,117 @@
                                         </div>
 
                                         <!-- Modal Commentaire -->
-                                        <div id="commentModal{{ $candidat->id }}" class="modal fade" tabindex="-1" role="dialog">
-                                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header text-white">
-                                                        <h5 class="modal-title">
-                                                            <i class="bx bx-message-square-detail me-2"></i>
-                                                            Compte rendu de l'entretien
-                                                        </h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="mb-3">
-                                                            <div class="d-flex align-items-center mb-2">
-                                                                <i class="bx bx-user me-2 text-primary"></i>
-                                                                <strong>{{ $candidat->candidature->user->fullName() }}</strong>
-                                                            </div>
-                                                            <label class="form-label fw-medium">
-                                                                <i class="bx bx-comment text-primary me-1"></i>
-                                                                Commentaire
-                                                            </label>
-                                                            <textarea class="form-control" readonly rows="5">{{ $candidat->comment ?: 'Aucun commentaire disponible' }}</textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                            <i class="bx bx-x me-1"></i>
-                                                            Fermer
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Modal Marquer Présent -->
-                                        @if ($candidat->presence == '0')
-                                            <div id="rapportModal{{ $candidat->id }}" class="modal fade" tabindex="-1" role="dialog">
+                                        @if ($candidat->comment)
+                                            <div id="commentModal{{ $candidat->id }}" class="modal fade" tabindex="-1" role="dialog">
                                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                                     <div class="modal-content">
-                                                        <div class="modal-header text-white">
-                                                            <h5 class="modal-title">
-                                                                <i class="bx bx-check-circle me-2"></i>
-                                                                Marquer présent
+                                                        <div class="modal-header bg-info text-white">
+                                                            <h5 class="modal-title text-white">
+                                                                <i class="bx bx-message-square-detail me-2"></i>
+                                                                Compte rendu de l'entretien
                                                             </h5>
                                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
-                                                        <form action="{{ route('entretiens.presence') }}" method="POST">
-                                                            @csrf
-                                                            <div class="modal-body">
-                                                                <div class="mb-3">
-                                                                    <div class="d-flex align-items-center mb-2">
-                                                                        <i class="bx bx-user me-2 text-primary"></i>
-                                                                        <strong>{{ $candidat->candidature->user->fullName() }}</strong>
-                                                                    </div>
-                                                                    <label class="form-label fw-medium">
-                                                                        <i class="bx bx-comment text-primary me-1"></i>
-                                                                        Commentaire sur l'entretien
-                                                                    </label>
-                                                                    <textarea name="comment" class="form-control" rows="5" 
-                                                                              placeholder="Ajoutez vos observations sur l'entretien..."></textarea>
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <div class="d-flex align-items-center mb-2">
+                                                                    <i class="bx bx-user me-2 text-primary"></i>
+                                                                    <strong>{{ $candidat->candidature->user->fullName() }}</strong>
                                                                 </div>
-                                                                <input type="hidden" name="presence" value="1">
-                                                                <input type="hidden" name="candidatentretien_id" value="{{ $candidat->id }}">
-                                                                <input type="hidden" name="candidat_id" value="{{ $candidat->candidature->id }}">
-                                                                <input type="hidden" name="entretien_id" value="{{ $entretien->id }}">
+                                                                <label class="form-label fw-medium">
+                                                                    <i class="bx bx-comment text-primary me-1"></i>
+                                                                    Commentaire / Observations
+                                                                </label>
+                                                                <textarea class="form-control" readonly rows="5">{{ $candidat->comment }}</textarea>
                                                             </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                    <i class="bx bx-x me-1"></i>
-                                                                    Annuler
-                                                                </button>
-                                                                <button type="submit" class="btn btn-success">
-                                                                    <i class="bx bx-save me-1"></i>
-                                                                    Enregistrer
-                                                                </button>
-                                                            </div>
-                                                        </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                <i class="bx bx-x me-1"></i>
+                                                                Fermer
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         @endif
 
-                                        <!-- Form pour marquer absent (caché) -->
+                                        <!-- Modal Évaluation & Statut (Présent / Absent / Abandon) -->
+                                        <div id="rapportModal{{ $candidat->id }}" class="modal fade" tabindex="-1" role="dialog">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content border-0 shadow">
+                                                    <div class="modal-header text-white bg-primary">
+                                                        <h5 class="modal-title text-white">
+                                                            <i class="bx bx-slider-alt me-2"></i>
+                                                            Évaluation & Statut de l'entretien
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('entretiens.presence') }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body p-4">
+                                                            <div class="d-flex align-items-center mb-3 p-2 bg-light rounded-3">
+                                                                <div class="avatar bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px;">
+                                                                    {{ strtoupper(substr($candidat->candidature->user->firstname ?? 'C', 0, 1) . substr($candidat->candidature->user->lastname ?? 'A', 0, 1)) }}
+                                                                </div>
+                                                                <div>
+                                                                    <strong class="text-dark">{{ $candidat->candidature->user->fullName() }}</strong>
+                                                                    <div class="small text-muted">Matricule: {{ $candidat->candidature->user->mecano ?? 'N/A' }}</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold text-dark">
+                                                                    Statut de participation <span class="text-danger">*</span>
+                                                                </label>
+                                                                <select name="presence" class="form-select" required>
+                                                                    <option value="1" {{ $candidat->presence == 1 ? 'selected' : '' }}>🟢 Présent (Valider l'entretien)</option>
+                                                                    <option value="0" {{ ($candidat->presence === 0 || $candidat->presence === '0') ? 'selected' : '' }}>🔴 Absent</option>
+                                                                    <option value="2" {{ $candidat->presence == 2 ? 'selected' : '' }}>🟠 Abandon</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold text-dark">
+                                                                    <i class="bx bx-comment text-primary me-1"></i>
+                                                                    Compte-rendu / Observations sur l'entretien
+                                                                </label>
+                                                                <textarea name="comment" class="form-control" rows="4" 
+                                                                          placeholder="Ajoutez vos observations sur l'entretien...">{{ $candidat->comment }}</textarea>
+                                                            </div>
+
+                                                            <input type="hidden" name="candidatentretien_id" value="{{ $candidat->id }}">
+                                                            <input type="hidden" name="candidat_id" value="{{ $candidat->candidature->id }}">
+                                                            <input type="hidden" name="entretien_id" value="{{ $entretien->id }}">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                                <i class="bx bx-x me-1"></i>
+                                                                Annuler
+                                                            </button>
+                                                            <button type="submit" class="btn btn-primary px-4">
+                                                                <i class="bx bx-check me-1"></i>
+                                                                Enregistrer le statut
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Form pour marquer absent rapide -->
                                         <form id="refusedForm-{{ $candidat->id }}" action="{{ route('entretiens.presence') }}" method="post" style="display: none;">
                                             @csrf
                                             <input type="hidden" name="presence" value="0">
+                                            <input type="hidden" name="candidatentretien_id" value="{{ $candidat->id }}">
+                                            <input type="hidden" name="candidat_id" value="{{ $candidat->candidature->id }}">
+                                            <input type="hidden" name="entretien_id" value="{{ $entretien->id }}">
+                                        </form>
+
+                                        <!-- Form pour marquer abandon rapide -->
+                                        <form id="abandonForm-{{ $candidat->id }}" action="{{ route('entretiens.presence') }}" method="post" style="display: none;">
+                                            @csrf
+                                            <input type="hidden" name="presence" value="2">
                                             <input type="hidden" name="candidatentretien_id" value="{{ $candidat->id }}">
                                             <input type="hidden" name="candidat_id" value="{{ $candidat->candidature->id }}">
                                             <input type="hidden" name="entretien_id" value="{{ $entretien->id }}">
@@ -254,19 +316,48 @@
                     var routerefused = $('#refusedForm-' + candidatId).attr('action');
                     Swal.fire({
                         title: "Marquer ce candidat absent",
-                        text: "Voulez-vous marquer ce candidat absent?",
+                        text: "Voulez-vous marquer ce candidat absent ?",
                         icon: "warning",
                         showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Oui, absent!",
-                        cancelButtonText: "Non, retour"
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#6c757d",
+                        confirmButtonText: "Oui, marquer absent",
+                        cancelButtonText: "Annuler"
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
                                 url: routerefused,
                                 type: 'POST',
                                 data: $('#refusedForm-' + candidatId).serialize(),
+                                success: function(response) {
+                                    window.location.reload();
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error(error);
+                                }
+                            });
+                        }
+                    });
+                });
+
+                $('.abandon-btn').on('click', function() {
+                    var candidatId = $(this).data('candidat-id');
+                    var routeAbandon = $('#abandonForm-' + candidatId).attr('action');
+                    Swal.fire({
+                        title: "Marquer ce candidat en Abandon",
+                        text: "Voulez-vous déclarer ce candidat en statut abandon pour cet entretien ?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#ffc107",
+                        cancelButtonColor: "#6c757d",
+                        confirmButtonText: "Oui, marquer abandon",
+                        cancelButtonText: "Annuler"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: routeAbandon,
+                                type: 'POST',
+                                data: $('#abandonForm-' + candidatId).serialize(),
                                 success: function(response) {
                                     window.location.reload();
                                 },

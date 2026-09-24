@@ -70,8 +70,8 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>#</th>
-                                <th>Entreprise</th>
-                                <th>Intitulé</th>
+                                <th>Entreprise de formation</th>
+                                <th>Intitulé de formation</th>
                                 <th>Lieu</th>
                                 <th>Date de debut</th>
                                 <th>Date de fin</th>

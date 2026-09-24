@@ -233,6 +233,9 @@
     <script>
         $(document).ready(function() {
             "use strict";
+            if ($.fn.dataTable) {
+                $.fn.dataTable.ext.errMode = 'none';
+            }
             new DataTable('#datatable--barm', {
                 "searching": true, 
                 "ordering": false, 

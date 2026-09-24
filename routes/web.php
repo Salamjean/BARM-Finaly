@@ -420,6 +420,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::prefix('post_monitored')->name('post_monitored.')->group(function () {
             Route::post('adherent/{id}', [PostMonitoredController::class, 'store'])->name('store');
+            Route::post('adherent/{id}/suivi/{step}', [PostMonitoredController::class, 'save_suivi'])->name('save_suivi');
+            Route::post('adherent/{id}/decision', [PostMonitoredController::class, 'save_decision'])->name('save_decision');
 
             Route::get('cohort', [PostMonitoredController::class, 'cohorts'])->name('cohorts');
             Route::get('cohort/{id}', [PostMonitoredController::class, 'cohort'])->name('cohort');
@@ -467,6 +469,7 @@ Route::group(['middleware' => ['auth']], function () {
         route::delete('resignation/{id}', [InscriptionController::class, 'resignation'])->name('resignation');
 
         route::post('duplicate', [DuplicatCandidatureController::class, 'store'])->name('duplicate');
+        route::post('decision-profilage/{id}', [InscriptionController::class, 'decisionProfilage'])->name('decision.profilage');
 
 
         /**
@@ -955,15 +958,24 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('{id}/update-comment', [PrepaentretienController::class, 'updateComment'])->name('update-comment');
     });
 
+    // techniques de recherche d'emploi (TRE) candidats entreprise privée
+    Route::prefix('techrechercheemplois')->name('techrechercheemplois.')->group(function () {
+        Route::get('/candidats', [App\Http\Controllers\TechrechercheemploiController::class, 'candidats'])->name('candidats');
+        Route::post('/cloturer', [App\Http\Controllers\TechrechercheemploiController::class, 'cloturer'])->name('cloturer');
+        Route::delete('{id}', [App\Http\Controllers\TechrechercheemploiController::class, 'destroy'])->name('destroy');
+    });
+
     // candidature d'un candidat dans une entreprise privée
     // Route::resource('candidatentreprises', App\Http\Controllers\CandidatentrepriseController::class);
     Route::prefix('candidatentreprises')->name('candidatentreprises.')->group(function () {
         Route::get('/candidats', [CandidatentrepriseController::class, 'candidats'])->name('candidats');
         Route::get('/index', [CandidatentrepriseController::class, 'index'])->name('index');
+        Route::get('/envoi', [CandidatentrepriseController::class, 'envoi'])->name('envoi');
+        Route::get('/integres', [CandidatentrepriseController::class, 'integres'])->name('integres');
         Route::get('/mise_a_disposition', [CandidatentrepriseController::class, 'mise_a_disposition'])->name('mise_a_disposition');
         Route::post('/store_mise_a_disposition', [CandidatentrepriseController::class, 'store_mise_a_disposition'])->name('store_mise_a_disposition');
         Route::post('/store_candidature_spontannee', [CandidatentrepriseController::class, 'store_candidature_spontannee'])->name('store_candidature_spontannee');
-        Route::get('/show/{entreprise}/{date}', [CandidatentrepriseController::class, 'show'])->name('show');
+        Route::get('/show/{entreprise}/{date?}', [CandidatentrepriseController::class, 'show'])->name('show');
         Route::post('/changestatut', [CandidatentrepriseController::class, 'changestatut'])->name('changestatut');
         Route::post('/end_poste', [CandidatentrepriseController::class, 'end_poste'])->name('end_poste');
         Route::get('/create_candidatentreprise/{candidat}', [CandidatentrepriseController::class, 'create_candidatentreprise'])->name('create_candidatentreprise');
@@ -972,12 +984,46 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('{id}', [CandidatentrepriseController::class, 'destroy'])->name('destroy');
         Route::get('/suivie_ep_candidats', [CandidatentrepriseController::class, 'suivie_ep_candidats'])->name('suivie_ep_candidats');
         Route::get('/suivie_fp_candidats', [CandidatentrepriseController::class, 'suivie_fp_candidats'])->name('suivie_fp_candidats');
+        Route::get('/decision_ep', [CandidatentrepriseController::class, 'decision_ep'])->name('decision_ep');
+        Route::get('/decision_fp', [CandidatentrepriseController::class, 'decision_fp'])->name('decision_fp');
+        Route::get('/historique_ep', [CandidatentrepriseController::class, 'historique_ep'])->name('historique_ep');
+        Route::get('/historique_fp', [CandidatentrepriseController::class, 'historique_fp'])->name('historique_fp');
+        Route::get('/parcours/{candidat}', [CandidatentrepriseController::class, 'synthese_parcours'])->name('synthese_parcours');
         Route::put('{id}/update-comment', [CandidatentrepriseController::class, 'updateComment'])->name('update-comment');
     });
 
     // suivis candidats entreprise privée
     Route::resource('suivis', App\Http\Controllers\SuiviController::class);
     Route::prefix('suivis')->name('suivis.')->group(function () {});
+
+    // Module Unifié Concours (Fonction Publique) : 4 sous-onglets
+    Route::prefix('concours')->name('concours.')->group(function () {
+        // 1. Choix du concours
+        Route::get('/choix', [App\Http\Controllers\ConcoursController::class, 'choix'])->name('choix');
+        Route::get('/choix/{candidat}/edit', [App\Http\Controllers\ConcoursController::class, 'editChoix'])->name('choix.edit');
+        Route::post('/choix/store', [App\Http\Controllers\ConcoursController::class, 'storeChoix'])->name('choix.store');
+
+        // 2. Prépa concours
+        Route::get('/prepa', [App\Http\Controllers\ConcoursController::class, 'prepa'])->name('prepa');
+        Route::get('/prepa/{suivi}/edit', [App\Http\Controllers\ConcoursController::class, 'editPrepa'])->name('prepa.edit');
+        Route::post('/prepa/store', [App\Http\Controllers\ConcoursController::class, 'storePrepa'])->name('prepa.store');
+
+        // 3. Prépa de dossier (2 rencontres)
+        Route::get('/dossier', [App\Http\Controllers\ConcoursController::class, 'dossier'])->name('dossier');
+        Route::get('/dossier/{suivi}/edit', [App\Http\Controllers\ConcoursController::class, 'editDossier'])->name('dossier.edit');
+        Route::post('/dossier/store', [App\Http\Controllers\ConcoursController::class, 'storeDossier'])->name('dossier.store');
+
+        // 4. Choix final
+        Route::get('/final', [App\Http\Controllers\ConcoursController::class, 'final'])->name('final');
+        Route::get('/final/{suivi}/edit', [App\Http\Controllers\ConcoursController::class, 'editFinal'])->name('final.edit');
+        Route::post('/final/store', [App\Http\Controllers\ConcoursController::class, 'storeFinal'])->name('final.store');
+
+        // 5. Liste des inscrits aux concours & Résultats (Admis / Ajournés)
+        Route::get('/inscrits', [App\Http\Controllers\ConcoursController::class, 'inscrits'])->name('inscrits');
+        Route::post('/decision-resultat', [App\Http\Controllers\ConcoursController::class, 'storeDecisionResultat'])->name('decision_resultat');
+
+        Route::delete('/{id}', [App\Http\Controllers\ConcoursController::class, 'destroy'])->name('destroy');
+    });
 
     // soummissions de dossier pour les candidats de fonction publique
     Route::prefix('soumissiondossiers')->name('soumissiondossiers.')->group(function () {

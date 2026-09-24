@@ -1626,4 +1626,43 @@ class InscriptionController extends Controller
 
         $candidate->save();
     }
+
+    public function decisionProfilage(Request $request, int $id)
+    {
+        $request->validate([
+            'decision' => 'required|in:confirm,reject',
+            'new_orientation' => 'required_if:decision,reject|nullable|in:auto-emploi,fonction-publique,entreprise-privee',
+            'motif' => 'nullable|string',
+        ]);
+
+        $candidature = Candidature::findOrFail($id);
+
+        $candidature->profilage_decision = true;
+        $candidature->date_decision_profilage = now()->toDateString();
+        $candidature->motif_decision_profilage = $request->motif;
+
+        if ($request->decision === 'reject') {
+            $newOrientation = $request->new_orientation;
+            $candidature->orientation = $newOrientation;
+            $candidature->save();
+
+            $orientationLabels = [
+                'auto-emploi' => 'Auto-Emploi',
+                'fonction-publique' => 'Fonction Publique',
+                'entreprise-privee' => 'Entreprise Privée',
+            ];
+            $orientationLabel = $orientationLabels[$newOrientation] ?? $newOrientation;
+
+            return redirect()->route('candidatentreprises.synthese_parcours', $candidature->id)
+                ->with('success', "Le candidat a été réorienté vers $orientationLabel avec succès. La décision de profilage est clôturée.");
+        }
+
+        $candidature->save();
+
+        $orientationName = $candidature->orientation === 'fonction-publique' ? 'Fonction Publique' : 'Entreprise Privée';
+
+        return redirect()->route('candidatentreprises.synthese_parcours', $candidature->id)
+            ->with('success', "Le profilage en $orientationName a été validé et confirmé avec succès.");
+    }
 }
+

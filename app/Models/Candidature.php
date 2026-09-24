@@ -234,6 +234,16 @@ class Candidature extends Model
         return $this->hasOne(Choixconcour::class);
     }
 
+    public function concourSuivi(): HasOne
+    {
+        return $this->hasOne(ConcourSuivi::class, 'candidature_id');
+    }
+
+    public function concourSuivis(): HasMany
+    {
+        return $this->hasMany(ConcourSuivi::class, 'candidature_id');
+    }
+
     public function candidatentretiens() : HasMany
     {
         return $this->hasMany(Candidatentretien::class);
@@ -254,4 +264,33 @@ class Candidature extends Model
         return $this->hasMany(Prepaentretien::class);
     }
 
+    public function techrechercheemplois() : HasMany
+    {
+        return $this->hasMany(Techrechercheemploi::class, 'candidature_id');
+    }
+
+    public function suivi1User(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'suivi_1_by');
+    }
+
+    public function suivi2User(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'suivi_2_by');
+    }
+
+    public function suivi3User(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'suivi_3_by');
+    }
+
+    public function candidatentreprise(): HasOne
+    {
+        return $this->hasOne(Candidatentreprise::class, 'candidature_id');
+    }
+
+    public function postInsertionUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'post_insertion_by');
+    }
 }

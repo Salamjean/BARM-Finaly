@@ -43,19 +43,25 @@
                             <td>{{ $candidat->user->fullName() }}</td>
                             <td class="text-start">{{ $candidat->phone_number }}</td>
                             <td style="text-align: center">
-                                <a href="{{ route('adherent.show', $candidat->user->id) }}">
-                                    <i class='bx bxs-show'></i>
-                                </a>
+                                <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap">
+                                    <a href="{{ route('candidatentreprises.synthese_parcours', $candidat->id) }}" class="btn btn-sm btn-outline-info" title="Voir le dossier / synthèse du parcours">
+                                        <i class='bx bx-folder-open me-1'></i> Dossier
+                                    </a>
 
-                                <a class="badge bg-primary text-white" href="{{ route('candidatentreprises.show_candidatentreprise', $candidat->id) }}">
-                                    Voir
-                                </a>
-                                @if ($candidat->en_poste != '1')
-                                <a class="badge bg-warning text-white" href="{{ route('candidatentreprises.create_candidatentreprise', $candidat->id) }}">
-                                    Dépot dossier
-                                </a>
-                                @endif
+                                    <a href="{{ route('adherent.show', $candidat->user->id) }}" class="btn btn-sm btn-outline-secondary" title="Fiche profil">
+                                        <i class='bx bxs-show'></i>
+                                    </a>
 
+                                    <a class="btn btn-sm btn-primary" href="{{ route('candidatentreprises.show_candidatentreprise', $candidat->id) }}" title="Voir les mises à disposition">
+                                        Mises à dispo
+                                    </a>
+
+                                    @if ($candidat->en_poste != '1')
+                                        <a class="btn btn-sm btn-warning text-dark" href="{{ route('candidatentreprises.create_candidatentreprise', $candidat->id) }}">
+                                            Dépôt dossier
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @endforeach

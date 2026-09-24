@@ -35,4 +35,9 @@ class Cvlm extends Model
         'id' => 'integer',
         'date' => 'date',
     ];
+
+    public function candidature()
+    {
+        return $this->belongsTo(Candidature::class, 'candidature_id');
+    }
 }

@@ -17,20 +17,40 @@ class BilancompetenceController extends Controller
 {
     public function candidats()
     {
-        $candidats = Candidature::orderByDESC('created_at')->where('death','0')->where('resignation','0')->where('orientation','entreprise-privee')->get();
+        $candidats = Candidature::where('death', '0')
+            ->where('resignation', '0')
+            ->where('orientation', 'entreprise-privee')
+            ->whereHas('candidatentretiens', function ($query) {
+                $query->where('presence', 1);
+            })
+            ->with(['user', 'bilancompetences'])
+            ->get()
+            ->sortBy(function ($candidat) {
+                return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+            }, SORT_NATURAL | SORT_FLAG_CASE);
 
         $title = 'Les candidats';
 
-        return view('dashboard.bilancompetence.candidats', compact('candidats','title'));
+        return view('dashboard.bilancompetence.candidats', compact('candidats', 'title'));
     }
 
     public function candidatsfp()
     {
-        $candidats = Candidature::orderByDESC('created_at')->where('death','0')->where('resignation','0')->where('orientation','fonction-publique')->get();
+        $candidats = Candidature::where('death', '0')
+            ->where('resignation', '0')
+            ->where('orientation', 'fonction-publique')
+            ->whereHas('candidatentretiens', function ($query) {
+                $query->where('presence', 1);
+            })
+            ->with(['user', 'bilancompetences'])
+            ->get()
+            ->sortBy(function ($candidat) {
+                return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+            }, SORT_NATURAL | SORT_FLAG_CASE);
 
         $title = 'Les candidats';
 
-        return view('dashboard.bilancompetence.candidats', compact('candidats','title'));
+        return view('dashboard.bilancompetence.candidats', compact('candidats', 'title'));
     }
 
     public function index(Candidature $candidat)
@@ -66,6 +86,10 @@ class BilancompetenceController extends Controller
                 'autor_id' => Auth::user()->id,
             ]);
 
+            // Réinitialiser la décision de profilage pour ce candidat
+            Candidature::where('id', $request->candidature_id)->update([
+                'profilage_decision' => false,
+            ]);
 
             return redirect()->route('bilancompetences.index',$request->candidature_id)->with("success", 'Donnée
             enregistées');
@@ -104,6 +128,14 @@ class BilancompetenceController extends Controller
                 'comment' => $request->comment,
                 'rapport' => $filePath,
             ]);
+
+            // Si le bilan est validé présent, s'assurer que le profilage est ouvert pour décision
+            if ($request->presence == 1) {
+                $candidatId = $request->candidat_id ?? $bilancompetence->candidature_id;
+                Candidature::where('id', $candidatId)->update([
+                    'profilage_decision' => false,
+                ]);
+            }
 
 
             return redirect()->route('bilancompetences.index', $request->candidat_id)->with("success", 'Donnée modifiées');

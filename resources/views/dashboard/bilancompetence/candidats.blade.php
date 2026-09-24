@@ -112,9 +112,14 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="d-flex justify-content-center gap-2">
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <a href="{{ route('candidatentreprises.synthese_parcours', $candidat->id) }}" 
+                                               class="btn btn-outline-info btn-sm" 
+                                               title="Voir le dossier / synthèse du parcours">
+                                                <i class="bx bx-folder-open me-1"></i> Dossier
+                                            </a>
                                             <a href="{{ route('adherent.show', $candidat->user->id) }}" 
-                                               class="btn btn-outline-primary btn-sm" 
+                                               class="btn btn-outline-secondary btn-sm" 
                                                title="Voir le profil">
                                                 <i class="bx bx-show"></i>
                                             </a>
