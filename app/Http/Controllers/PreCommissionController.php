@@ -157,6 +157,7 @@ class PreCommissionController extends Controller
         $pa->save();
 
         $candidature->pa = '0';
+        $candidature->pa_resubmitted = false;
         $candidature->focal_point_area = null;
         $candidature->save();
 
