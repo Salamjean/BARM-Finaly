@@ -138,7 +138,7 @@ class Candidature extends Model
 
     public function paPending(): HasOne
     {
-        return $this->hasOne(PA::class)->where('status', 'in_progress');
+        return $this->hasOne(PA::class)->whereIn('status', ['in_progress', 'missing']);
     }
 
 

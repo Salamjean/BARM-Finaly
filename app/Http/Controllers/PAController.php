@@ -172,8 +172,8 @@ class PAController extends Controller
 
         $pa = null;
         foreach ($adherents as $adherent) {
-            $adherent->pa_status = in_array('in_progress', $adherent->pas->pluck('status')->toArray()) ? 'En cours' : 'Validé';
-            $pa = PA::where('candidature_id', $adherent->id)->where('status', 'in_progress')->first();
+            $adherent->pa_status = $adherent->pas->whereIn('status', ['in_progress', 'missing'])->isNotEmpty() ? 'En cours' : 'Validé';
+            $pa = PA::where('candidature_id', $adherent->id)->whereIn('status', ['in_progress', 'missing'])->first();
             if (!$pa)
                 $pa = PA::where('candidature_id', $adherent->id)->where('status', 'accepted')->first();
             $adherent->pa_file = $pa ? $pa->url : null;
