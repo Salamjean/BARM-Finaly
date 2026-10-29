@@ -118,6 +118,15 @@
             <div class="text-primary fw-bold">Auto Emploi</div>
         </a>
         <ul class="menu-sub section-content" style="display: none;">
+            @if (can('conseiller-auto-emploi') || can('chef-cellule-formation-et-insertion'))
+                <li class="menu-item {{ routeActive(['candidatentreprises.suivie_ae_candidats']) }}">
+                    <a href="{{ route('candidatentreprises.suivie_ae_candidats') }}" class="menu-link">
+                        <i class='menu-icon tf-icons bx bx-bar-chart-alt-2'></i>
+                        <div>Suivi des candidats</div>
+                    </a>
+                </li>
+            @endif
+
             {{-- Cohorte --}}
             <li class="menu-item {{ routeActive(['cohort.create', 'cohort.index']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -268,23 +277,6 @@
                 </a>
             </li>
 
-            {{-- PV Comité crédit --}}
-            <li
-                class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
-                <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
-                    <i class='menu-icon tf-icons bx bxs-buildings'></i>
-                    <div class="d-flex justify-content-between">
-                        <div>PV Comité crédit</div>
-                        @if (disbursementPendingCountByUser('pv_credit') > 0)
-                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
-                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
-                                {{ disbursementPendingCountByUser('pv_credit') }}
-                            </span>
-                        @endif
-                    </div>
-                </a>
-            </li>
-
             {{-- Ouverture de compte --}}
             @if (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi'))
                 <li
@@ -303,6 +295,23 @@
                     </a>
                 </li>
             @endif
+
+            {{-- PV Comité crédit --}}
+            <li
+                class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
+                <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
+                    <i class='menu-icon tf-icons bx bxs-buildings'></i>
+                    <div class="d-flex justify-content-between">
+                        <div>PV Comité crédit</div>
+                        @if (disbursementPendingCountByUser('pv_credit') > 0)
+                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                                {{ disbursementPendingCountByUser('pv_credit') }}
+                            </span>
+                        @endif
+                    </div>
+                </a>
+            </li>
 
             {{-- Decaissements --}}
             <li
@@ -379,14 +388,6 @@
                     </ul>
                 </li>
 
-                <li
-                    class="menu-item {{ routeActive(['entreprises.index', 'entreprises.create', 'entreprises.show', 'entreprises.edit']) }}">
-                    <a href="{{ route('entreprises.index') }}" class="menu-link">
-                        <i class='menu-icon tf-icons bx bxs-school'></i>
-                        <div>Entreprises</div>
-                    </a>
-                </li>
-
                 <li class="menu-item {{ routeActive(['formations.index', 'formations.create', 'formations.presence']) }}">
                     <a href="{{ route('formations.index') }}" class="menu-link">
                         <i class='menu-icon tf-icons bx bxs-file-doc'></i>
@@ -419,17 +420,17 @@
                 </li>
             @endif
 
-            {{-- Mise à disposition --}}
+            {{-- Mise en relation --}}
             <li
                 class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.envoi', 'candidatentreprises.integres', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-briefcase'></i>
-                    <div>Mise à disposition</div>
+                    <div>Mise en relation</div>
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item {{ routeActive(['candidatentreprises.envoi', 'candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
                         <a href="{{ route('candidatentreprises.envoi') }}" class="menu-link">
-                            <div>Envoi en entreprise</div>
+                            <div>Entretien d'embauche</div>
                         </a>
                     </li>
                     <li class="menu-item {{ routeActive(['candidatentreprises.integres']) }}">

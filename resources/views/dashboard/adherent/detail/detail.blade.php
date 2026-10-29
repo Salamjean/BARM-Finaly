@@ -279,7 +279,7 @@
                                             @if ($child->file)
                                                 <div class="col-md-2">
                                                     <div class="text-muted small mb-1">Document J.</div>
-                                                    <a href="{{ asset($child->file) }}"
+                                                    <a href="{{ route('document.download', ['path' => $child->file, 'name' => 'Acte - ' . $child->fullname, 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                                         class="btn btn-outline-primary btn-sm" download>
                                                         <i class="bx bx-download me-1"></i> Télécharger
                                                     </a>
@@ -679,7 +679,7 @@
                                     <i class="bx bx-file text-primary fs-5 me-2"></i>
                                     <span>Fiche d'inscription</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->fiche_inscription) }}"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->fiche_inscription, 'name' => 'Fiche d\'inscription', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                     class="btn btn-primary btn-sm" download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -694,7 +694,7 @@
                                     <i class="bx bx-id-card text-info fs-5 me-2"></i>
                                     <span>Pièce d'identité du conjoint(e)</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->partner_card) }}" class="btn btn-primary btn-sm"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->partner_card, 'name' => 'Pièce d\'identité du conjoint', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}" class="btn btn-primary btn-sm"
                                     download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -709,7 +709,7 @@
                                     <i class="bx bx-heart text-danger fs-5 me-2"></i>
                                     <span>Certificat de mariage</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->marriage_certificate) }}"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->marriage_certificate, 'name' => 'Certificat de mariage', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                     class="btn btn-primary btn-sm" download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -724,7 +724,7 @@
                                     <i class="bx bx-edit text-warning fs-5 me-2"></i>
                                     <span>Demande manuscrite</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->demande_manuscrite) }}"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->demande_manuscrite, 'name' => 'Demande manuscrite', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                     class="btn btn-primary btn-sm" download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -739,7 +739,7 @@
                                     <i class="bx bx-user-circle text-success fs-5 me-2"></i>
                                     <span>CV</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->cv) }}" class="btn btn-primary btn-sm" download>
+                                <a href="{{ route('document.download', ['path' => $user->candidate->cv, 'name' => 'CV - ' . $user->fullName(), 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}" class="btn btn-primary btn-sm" download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
                             </div>
@@ -753,7 +753,7 @@
                                     <i class="bx bx-id-card text-primary fs-5 me-2"></i>
                                     <span>Pièce d'identité</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->id_card) }}" class="btn btn-primary btn-sm"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->id_card, 'name' => 'Pièce d\'identité', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}" class="btn btn-primary btn-sm"
                                     download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -768,7 +768,7 @@
                                     <i class="bx bx-briefcase text-info fs-5 me-2"></i>
                                     <span>Carte professionnelle</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->carte_pro) }}" class="btn btn-primary btn-sm"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->carte_pro, 'name' => 'Carte professionnelle', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}" class="btn btn-primary btn-sm"
                                     download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -783,7 +783,7 @@
                                     <i class="bx bx-file-blank text-secondary fs-5 me-2"></i>
                                     <span>Fiche d'engagement</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->fiche_engagement) }}"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->fiche_engagement, 'name' => 'Fiche d\'engagement', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                     class="btn btn-primary btn-sm" download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -798,7 +798,7 @@
                                     <i class="bx bx-user text-warning fs-5 me-2"></i>
                                     <span>Fiche individuelle</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->fiche_individuelle) }}"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->fiche_individuelle, 'name' => 'Fiche individuelle', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                     class="btn btn-primary btn-sm" download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -813,7 +813,7 @@
                                     <i class="bx bx-file text-danger fs-5 me-2"></i>
                                     <span>Arrêté de radiation</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->arrete_radiation) }}"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->arrete_radiation, 'name' => 'Arrêté de radiation', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                     class="btn btn-primary btn-sm" download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
@@ -828,7 +828,7 @@
                                     <i class="bx bx-plus-medical text-success fs-5 me-2"></i>
                                     <span>Certificat médical</span>
                                 </div>
-                                <a href="{{ asset($user->candidate->certificat) }}" class="btn btn-primary btn-sm"
+                                <a href="{{ route('document.download', ['path' => $user->candidate->certificat, 'name' => 'Certificat médical', 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}" class="btn btn-primary btn-sm"
                                     download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>

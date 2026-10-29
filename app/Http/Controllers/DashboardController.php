@@ -3,6 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Candidature;
+use App\Models\Candidatentretien;
+use App\Models\Bilancompetence;
+use App\Models\Cvlm;
+use App\Models\Prepaentretien;
+use App\Models\Techrechercheemploi;
+use App\Models\Candidatformation;
+use App\Models\Candidatentreprise;
+use App\Models\Entreprise;
+use App\Models\Cohort;
 use App\Models\PA;
 use App\Models\Partenaire;
 use App\Models\User;
@@ -166,7 +175,7 @@ class DashboardController extends Controller
                 'candidatures_post_monitored' => $candidatures_post_monitored
             ]);
         } elseif (can('chef-cellule-formation-et-insertion|conseiller-auto-emploi|conseiller-fonction-public|conseiller-entreprise-prive')) {
-            $data = Cache::remember('dashboard_data_' . auth()->id(), 300, function () {
+            $data = Cache::remember('dashboard_data_v4_' . auth()->id(), 300, function () {
                 return $this->getDashboardData();
             });
 
@@ -363,6 +372,32 @@ class DashboardController extends Controller
         $type_armes_entreprise_privee = [];
         $grades_entreprise_privee = [];
 
+        $ep_totalCandidats = 0;
+        $ep_totalHommes = 0;
+        $ep_totalFemmes = 0;
+        $ep_rdv1Count = 0;
+        $ep_rdv1Absents = 0;
+        $ep_rdv2Count = 0;
+        $ep_rdv3Valides = 0;
+        $ep_rdv3Eligibles = 0;
+        $ep_cvlmCount = 0;
+        $ep_prepaCount = 0;
+        $ep_treCount = 0;
+        $ep_formationCount = 0;
+        $ep_beneficiairesPrepa = 0;
+        $ep_madTotal = 0;
+        $ep_madAcceptes = 0;
+        $ep_madPending = 0;
+        $ep_madRejected = 0;
+        $ep_madCandidatsUniques = 0;
+        $ep_enPosteCount = 0;
+        $ep_tauxInsertion = 0;
+        $ep_tauxRecrutementMAD = 0;
+        $ep_tauxProfilage = 0;
+        $ep_entreprisesStats = collect();
+        $ep_contratsStats = collect();
+        $ep_candidats = collect();
+
         $type_armes_fonction_publique = [];
         $grades_fonction_publique = [];
 
@@ -521,6 +556,93 @@ class DashboardController extends Controller
                 ->selectRaw("grade, COUNT(*) as count")
                 ->groupBy('grade')
                 ->pluck('count', 'grade');
+
+            // Indicateurs et métriques de suivi des candidats en Entreprise Privée
+            $ep_query = Candidature::where('death', '0')
+                ->where('resignation', '0')
+                ->where('orientation', 'entreprise-privee');
+
+            $ep_candidatsIds = (clone $ep_query)->pluck('id')->toArray();
+            $ep_totalCandidats = count($ep_candidatsIds);
+
+            // Répartition Genre
+            $ep_totalHommes = (clone $ep_query)->where(function ($q) {
+                $q->where('gender', 'Masculin')->orWhere('gender', 'M')->orWhere('gender', 'Homme')->orWhere('gender', 'homme');
+            })->count();
+            $ep_totalFemmes = (clone $ep_query)->where(function ($q) {
+                $q->where('gender', 'Feminin')->orWhere('gender', 'F')->orWhere('gender', 'Femme')->orWhere('gender', 'femme');
+            })->count();
+
+            // 1. RDV 1 : Entretien
+            $ep_rdv1Count = Candidatentretien::whereIn('candidature_id', $ep_candidatsIds)->where('presence', 1)->distinct('candidature_id')->count('candidature_id');
+            $ep_rdv1Absents = Candidatentretien::whereIn('candidature_id', $ep_candidatsIds)->where('presence', 0)->distinct('candidature_id')->count('candidature_id');
+
+            // 2. RDV 2 : Bilan de compétences
+            $ep_rdv2Count = Bilancompetence::whereIn('candidature_id', $ep_candidatsIds)->where('presence', 1)->distinct('candidature_id')->count('candidature_id');
+
+            // 3. RDV 3 : Validation / Décision de Profilage
+            $ep_rdv3Valides = (clone $ep_query)->where('profilage_decision', 1)->count();
+            $ep_rdv3Eligibles = (clone $ep_query)->where(function ($q) {
+                    $q->where('profilage_decision', 0)
+                        ->orWhere('profilage_decision', false)
+                        ->orWhereNull('profilage_decision');
+                })
+                ->whereHas('bilancompetences', function ($q) {
+                    $q->where('presence', 1);
+                })->count();
+
+            // 4. Préparation à l'insertion
+            $ep_cvlmCount = Cvlm::whereIn('candidature_id', $ep_candidatsIds)->distinct('candidature_id')->count('candidature_id');
+            $ep_prepaCount = Prepaentretien::whereIn('candidature_id', $ep_candidatsIds)->distinct('candidature_id')->count('candidature_id');
+            $ep_treCount = Techrechercheemploi::whereIn('candidature_id', $ep_candidatsIds)->distinct('candidature_id')->count('candidature_id');
+            $ep_formationCount = Candidatformation::whereIn('candidature_id', $ep_candidatsIds)->distinct('candidature_id')->count('candidature_id');
+
+            $ep_beneficiairesPrepa = Candidature::whereIn('id', $ep_candidatsIds)->where(function ($q) {
+                $q->whereHas('cvlms')
+                    ->orWhereHas('prepaentretiens')
+                    ->orWhereHas('techrechercheemplois')
+                    ->orWhereHas('candidatformations');
+            })->count();
+
+            // 5. Mise à disposition en entreprise
+            $ep_madQuery = Candidatentreprise::whereIn('candidature_id', $ep_candidatsIds);
+            $ep_madTotal = (clone $ep_madQuery)->count();
+            $ep_madAcceptes = (clone $ep_madQuery)->where('statut', 'accepted')->count();
+            $ep_madPending = (clone $ep_madQuery)->where('statut', 'pending')->count();
+            $ep_madRejected = (clone $ep_madQuery)->where('statut', 'rejected')->count();
+            $ep_madCandidatsUniques = (clone $ep_madQuery)->distinct('candidature_id')->count('candidature_id');
+
+            // 6. Candidats effectivement en poste
+            $ep_enPosteCount = (clone $ep_query)->where('en_poste', '1')->count();
+
+            // Taux clés
+            $ep_tauxInsertion = $ep_totalCandidats > 0 ? round(($ep_enPosteCount / $ep_totalCandidats) * 100, 1) : 0;
+            $ep_tauxRecrutementMAD = $ep_madTotal > 0 ? round(($ep_madAcceptes / $ep_madTotal) * 100, 1) : 0;
+            $ep_tauxProfilage = $ep_totalCandidats > 0 ? round(($ep_rdv3Valides / $ep_totalCandidats) * 100, 1) : 0;
+
+            // Statistiques par entreprise partenaire
+            $ep_entreprisesStats = Candidatentreprise::whereIn('candidature_id', $ep_candidatsIds)
+                ->select(
+                    'entreprise',
+                    DB::raw('count(*) as total_envois'),
+                    DB::raw('SUM(CASE WHEN statut = "accepted" THEN 1 ELSE 0 END) as total_acceptes'),
+                    DB::raw('SUM(CASE WHEN statut = "pending" THEN 1 ELSE 0 END) as total_pending'),
+                    DB::raw('SUM(CASE WHEN statut = "rejected" THEN 1 ELSE 0 END) as total_refuses'),
+                    DB::raw('COUNT(DISTINCT candidature_id) as total_candidats')
+                )
+                ->groupBy('entreprise')
+                ->orderByDesc('total_envois')
+                ->get();
+
+            // Statistiques par type de contrat
+            $ep_contratsStats = Candidatentreprise::whereIn('candidature_id', $ep_candidatsIds)
+                ->whereNotNull('type_contrat')
+                ->where('type_contrat', '!=', '')
+                ->select('type_contrat', DB::raw('count(*) as count'))
+                ->groupBy('type_contrat')
+                ->get();
+
+            $ep_candidats = collect();
         }
 
         if (can('chef-cellule-formation-et-insertion|conseiller-fonction-public')) {
@@ -620,6 +742,33 @@ class DashboardController extends Controller
 
             'adherents_by_type_armes_entreprise_privee' => $type_armes_entreprise_privee,
             'adherents_by_grades_entreprise_privee' => $grades_entreprise_privee,
+
+            // Métriques Suivi Entreprise Privée
+            'ep_totalCandidats' => $ep_totalCandidats,
+            'ep_totalHommes' => $ep_totalHommes,
+            'ep_totalFemmes' => $ep_totalFemmes,
+            'ep_rdv1Count' => $ep_rdv1Count,
+            'ep_rdv1Absents' => $ep_rdv1Absents,
+            'ep_rdv2Count' => $ep_rdv2Count,
+            'ep_rdv3Valides' => $ep_rdv3Valides,
+            'ep_rdv3Eligibles' => $ep_rdv3Eligibles,
+            'ep_cvlmCount' => $ep_cvlmCount,
+            'ep_prepaCount' => $ep_prepaCount,
+            'ep_treCount' => $ep_treCount,
+            'ep_formationCount' => $ep_formationCount,
+            'ep_beneficiairesPrepa' => $ep_beneficiairesPrepa,
+            'ep_madTotal' => $ep_madTotal,
+            'ep_madAcceptes' => $ep_madAcceptes,
+            'ep_madPending' => $ep_madPending,
+            'ep_madRejected' => $ep_madRejected,
+            'ep_madCandidatsUniques' => $ep_madCandidatsUniques,
+            'ep_enPosteCount' => $ep_enPosteCount,
+            'ep_tauxInsertion' => $ep_tauxInsertion,
+            'ep_tauxRecrutementMAD' => $ep_tauxRecrutementMAD,
+            'ep_tauxProfilage' => $ep_tauxProfilage,
+            'ep_entreprisesStats' => $ep_entreprisesStats,
+            'ep_contratsStats' => $ep_contratsStats,
+            'ep_candidats' => $ep_candidats,
 
             'adherents_by_type_armes_fonction_publique' => $type_armes_fonction_publique,
             'adherents_by_grades_fonction_publique' => $grades_fonction_publique,

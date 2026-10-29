@@ -64,15 +64,20 @@ class CvlmController extends Controller
             $filePathCv = null;
             $filePathLm = null;
 
+            $dir = public_path('data/docs/cvlm');
+            if (!\Illuminate\Support\Facades\File::isDirectory($dir)) {
+                \Illuminate\Support\Facades\File::makeDirectory($dir, 0755, true, true);
+            }
+
             if ($request->hasFile('cv')) {
                 $fileName = uniqid('cv_') . '.' . $request->file('cv')->getClientOriginalExtension();
-                $request->cv->move(saveByEnv() .'data/docs/cvlm', $fileName);
+                $request->cv->move($dir, $fileName);
                 $filePathCv = 'data/docs/cvlm/' . $fileName;
             }
 
             if ($request->hasFile('lm')) {
                 $fileName = uniqid('lm_') . '.' . $request->file('lm')->getClientOriginalExtension();
-                $request->lm->move(saveByEnv() .'data/docs/cvlm', $fileName);
+                $request->lm->move($dir, $fileName);
                 $filePathLm = 'data/docs/cvlm/' . $fileName;
             }
 

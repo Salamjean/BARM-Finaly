@@ -21,9 +21,9 @@
             </div>
             <div class="ms-auto d-flex align-items-center gap-2">
                 @if (can('conseiller-entreprise-prive') || can('chef-cellule-formation-et-insertion'))
-                    <a href="{{ route('candidatentreprises.mise_a_disposition') }}" class="btn btn-primary shadow-sm">
+                    <a href="{{ route('candidatentreprises.mise_a_disposition') }}" class="btn btn-primary shadow-sm" id="btn-action-mad">
                         <i class="bx bx-plus me-1"></i>
-                        Nouvelle Mise à disposition
+                        {{ (request()->is('candidatentreprises/envoi*') || ($currentTab ?? 'envoi') === 'envoi') ? 'Nouvel entretien' : 'Nouvelle Mise en relation' }}
                     </a>
                 @endif
             </div>
@@ -63,11 +63,11 @@
                 <div class="card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-3 d-flex align-items-center">
                         <div class="rounded-circle p-3 bg-light-warning text-warning me-3">
-                            <i class="bx bx-send fs-3"></i>
+                            <i class="bx bx-conversation fs-3"></i>
                         </div>
                         <div>
                             <h4 class="mb-0 fw-bold text-warning">{{ $envoyes->count() }}</h4>
-                            <small class="text-muted">Envoi en entreprise (En cours)</small>
+                            <small class="text-muted">Entretien d’embauche (En cours)</small>
                         </div>
                     </div>
                 </div>
@@ -119,8 +119,8 @@
                                 role="tab"
                                 aria-controls="envoi-pane"
                                 aria-selected="{{ $currentTab === 'envoi' ? 'true' : 'false' }}">
-                            <i class="bx bx-send fs-5"></i>
-                            <span>1. Envoi en entreprise</span>
+                            <i class="bx bx-conversation fs-5"></i>
+                            <span>1. Entretien d’embauche</span>
                             <span class="badge bg-warning text-dark rounded-pill ms-1">{{ $envoyes->count() }}</span>
                         </button>
                     </li>
@@ -145,15 +145,15 @@
                 <div class="tab-content" id="madTabContent">
                     
                     <!-- ========================================================================= -->
-                    <!-- SOUS-ONGLET 1 : ENVOI EN ENTREPRISE (LISTE DES ENTREPRISES)               -->
+                    <!-- SOUS-ONGLET 1 : ENTRETIEN D’EMBAUCHE (LISTE DES ENTREPRISES)              -->
                     <!-- ========================================================================= -->
                     <div class="tab-pane fade {{ $currentTab === 'envoi' ? 'show active' : '' }}" id="envoi-pane" role="tabpanel" aria-labelledby="envoi-tab">
                         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                             <div>
                                 <h5 class="fw-bold text-dark mb-1">
-                                    <i class="bx bx-paper-plane text-warning me-2"></i> Liste des entreprises - Envois de candidats
+                                    <i class="bx bx-conversation text-warning me-2"></i> Liste des entreprises - Entretiens d’embauche
                                 </h5>
-                                <p class="text-muted small mb-0">Sélectionnez une entreprise pour ouvrir et consulter la liste des candidats qui lui ont été envoyés.</p>
+                                <p class="text-muted small mb-0">Sélectionnez une entreprise pour ouvrir et consulter la liste des candidats en entretien d’embauche.</p>
                             </div>
                         </div>
 
@@ -162,8 +162,8 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th style="width: 5%;">#</th>
-                                        <th style="width: 35%;">Entreprise / Structure</th>
-                                        <th style="width: 25%;">Date de mise à disposition</th>
+                                        <th style="width: 40%;">Entreprise / Structure</th>
+                                        <th style="width: 20%;">Mises en relation</th>
                                         <th style="width: 20%;">Candidats envoyés</th>
                                         <th style="width: 15%;" class="text-center">Actions</th>
                                     </tr>
@@ -186,7 +186,12 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <i class="bx bx-calendar text-primary me-2 fs-5"></i>
-                                                    <span class="fw-medium text-dark">{{ dateFr($item['date_mise_disposition'], 'letter') }}</span>
+                                                    <div>
+                                                        <span class="fw-bold text-dark">{{ $item['total_dates'] }} session(s)</span>
+                                                        @if ($item['dernier_envoi'])
+                                                            <small class="text-muted d-block">Dernière : {{ dateFr($item['dernier_envoi'], 'dayMonthYear') }}</small>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td>
@@ -207,9 +212,9 @@
                                                 </div>
                                             </td>
                                             <td class="text-center">
-                                                <a href="{{ route('candidatentreprises.show', [$item['entreprise'], $item['date_mise_disposition'], 'type' => 'envoi']) }}" 
+                                                <a href="{{ route('candidatentreprises.show', ['entreprise' => $item['entreprise'], 'type' => 'envoi']) }}" 
                                                    class="btn btn-primary btn-sm shadow-sm"
-                                                   title="Ouvrir l'entreprise pour voir les candidats">
+                                                   title="Ouvrir l'entreprise pour voir les différentes dates de mise en relation">
                                                     <i class="bx bx-folder-open me-1"></i> Ouvrir
                                                 </a>
                                             </td>
@@ -217,9 +222,9 @@
                                     @empty
                                         <tr>
                                             <td colspan="5" class="text-center py-5 text-muted">
-                                                <i class="bx bx-send fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                                                <h6 class="fw-bold mb-1">Aucune entreprise avec des envois de candidats</h6>
-                                                <small class="text-muted">Cliquez sur « Nouvelle Mise à disposition » pour affecter des candidats.</small>
+                                                <i class="bx bx-conversation fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                                <h6 class="fw-bold mb-1">Aucune entreprise avec des candidats en entretien d’embauche</h6>
+                                                <small class="text-muted">Cliquez sur « Nouvel entretien » pour affecter des candidats.</small>
                                             </td>
                                         </tr>
                                     @endforelse
@@ -246,8 +251,8 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th style="width: 5%;">#</th>
-                                        <th style="width: 35%;">Entreprise d'accueil</th>
-                                        <th style="width: 25%;">Date de mise à disposition</th>
+                                        <th style="width: 40%;">Entreprise d'accueil</th>
+                                        <th style="width: 20%;">Mises en relation</th>
                                         <th style="width: 20%;">Candidats intégrés</th>
                                         <th style="width: 15%;" class="text-center">Actions</th>
                                     </tr>
@@ -270,7 +275,12 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <i class="bx bx-calendar text-success me-2 fs-5"></i>
-                                                    <span class="fw-medium text-dark">{{ dateFr($integre['date_mise_disposition'], 'letter') }}</span>
+                                                    <div>
+                                                        <span class="fw-bold text-dark">{{ $integre['total_dates'] }} session(s)</span>
+                                                        @if ($integre['dernier_envoi'])
+                                                            <small class="text-muted d-block">Dernière : {{ dateFr($integre['dernier_envoi'], 'dayMonthYear') }}</small>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td>
@@ -279,9 +289,9 @@
                                                 </span>
                                             </td>
                                             <td class="text-center">
-                                                <a href="{{ route('candidatentreprises.show', [$integre['entreprise'], $integre['date_mise_disposition'], 'type' => 'integre']) }}" 
+                                                <a href="{{ route('candidatentreprises.show', ['entreprise' => $integre['entreprise'], 'type' => 'integre']) }}" 
                                                    class="btn btn-success btn-sm shadow-sm"
-                                                   title="Ouvrir l'entreprise pour voir les candidats intégrés">
+                                                   title="Ouvrir l'entreprise pour voir les différentes dates de mise en relation">
                                                     <i class="bx bx-folder-open me-1"></i> Ouvrir
                                                 </a>
                                             </td>
@@ -327,6 +337,13 @@
                         }
                     });
                 }
+
+                $('#envoi-tab').on('shown.bs.tab', function() {
+                    $('#btn-action-mad').html('<i class="bx bx-plus me-1"></i> Nouvel entretien');
+                });
+                $('#integre-tab').on('shown.bs.tab', function() {
+                    $('#btn-action-mad').html('<i class="bx bx-plus me-1"></i> Nouvelle Mise en relation');
+                });
             })(jQuery);
         </script>
     @endpush

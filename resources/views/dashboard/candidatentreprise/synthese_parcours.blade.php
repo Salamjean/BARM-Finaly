@@ -228,7 +228,7 @@
         <div class="col-6 col-md-4 col-xl-2">
             <div class="card border-0 shadow-sm rounded-3 h-100 p-3 text-center bg-white border-start border-dark border-4">
                 <div class="text-muted small fw-semibold mb-1">
-                    {{ $candidat->orientation === 'fonction-publique' ? 'Concours / Dossiers' : 'Mises à disposition' }}
+                    {{ $candidat->orientation === 'fonction-publique' ? 'Concours / Dossiers' : 'Mises en relation' }}
                 </div>
                 <div class="d-flex align-items-center justify-content-center gap-2">
                     <span class="fs-3 fw-bold text-dark">
@@ -512,10 +512,10 @@
                             </div>
                         </div>
                     @else
-                        <!-- Section Entreprise Privée : Mises à disposition & Postes -->
+                        <!-- Section Entreprise Privée : Mises en relation & Postes -->
                         <div class="card border shadow-none">
                             <div class="card-header bg-light py-2 fw-bold d-flex justify-content-between align-items-center">
-                                <span><i class="bx bx-buildings text-primary me-2"></i> Propositions de postes & Mises à disposition ({{ $candidat->candidatentreprises->count() }})</span>
+                                <span><i class="bx bx-buildings text-primary me-2"></i> Propositions de postes & Mises en relation ({{ $candidat->candidatentreprises->count() }})</span>
                             </div>
                             <div class="card-body p-3">
                                 @if ($candidat->candidatentreprises && $candidat->candidatentreprises->count() > 0)
@@ -526,7 +526,7 @@
                                                     <th>#</th>
                                                     <th>Entreprise</th>
                                                     <th>Poste proposé</th>
-                                                    <th>Date de mise à disposition</th>
+                                                    <th>Date de mise en relation</th>
                                                     <th>Type de contrat</th>
                                                     <th>Statut de l'action</th>
                                                     <th>Observations</th>
@@ -560,7 +560,7 @@
                                 @else
                                     <div class="text-center py-4 text-muted">
                                         <i class="bx bx-briefcase fs-1 opacity-50 mb-2"></i>
-                                        <p class="mb-0">Aucune mise à disposition ou candidature en entreprise pour le moment.</p>
+                                        <p class="mb-0">Aucune mise en relation ou candidature en entreprise pour le moment.</p>
                                     </div>
                                 @endif
                             </div>

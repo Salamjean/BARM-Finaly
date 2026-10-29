@@ -80,7 +80,7 @@
                                     </span>
                                     <div class="d-flex align-items-center gap-2">
                                         @if ($bilancompetence->rapport)
-                                            <a href="{{ asset($bilancompetence->rapport) }}"
+                                            <a href="{{ route('document.download', ['path' => $bilancompetence->rapport, 'name' => 'Rapport_Bilan_' . ($key + 1), 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                                 class="btn btn-primary btn-sm" download>
                                                 <i class="bx bx-download me-1"></i> Rapport
                                             </a>
@@ -270,7 +270,7 @@
                                     </span>
                                     <div class="d-flex align-items-center gap-2">
                                         @if ($concour->recu)
-                                            <a href="{{ asset($concour->recu) }}" class="btn btn-primary btn-sm"
+                                            <a href="{{ route('document.download', ['path' => $concour->recu, 'name' => 'Recu_Concours_' . Str::slug($concour->type_concours, '_'), 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}" class="btn btn-primary btn-sm"
                                                 download>
                                                 <i class="bx bx-download me-1"></i> Reçu
                                             </a>

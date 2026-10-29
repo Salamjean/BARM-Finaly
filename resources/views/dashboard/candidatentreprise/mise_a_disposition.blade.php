@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-xl-10 mx-auto">
             <h4 class="py-3 breadcrumb-wrapper mb-4">
-                <span class="text-muted fw-light">Mise à disposition/</span> {{ $title }}
+                <span class="text-muted fw-light">Mise en relation/</span> {{ $title }}
             </h4>
             <div class="card">
                 <div class="card-header px-4 py-3 border-bottom">
@@ -55,7 +55,7 @@
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="date_mise_disposition" class="form-label">Date de mise à disposition <span
+                            <label for="date_mise_disposition" class="form-label">Date de mise en relation <span
                             class="text-danger">*</span> : </label>
                             <div class="input-group">
                                 <input type="date" class="form-control @error('date_mise_disposition') is-invalid @enderror" id="date_mise_disposition" placeholder="Date" name="date_mise_disposition" value="{{ old('date_mise_disposition') }}" />

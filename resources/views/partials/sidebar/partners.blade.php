@@ -162,22 +162,6 @@
         </a>
     </li>
 
-    {{-- PV Comité credit --}}
-    <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
-        <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
-            <i class='menu-icon tf-icons bx bxs-buildings'></i>
-            <div class="d-flex justify-content-between">
-                <div>PV Comité credit</div>
-                @if (disbursementPendingCountByUser('pv_credit') > 0)
-                    <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
-                        style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
-                        {{ disbursementPendingCountByUser('pv_credit') }}
-                    </span>
-                @endif
-            </div>
-        </a>
-    </li>
-
     {{-- Ouverture du compte --}}
     <li class="menu-item {{ routeActive(['monitored-evaluation.account_opening.cohorts.authorization', 'mmonitored-evaluation.account_opening.cohort.authorization_approved']) }}">
         <a href="{{ route('monitored-evaluation.account_opening.cohorts.authorization') }}" class="menu-link">
@@ -188,6 +172,22 @@
                     <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
                         style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
                         {{ $authorization_approved_pending_count }}
+                    </span>
+                @endif
+            </div>
+        </a>
+    </li>
+
+    {{-- PV Comité credit --}}
+    <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
+        <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-buildings'></i>
+            <div class="d-flex justify-content-between">
+                <div>PV Comité credit</div>
+                @if (disbursementPendingCountByUser('pv_credit') > 0)
+                    <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                        style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                        {{ disbursementPendingCountByUser('pv_credit') }}
                     </span>
                 @endif
             </div>

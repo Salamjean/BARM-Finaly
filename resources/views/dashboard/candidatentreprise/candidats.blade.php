@@ -14,7 +14,7 @@
 
             @if(can('conseiller-entreprise-prive') || can('chef-cellule-formation-et-insertion'))
             <div class="btn-group">
-                <a href="{{ route('candidatentreprises.mise_a_disposition') }}" type="button" class="btn btn-primary">Mise à disposition</a>
+                <a href="{{ route('candidatentreprises.mise_a_disposition') }}" type="button" class="btn btn-primary">Mise en relation</a>
             </div>
             @endif
 
@@ -52,8 +52,8 @@
                                         <i class='bx bxs-show'></i>
                                     </a>
 
-                                    <a class="btn btn-sm btn-primary" href="{{ route('candidatentreprises.show_candidatentreprise', $candidat->id) }}" title="Voir les mises à disposition">
-                                        Mises à dispo
+                                    <a class="btn btn-sm btn-primary" href="{{ route('candidatentreprises.show_candidatentreprise', $candidat->id) }}" title="Voir les mises en relation">
+                                        Mises en relation
                                     </a>
 
                                     @if ($candidat->en_poste != '1')

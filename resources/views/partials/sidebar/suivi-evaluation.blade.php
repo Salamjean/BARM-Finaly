@@ -198,22 +198,6 @@
                 </a>
             </li>
 
-            {{-- PV Comité crédit --}}
-            <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
-                <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
-                    <i class='menu-icon tf-icons bx bxs-buildings'></i>
-                    <div class="d-flex justify-content-between">
-                        <div>PV Comité crédit</div>
-                        @if (disbursementPendingCountByUser('pv_credit') > 0)
-                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
-                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
-                                {{ disbursementPendingCountByUser('pv_credit') }}
-                            </span>
-                        @endif
-                    </div>
-                </a>
-            </li>
-
             {{-- Avis favorable --}}
             <li class="menu-item {{ routeActive(['monitored-evaluation.favorable_opinion.cohorts', 'monitored-evaluation.favorable_opinion.cohort']) }}">
                 <a href="{{ route('monitored-evaluation.favorable_opinion.cohorts') }}" class="menu-link">
@@ -246,6 +230,21 @@
                 </a>
             </li>
 
+            {{-- PV Comité crédit --}}
+            <li class="menu-item {{ routeActive(['monitored-evaluation.credit_committee.index', 'monitored-evaluation.credit_committee.show', 'monitored-evaluation.credit_committee.adherent']) }}">
+                <a href="{{ route('monitored-evaluation.credit_committee.index') }}" class="menu-link">
+                    <i class='menu-icon tf-icons bx bxs-buildings'></i>
+                    <div class="d-flex justify-content-between">
+                        <div>PV Comité crédit</div>
+                        @if (disbursementPendingCountByUser('pv_credit') > 0)
+                            <span class="ms-2 bg-primary text-white fw-bold rounded px-2"
+                                style="font-size: 11px; height: 18px; line-height: 18px; display: inline-block; vertical-align: middle;">
+                                {{ disbursementPendingCountByUser('pv_credit') }}
+                            </span>
+                        @endif
+                    </div>
+                </a>
+            </li>
 
             {{-- Decaissements --}}
             <li class="menu-item {{ routeActive(['monitored-evaluation.disbursement.cohorts', 'monitored-evaluation.disbursement.cohort', 'monitored-evaluation.disbursement.adherent']) }}">
@@ -282,16 +281,16 @@
             <div class="text-primary fw-bold">Entreprise privée</div>
         </a>
         <ul class="menu-sub section-content" style="display: none;">
-            {{-- Mise à disposition --}}
+            {{-- Mise en relation --}}
             <li class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.envoi', 'candidatentreprises.integres', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-briefcase'></i>
-                    <div>Mise à disposition</div>
+                    <div>Mise en relation</div>
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item {{ routeActive(['candidatentreprises.envoi', 'candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
                         <a href="{{ route('candidatentreprises.envoi') }}" class="menu-link">
-                            <div>Envoi en entreprise</div>
+                            <div>Entretien d'embauche</div>
                         </a>
                     </li>
                     <li class="menu-item {{ routeActive(['candidatentreprises.integres']) }}">

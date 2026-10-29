@@ -959,12 +959,16 @@ class InscriptionController extends Controller
                 }
 
                 $file = time() . '_' . $key . '.' . $val->getClientOriginalExtension();
-                $path = public_path(saveByEnv() . "data/docs/$key") . "/" . $file;
+                $dir = public_path("data/docs/$key");
+                if (!File::isDirectory($dir)) {
+                    File::makeDirectory($dir, 0755, true, true);
+                }
+                $path = $dir . "/" . $file;
 
                 if ($val->getClientOriginalExtension() != 'pdf')
                     \Image::make($val->getRealPath())->save($path);
                 else
-                    $val->move(saveByEnv() . "data/docs/$key/", $file);
+                    $val->move($dir, $file);
 
                 $can[$key] = "data/docs/$key/" . $file;
             }
@@ -1535,8 +1539,11 @@ class InscriptionController extends Controller
                 if ($candidate->$field && File::exists($candidate->$field)) {
                     File::delete($candidate->$field);
                 }
-                $fileName = time() . '_' . $field . '.' . $request->file($field)->getClientOriginalExtension();
-                $request->file($field)->move(saveByEnv() . "data/docs/$field/", $fileName);
+                $dir = public_path("data/docs/$field");
+                if (!File::isDirectory($dir)) {
+                    File::makeDirectory($dir, 0755, true, true);
+                }
+                $request->file($field)->move($dir, $fileName);
                 $candidate->$field = "data/docs/$field/" . $fileName;
             }
         }

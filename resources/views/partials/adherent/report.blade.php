@@ -17,7 +17,7 @@
                                 <h5 class="mb-0 text-dark">{{ $report->report_title }}</h5>
                             </div>
                             @if ($report->file_report)
-                                <a href="{{ asset($report->file_report) }}" class="btn btn-primary btn-sm" download>
+                                <a href="{{ route('document.download', ['path' => $report->file_report, 'name' => 'Rapport_' . Str::slug($report->report_title, '_')]) }}" class="btn btn-primary btn-sm" download>
                                     <i class="bx bx-download me-1"></i> Télécharger
                                 </a>
                             @endif

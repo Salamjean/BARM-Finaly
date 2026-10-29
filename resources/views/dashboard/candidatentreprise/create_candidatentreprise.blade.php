@@ -32,7 +32,7 @@
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="date_mise_disposition" class="form-label">Date de mise à disposition <span
+                            <label for="date_mise_disposition" class="form-label">Date de mise en relation <span
                                     class="text-danger">*</span> : </label>
                             <div class="input-group">
                                 <input type="date" class="form-control @error('date_mise_disposition') is-invalid @enderror" id="date_mise_disposition" placeholder="Date" name="date_mise_disposition" value="{{ old('date_mise_disposition') }}" />

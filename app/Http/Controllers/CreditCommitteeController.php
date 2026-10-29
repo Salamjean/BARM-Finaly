@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Exception;
 use App\Models\PA;
 use App\Models\Cohort;
@@ -35,18 +37,29 @@ class CreditCommitteeController extends Controller
 
     public function create()
     {
-
         $adherents = [];
 
         if (can('partner-financial')) {
-
-            $adherents = Candidature::with('user')->where('partner_financial_id', auth()->user()->partenaire->id)
+            $adherents = Candidature::with(['user', 'partnerTechnical.user'])
+                ->where('partner_financial_id', auth()->user()->partenaire->id)
+                ->where('credit_committee', true)
+                ->doesntHave('creditCommittee')
+                ->get();
+        } else {
+            $adherents = Candidature::with(['user', 'partnerTechnical.user'])
                 ->where('credit_committee', true)
                 ->doesntHave('creditCommittee')
                 ->get();
         }
 
-        return view('dashboard.monitored_evaluation.credit_committee.create', ['adherents' => $adherents]);
+        $technicale_partenaires = User::whereHas('permissions', function (Builder $query) {
+            $query->where('slug', 'like', 'partner-technical%');
+        })->get();
+
+        return view('dashboard.monitored_evaluation.credit_committee.create', [
+            'adherents' => $adherents,
+            'technicale_partenaires' => $technicale_partenaires
+        ]);
     }
 
     public function store(Request $request)

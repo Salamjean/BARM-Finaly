@@ -122,7 +122,7 @@
                                     </span>
                                     <div class="d-flex align-items-center gap-2">
                                         @if ($bilancompetence->rapport)
-                                            <a href="{{ asset($bilancompetence->rapport) }}"
+                                            <a href="{{ route('document.download', ['path' => $bilancompetence->rapport, 'name' => 'Rapport_Bilan_' . ($key + 1), 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                                 class="btn btn-primary btn-sm" download>
                                                 <i class="bx bx-download me-1"></i> Rapport
                                             </a>
@@ -231,7 +231,7 @@
                                     </span>
                                     <div class="d-flex align-items-center gap-2">
                                         @if ($formation->attestation)
-                                            <a href="{{ asset($formation->attestation) }}"
+                                            <a href="{{ route('document.download', ['path' => $formation->attestation, 'name' => 'Attestation_Formation_' . ($key + 1), 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                                 class="btn btn-primary btn-sm" download>
                                                 <i class="bx bx-download me-1"></i> Attestation
                                             </a>
@@ -358,12 +358,12 @@
                                     </span>
                                     <div class="d-flex align-items-center gap-2">
                                         @if ($cvlm->cv)
-                                            <a href="{{ asset($cvlm->cv) }}" class="btn btn-primary btn-sm" download>
+                                            <a href="{{ route('document.download', ['path' => $cvlm->cv, 'name' => 'CV_' . Str::slug($cvlm->poste, '_'), 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}" class="btn btn-primary btn-sm" download>
                                                 <i class="bx bx-download me-1"></i> CV
                                             </a>
                                         @endif
                                         @if ($cvlm->lm)
-                                            <a href="{{ asset($cvlm->lm) }}" class="btn btn-info btn-sm" download>
+                                            <a href="{{ route('document.download', ['path' => $cvlm->lm, 'name' => 'LM_' . Str::slug($cvlm->poste, '_'), 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}" class="btn btn-info btn-sm" download>
                                                 <i class="bx bx-download me-1"></i> LM
                                             </a>
                                         @endif
@@ -558,7 +558,7 @@
                                     </span>
                                     <div class="d-flex align-items-center gap-2">
                                         @if ($candidatentreprise->statut === 'accepted' && $candidatentreprise->contrat)
-                                            <a href="{{ asset($candidatentreprise->contrat) }}"
+                                            <a href="{{ route('document.download', ['path' => $candidatentreprise->contrat, 'name' => 'Attestation_Embauche_' . Str::slug($candidatentreprise->entreprise, '_'), 'user' => $user->fullName(), 'matricule' => $user->matricule]) }}"
                                                 class="btn btn-primary btn-sm" download>
                                                 <i class="bx bx-download me-1"></i> Attestation
                                             </a>
@@ -590,7 +590,7 @@
                                     <table class="table table-borderless table-sm">
                                         <tbody>
                                             <tr class="border-bottom">
-                                                <td class="text-muted">Date de mise à disposition</td>
+                                                <td class="text-muted">Date de mise en relation</td>
                                                 <td class="text-end">
                                                     {{ dateFr($candidatentreprise->date_mise_disposition, 'letter') }}
                                                 </td>

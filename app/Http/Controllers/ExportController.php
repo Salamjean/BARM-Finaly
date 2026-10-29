@@ -237,4 +237,195 @@ class ExportController extends Controller
         $pdf = PDF::loadView('pdf.exports.session_presents', compact('title', 'items'));
         return $pdf->download('candidats_presents_sessions.pdf');
     }
+
+    public function exportSuiviEpCandidats(Request $request)
+    {
+        $validated = $request->validate([
+            'entreprise' => 'nullable|string|max:255',
+            'date_from'  => 'nullable|date',
+            'date_to'    => 'nullable|date',
+        ]);
+
+        $selectedEntreprise = $validated['entreprise'] ?? null;
+        $dateFrom = $validated['date_from'] ?? null;
+        $dateTo = $validated['date_to'] ?? null;
+
+        $query = Candidature::where('death', '0')
+            ->where('resignation', '0')
+            ->where('orientation', 'entreprise-privee');
+
+        $filters = [];
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+            $filters[] = "Du " . date('d/m/Y', strtotime($dateFrom));
+        }
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+            $filters[] = "Au " . date('d/m/Y', strtotime($dateTo));
+        }
+        if ($selectedEntreprise) {
+            $query->whereHas('candidatentreprises', function ($q) use ($selectedEntreprise) {
+                $q->where('entreprise', $selectedEntreprise);
+            });
+            $filters[] = "Entreprise : " . $selectedEntreprise;
+        }
+
+        $items = $query->with([
+            'user',
+            'cohort',
+            'candidatentretiens',
+            'bilancompetences',
+            'cvlms',
+            'prepaentretiens',
+            'techrechercheemplois',
+            'candidatformations.formation',
+            'candidatentreprises'
+        ])->get()->sortBy(function ($candidat) {
+            return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+        }, SORT_NATURAL | SORT_FLAG_CASE)->values();
+
+        $title = 'Suivi des Candidats (Entreprise Privée)';
+        $filtersText = implode(' | ', $filters);
+        $total = $items->count();
+
+        $pdf = Pdf::loadView('pdf.exports.suivi_ep_candidats', compact('title', 'items', 'filtersText', 'total'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('suivi_candidats_entreprise_privee.pdf');
+    }
+
+    public function exportSuiviFpCandidats(Request $request)
+    {
+        $validated = $request->validate([
+            'concours'        => 'nullable|string|max:255',
+            'statut_concours' => 'nullable|string|max:100',
+            'cohorte'         => 'nullable|string|max:100',
+            'date_from'       => 'nullable|date',
+            'date_to'         => 'nullable|date',
+        ]);
+
+        $selectedConcours = $validated['concours'] ?? null;
+        $selectedStatut = $validated['statut_concours'] ?? null;
+        $selectedCohorte = $validated['cohorte'] ?? null;
+        $dateFrom = $validated['date_from'] ?? null;
+        $dateTo = $validated['date_to'] ?? null;
+
+        $query = Candidature::where('death', '0')
+            ->where('resignation', '0')
+            ->where('orientation', 'fonction-publique');
+
+        $filters = [];
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+            $filters[] = "Du " . date('d/m/Y', strtotime($dateFrom));
+        }
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+            $filters[] = "Au " . date('d/m/Y', strtotime($dateTo));
+        }
+        if ($selectedCohorte) {
+            $query->where('cohort_id', $selectedCohorte);
+            $filters[] = "Cohorte spécifiée";
+        }
+        if ($selectedConcours) {
+            $query->whereHas('concourSuivi', function ($q) use ($selectedConcours) {
+                $q->where('intitule_concours', $selectedConcours);
+            });
+            $filters[] = "Concours : " . $selectedConcours;
+        }
+        if ($selectedStatut) {
+            $query->whereHas('concourSuivi', function ($q) use ($selectedStatut) {
+                $q->where('resultat_statut', $selectedStatut);
+            });
+            $filters[] = "Statut : " . $selectedStatut;
+        }
+
+        $items = $query->with([
+            'user',
+            'cohort',
+            'candidatentretiens',
+            'bilancompetences',
+            'concourSuivi',
+            'candidatformations.formation',
+        ])->get()->sortBy(function ($candidat) {
+            return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+        }, SORT_NATURAL | SORT_FLAG_CASE)->values();
+
+        $title = 'Suivi des Candidats (Fonction Publique)';
+        $filtersText = implode(' | ', $filters);
+        $total = $items->count();
+
+        $pdf = Pdf::loadView('pdf.exports.suivi_fp_candidats', compact('title', 'items', 'filtersText', 'total'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('suivi_candidats_fonction_publique.pdf');
+    }
+
+    public function exportSuiviAeCandidats(Request $request)
+    {
+        $validated = $request->validate([
+            'partner_technical_id' => 'nullable|integer',
+            'partner_financial_id' => 'nullable|integer',
+            'cohort_id'            => 'nullable|integer',
+            'date_from'            => 'nullable|date',
+            'date_to'              => 'nullable|date',
+        ]);
+
+        $selectedPartnerTech = $validated['partner_technical_id'] ?? null;
+        $selectedPartnerFin = $validated['partner_financial_id'] ?? null;
+        $selectedCohort = $validated['cohort_id'] ?? null;
+        $dateFrom = $validated['date_from'] ?? null;
+        $dateTo = $validated['date_to'] ?? null;
+
+        $query = Candidature::where('death', '0')
+            ->where('resignation', '0')
+            ->where('orientation', 'auto-emploi');
+
+        $filters = [];
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+            $filters[] = "Du " . date('d/m/Y', strtotime($dateFrom));
+        }
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+            $filters[] = "Au " . date('d/m/Y', strtotime($dateTo));
+        }
+        if ($selectedCohort) {
+            $query->where('cohort_id', $selectedCohort);
+            $cohortObj = \App\Models\Cohort::find($selectedCohort);
+            $filters[] = "Cohorte : " . ($cohortObj ? $cohortObj->title : $selectedCohort);
+        }
+        if ($selectedPartnerTech) {
+            $query->where('partner_technical_id', $selectedPartnerTech);
+            $pTech = \App\Models\Partenaire::find($selectedPartnerTech);
+            $filters[] = "Partenaire technique : " . ($pTech && $pTech->user && !empty($pTech->user->username) ? $pTech->user->username : ($pTech && $pTech->user ? $pTech->user->fullName() : 'ID ' . $selectedPartnerTech));
+        }
+        if ($selectedPartnerFin) {
+            $query->where('partner_financial_id', $selectedPartnerFin);
+            $pFin = \App\Models\Partenaire::find($selectedPartnerFin);
+            $filters[] = "Partenaire financier : " . ($pFin && $pFin->user && !empty($pFin->user->username) ? $pFin->user->username : ($pFin && $pFin->user ? $pFin->user->fullName() : 'ID ' . $selectedPartnerFin));
+        }
+
+        $items = $query->with([
+            'user',
+            'cohort',
+            'partnerTechnical.user',
+            'partnerFinancial.user',
+            'selfEmploymentMonitoredPayment.disbursements',
+            'creditCommittee',
+            'commissionCandidats',
+            'pas'
+        ])->get()->sortBy(function ($candidat) {
+            return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+        }, SORT_NATURAL | SORT_FLAG_CASE)->values();
+
+        $title = 'Suivi des Candidats (Auto-Emploi)';
+        $filtersText = implode(' | ', $filters);
+        $total = $items->count();
+
+        $pdf = Pdf::loadView('pdf.exports.suivi_ae_candidats', compact('title', 'items', 'filtersText', 'total'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('suivi_candidats_auto_emploi.pdf');
+    }
 }

@@ -23,6 +23,10 @@ use App\Models\Candidatformation;
 use App\Models\ConcourSuivi;
 use Illuminate\Support\Facades\DB;
 use App\Models\CandidatureControl;
+use App\Models\Partenaire;
+use App\Models\Disbursement;
+use App\Models\SelfEmploymentMonitoredPayment;
+use App\Models\PA;
 
 class CandidatentrepriseController extends Controller
 {
@@ -69,35 +73,40 @@ class CandidatentrepriseController extends Controller
             return $item->statut !== 'accepted';
         });
         
-        // Liste des entreprises pour l'onglet Envoi (uniquement avec des candidats non encore acceptés)
-        $entreprisesEnvoi = $envoyes->groupBy(function($item) {
-            return $item->entreprise . '|' . $item->date_mise_disposition;
-        })->map(function($group) {
+        // Liste des entreprises pour l'onglet Envoi (regroupées par entreprise unique)
+        $entreprisesEnvoi = $envoyes->groupBy('entreprise')->map(function($group, $nomEntreprise) {
+            $dates = $group->map(function($item) {
+                return $item->date_mise_disposition ? \Carbon\Carbon::parse($item->date_mise_disposition)->format('Y-m-d') : null;
+            })->filter()->unique()->values();
+
             return [
-                'entreprise' => $group->first()->entreprise,
-                'date_mise_disposition' => $group->first()->date_mise_disposition,
+                'entreprise' => $nomEntreprise,
+                'total_dates' => $dates->count(),
+                'dernier_envoi' => $group->sortByDesc('created_at')->first()?->date_mise_disposition,
                 'total' => $group->count(),
                 'pending' => $group->where('statut', 'pending')->count(),
                 'refused' => $group->where('statut', 'refused')->count(),
             ];
-        })->values();
+        })->sortBy('entreprise')->values();
 
         // 2. Candidats intégrés (strictement ceux dont le statut est 'accepted')
         $integres = $candidatentreprises->filter(function($item) {
             return $item->statut === 'accepted';
         });
         
-        // Liste des entreprises pour l'onglet Intégrer
-        $entreprisesIntegres = $integres->groupBy(function($item) {
-            $d = $item->date_mise_disposition ?: $item->date_db;
-            return $item->entreprise . '|' . $d;
-        })->map(function($group) {
+        // Liste des entreprises pour l'onglet Intégrer (regroupées par entreprise unique)
+        $entreprisesIntegres = $integres->groupBy('entreprise')->map(function($group, $nomEntreprise) {
+            $dates = $group->map(function($item) {
+                return $item->date_mise_disposition ? \Carbon\Carbon::parse($item->date_mise_disposition)->format('Y-m-d') : ($item->date_db ? \Carbon\Carbon::parse($item->date_db)->format('Y-m-d') : null);
+            })->filter()->unique()->values();
+
             return [
-                'entreprise' => $group->first()->entreprise,
-                'date_mise_disposition' => $group->first()->date_mise_disposition ?: $group->first()->date_db,
+                'entreprise' => $nomEntreprise,
+                'total_dates' => $dates->count(),
+                'dernier_envoi' => $group->sortByDesc('created_at')->first()?->date_mise_disposition ?: $group->sortByDesc('created_at')->first()?->date_db,
                 'total' => $group->count(),
             ];
-        })->values();
+        })->sortBy('entreprise')->values();
 
         $datas = $candidatentreprises->map(function ($item) {
             return [
@@ -109,8 +118,8 @@ class CandidatentrepriseController extends Controller
         })->values();
 
         $title = $activeTab === 'integre' 
-            ? 'Mise à disposition - Candidats Intégrés' 
-            : 'Mise à disposition - Envoi en entreprise';
+            ? 'Insérés' 
+            : 'Mise en relation - Entretien d’embauche';
 
         return view('dashboard.candidatentreprise.index', compact('candidatentreprises', 'title', 'datas', 'envoyes', 'integres', 'entreprisesEnvoi', 'entreprisesIntegres', 'activeTab'));
     }
@@ -121,7 +130,7 @@ class CandidatentrepriseController extends Controller
 
         $entreprises = Entreprise::orderByDESC('created_at')->get();
 
-        $title = 'Mise à dispositions des candidats';
+        $title = 'Mise en relation des candidats';
 
         return view('dashboard.candidatentreprise.mise_a_disposition', compact('entreprises', 'title', 'candidats'));
     }
@@ -205,7 +214,11 @@ class CandidatentrepriseController extends Controller
             $filePath = null;
             if ($request->hasFile('lettre_recommandation')) {
                 $fileName = uniqid('lettre_recommandation_') . '.' . $request->file('lettre_recommandation')->getClientOriginalExtension();
-                $request->lettre_recommandation->move(saveByEnv() . 'data/docs/lettre_recommandation', $fileName);
+                $dir = public_path('data/docs/lettre_recommandation');
+                if (!\Illuminate\Support\Facades\File::isDirectory($dir)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($dir, 0755, true, true);
+                }
+                $request->lettre_recommandation->move($dir, $fileName);
                 $filePath = 'data/docs/lettre_recommandation/' . $fileName;
             }
 
@@ -252,25 +265,38 @@ class CandidatentrepriseController extends Controller
             $candidatentreprise = Candidatentreprise::findOrFail($request->candidatentreprise_id);
             $candidat = Candidature::findOrFail($candidatentreprise->candidature_id);
 
-            $filePath = null;
+            $filePath = $candidatentreprise->contrat;
             if ($request->hasFile('contrat')) {
                 $fileName = uniqid('contrat_') . '.' . $request->file('contrat')->getClientOriginalExtension();
-                $request->contrat->move(saveByEnv() . 'data/docs/contrat', $fileName);
+                $dir = public_path('data/docs/contrat');
+                if (!\Illuminate\Support\Facades\File::isDirectory($dir)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($dir, 0755, true, true);
+                }
+                $request->contrat->move($dir, $fileName);
                 $filePath = 'data/docs/contrat/' . $fileName;
             }
 
-            if ($request->statut == 'accepted') {
+            $updateData = [
+                'statut' => $request->statut,
+            ];
 
-                $candidatentreprise->update([
-                    'statut' => $request->statut,
-                    'type_contrat' => $request->type_contrat,
-                    'contrat' => $filePath,
-                    'service' => $request->service,
-                    'date_db' => $request->date_db,
-                    'date_fin' => $request->date_fin,
-                    'localisation' => $request->localisation,
-                    'commentaire' => $request->commentaire,
-                ]);
+            if ($request->has('poste_confirme') && !empty($request->poste_confirme)) {
+                $updateData['poste'] = $request->poste_confirme;
+            }
+            if ($request->has('date_mise_disposition') && !empty($request->date_mise_disposition)) {
+                $updateData['date_mise_disposition'] = $request->date_mise_disposition;
+            }
+
+            if ($request->statut == 'accepted') {
+                $updateData['type_contrat'] = $request->type_contrat;
+                $updateData['contrat'] = $filePath;
+                $updateData['service'] = $request->service;
+                $updateData['date_db'] = $request->date_db;
+                $updateData['date_fin'] = $request->date_fin;
+                $updateData['localisation'] = $request->localisation;
+                $updateData['commentaire'] = $request->commentaire;
+
+                $candidatentreprise->update($updateData);
 
                 $candidat->update([
                     'en_poste' => '1',
@@ -281,11 +307,19 @@ class CandidatentrepriseController extends Controller
 
                 $msg = "Candidature acceptée ! Le candidat est désormais intégré en poste et visible dans l'onglet « Intégrer ».";
             } elseif ($request->statut == 'refused') {
-                $candidatentreprise->update([
-                    'statut' => $request->statut,
-                ]);
+                $candidatentreprise->update($updateData);
+
+                if ($candidat->poste_id == $candidatentreprise->id) {
+                    $candidat->update([
+                        'en_poste' => '0',
+                        'post_monitored' => false,
+                        'poste_id' => null,
+                        'affectation' => null,
+                    ]);
+                }
                 $msg = "Décision enregistrée : candidature marquée comme non retenue.";
             } else {
+                $candidatentreprise->update($updateData);
                 $msg = "Données enregistrées avec succès.";
             }
 
@@ -362,24 +396,60 @@ class CandidatentrepriseController extends Controller
     {
         $type = request('type', 'all');
 
-        $query = Candidatentreprise::with(['candidature.user'])
+        $baseQuery = Candidatentreprise::with(['candidature.user'])
             ->where('entreprise', $entreprise);
 
-        if ($date && $date !== 'all') {
-            $query->where('date_mise_disposition', $date);
+        if ($type === 'envoi') {
+            $baseQuery->where('statut', '!=', 'accepted');
+        } elseif ($type === 'integre') {
+            $baseQuery->where('statut', 'accepted');
         }
 
-        if ($type === 'envoi') {
-            $query->where('statut', '!=', 'accepted');
-        } elseif ($type === 'integre') {
-            $query->where('statut', 'accepted');
+        $allMisesEnRelation = (clone $baseQuery)->orderByDesc('created_at')->get();
+
+        // NIVEAU 2 : Si aucune date n'est précisée (ou date === 'all'), on affiche la liste des dates de mise en relation de cette entreprise
+        if (!$date || $date === 'all') {
+            $datesSessions = $allMisesEnRelation->groupBy(function ($item) {
+                if ($item->date_mise_disposition) {
+                    return \Carbon\Carbon::parse($item->date_mise_disposition)->format('Y-m-d');
+                }
+                if ($item->date_db) {
+                    return \Carbon\Carbon::parse($item->date_db)->format('Y-m-d');
+                }
+                return 'sans-date';
+            })->map(function ($group, $dateKey) {
+                return [
+                    'date' => $dateKey,
+                    'postes' => $group->pluck('poste')->filter()->unique()->values(),
+                    'total' => $group->count(),
+                    'pending' => $group->where('statut', 'pending')->count(),
+                    'accepted' => $group->where('statut', 'accepted')->count(),
+                    'refused' => $group->where('statut', 'refused')->count(),
+                ];
+            })->sortByDesc('date')->values();
+
+            $title = ($type === 'integre' ? 'Mises en relation (Insérés)' : 'Sessions d’entretien d’embauche') . ' - ' . $entreprise;
+
+            return view('dashboard.candidatentreprise.show', compact('entreprise', 'datesSessions', 'allMisesEnRelation', 'type', 'title', 'date'));
+        }
+
+        // NIVEAU 3 : Si une date précise est indiquée, on affiche les candidats de cette date
+        $query = (clone $baseQuery);
+        if ($date === 'sans-date') {
+            $query->whereNull('date_mise_disposition')->whereNull('date_db');
+        } else {
+            $query->where(function ($q) use ($date) {
+                $q->whereDate('date_mise_disposition', $date)
+                  ->orWhere(function ($sub) use ($date) {
+                      $sub->whereNull('date_mise_disposition')->whereDate('date_db', $date);
+                  });
+            });
         }
 
         $candidatentreprises = $query->orderByDesc('created_at')->get();
+        $title = ($type === 'integre' ? 'Candidats insérés' : 'Candidats en entretien') . ' - ' . $entreprise;
 
-        $title = ($type === 'integre' ? 'Candidats intégrés' : 'Candidats envoyés') . ' - ' . $entreprise;
-
-        return view('dashboard.candidatentreprise.show', compact('candidatentreprises', 'entreprise', 'date', 'type', 'title'));
+        return view('dashboard.candidatentreprise.show', compact('candidatentreprises', 'entreprise', 'date', 'type', 'title', 'allMisesEnRelation'));
     }
 
     public function edit(Candidatentreprise $candidatentreprise)
@@ -399,7 +469,6 @@ class CandidatentrepriseController extends Controller
 
     public function suivie_ep_candidats(Request $request)
     {
-        $selectedCohort = $request->get('cohort_id');
         $selectedEntreprise = $request->get('entreprise');
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
@@ -409,9 +478,6 @@ class CandidatentrepriseController extends Controller
             ->where('resignation', '0')
             ->where('orientation', 'entreprise-privee');
 
-        if ($selectedCohort) {
-            $query->where('cohort_id', $selectedCohort);
-        }
         if ($dateFrom) {
             $query->whereDate('created_at', '>=', $dateFrom);
         }
@@ -518,7 +584,6 @@ class CandidatentrepriseController extends Controller
             return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
         }, SORT_NATURAL | SORT_FLAG_CASE);
 
-        $cohortes = Cohort::orderBy('title')->get();
         $allEntreprises = Entreprise::orderBy('nom')->get();
 
         $activeTab = $request->get('tab', 'stats');
@@ -552,9 +617,7 @@ class CandidatentrepriseController extends Controller
             'tauxProfilage',
             'entreprisesStats',
             'contratsStats',
-            'cohortes',
             'allEntreprises',
-            'selectedCohort',
             'selectedEntreprise',
             'dateFrom',
             'dateTo',
@@ -735,6 +798,224 @@ class CandidatentrepriseController extends Controller
             'allConcours',
             'selectedCohort',
             'selectedConcours',
+            'dateFrom',
+            'dateTo',
+            'title'
+        ));
+    }
+
+    public function suivie_ae_candidats(Request $request)
+    {
+        $selectedCohort = $request->get('cohort_id');
+        $selectedPartnerTech = $request->get('partner_technical_id');
+        $selectedPartnerFin = $request->get('partner_financial_id');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+
+        // Base query pour les candidatures orientées auto-emploi actives
+        $query = Candidature::where('death', '0')
+            ->where('resignation', '0')
+            ->where('orientation', 'auto-emploi');
+
+        if ($selectedCohort) {
+            $query->where('cohort_id', $selectedCohort);
+        }
+        if ($selectedPartnerTech) {
+            $query->where('partner_technical_id', $selectedPartnerTech);
+        }
+        if ($selectedPartnerFin) {
+            $query->where('partner_financial_id', $selectedPartnerFin);
+        }
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        $candidatsIds = (clone $query)->pluck('id')->toArray();
+        $totalCandidats = count($candidatsIds);
+
+        // Répartition Genre
+        $totalHommes = (clone $query)->where(function ($q) {
+            $q->where('gender', 'Masculin')->orWhere('gender', 'M')->orWhere('gender', 'Homme')->orWhere('gender', 'homme');
+        })->count();
+        $totalFemmes = (clone $query)->where(function ($q) {
+            $q->where('gender', 'Feminin')->orWhere('gender', 'F')->orWhere('gender', 'Femme')->orWhere('gender', 'femme');
+        })->count();
+
+        // 1. Sessions collectives & Partenaires techniques
+        $sessionCount = Candidature::whereIn('id', $candidatsIds)->where(function ($q) {
+            $q->where('session_collective', '1')
+                ->orWhereNotNull('session_id')
+                ->orWhereHas('sessioncollectives', function ($sq) {
+                    $sq->where('candidature_sessioncollective.presence', 1);
+                });
+        })->count();
+        $assignedPartnerTechCount = (clone $query)->whereNotNull('partner_technical_id')->count();
+
+        // 2. Plans d'affaires (PA)
+        $paSoumisCount = (clone $query)->where('pa', '1')->count();
+        $paValidesCount = (clone $query)->where('pa', '1')->where('pa_decision', '1')->count();
+        $paEnAttenteCount = (clone $query)->where('pa', '1')->where(function ($q) {
+            $q->where('pa_decision', '0')->orWhereNull('pa_decision');
+        })->count();
+        $paDifferesCount = (clone $query)->where('pa', '1')->where('pa_decision', '2')->count();
+
+        // 3. Commission d'approbation / Avis favorable
+        $commissionTotalCount = (clone $query)->where(function ($q) {
+            $q->where('commission_step', '1')->orWhereHas('commissionCandidats');
+        })->count();
+        $commissionAcceptedCount = (clone $query)->where(function ($q) {
+            $q->where('favorable_opinion', true)
+                ->orWhereHas('commissionCandidats', function ($cq) {
+                    $cq->where('decision', 'accepted');
+                });
+        })->count();
+        $commissionDeferredCount = (clone $query)->whereHas('commissionCandidats', function ($cq) {
+            $cq->where('decision', 'deferred');
+        })->count();
+        $commissionRefusedCount = (clone $query)->whereHas('commissionCandidats', function ($cq) {
+            $cq->where('decision', 'refused');
+        })->count();
+
+        // 4. Bancarisation / Comptes ouverts
+        $compteOuvertCount = (clone $query)->whereHas('selfEmploymentMonitoredPayment', function ($q) {
+            $q->where('account_opening', true)->orWhere('account_opening', 1);
+        })->count();
+        $compteEnAttenteCount = max(0, $commissionAcceptedCount - $compteOuvertCount);
+
+        // 5. Comité de crédit & Autorisation (10%)
+        $creditCommitteeCount = (clone $query)->where(function ($q) {
+            $q->where('credit_committee', true)->orWhereHas('creditCommittee');
+        })->count();
+        $authorizationCount = (clone $query)->where(function ($q) {
+            $q->where('ten_percent', true)
+                ->orWhereHas('selfEmploymentMonitoredPayment', function ($sq) {
+                    $sq->where('authorization_approved', true)->orWhere('authorization_approved', 1);
+                });
+        })->count();
+
+        // 6. Décaissements & Prêts mis en place
+        $disbursementCandidatesCount = (clone $query)->where(function ($q) {
+            $q->where('disbursement', true)
+                ->orWhereHas('selfEmploymentMonitoredPayment.disbursements', function ($dq) {
+                    $dq->whereNotNull('amount_disbursement')->where('amount_disbursement', '>', 0);
+                });
+        })->count();
+        $totalMontantDecaisse = Disbursement::whereHas('selfEmploymentMonitoredPayment', function ($q) use ($candidatsIds) {
+            $q->whereIn('candidature_id', $candidatsIds);
+        })->sum('amount_disbursement') ?? 0;
+        $pretsEnPlaceCount = (clone $query)->whereHas('selfEmploymentMonitoredPayment', function ($q) {
+            $q->whereNotNull('loan_set_up_date');
+        })->count();
+        $postMonitoredCount = (clone $query)->where(function ($q) {
+            $q->where('post_monitored', true)->orWhereHas('reportsPostMonitored');
+        })->count();
+
+        // Taux de conversion & ratios clés
+        $tauxValidationPA = $totalCandidats > 0 ? round(($paValidesCount / $totalCandidats) * 100, 1) : 0;
+        $tauxCommission = $paValidesCount > 0 ? round(($commissionAcceptedCount / $paValidesCount) * 100, 1) : 0;
+        $tauxBancarisation = $commissionAcceptedCount > 0 ? round(($compteOuvertCount / $commissionAcceptedCount) * 100, 1) : 0;
+        $tauxFinancement = $totalCandidats > 0 ? round(($disbursementCandidatesCount / $totalCandidats) * 100, 1) : 0;
+
+        // Statistiques par Partenaire Technique
+        $partnersStats = Candidature::whereIn('id', $candidatsIds)
+            ->whereNotNull('partner_technical_id')
+            ->select('partner_technical_id')
+            ->selectRaw('count(*) as total_candidats')
+            ->selectRaw('SUM(CASE WHEN pa = "1" THEN 1 ELSE 0 END) as total_pa')
+            ->selectRaw('SUM(CASE WHEN pa = "1" AND pa_decision = "1" THEN 1 ELSE 0 END) as total_pa_valides')
+            ->selectRaw('SUM(CASE WHEN favorable_opinion = 1 THEN 1 ELSE 0 END) as total_favorable')
+            ->groupBy('partner_technical_id')
+            ->with(['partnerTechnical.user'])
+            ->get();
+
+        foreach ($partnersStats as $pStat) {
+            $pCandIds = Candidature::whereIn('id', $candidatsIds)
+                ->where('partner_technical_id', $pStat->partner_technical_id)
+                ->pluck('id');
+
+            $pStat->total_comptes = SelfEmploymentMonitoredPayment::whereIn('candidature_id', $pCandIds)
+                ->where('account_opening', 1)
+                ->count();
+
+            $pStat->total_decaissements_candidats = Candidature::whereIn('id', $pCandIds)
+                ->where(function ($q) {
+                    $q->where('disbursement', true)
+                        ->orWhereHas('selfEmploymentMonitoredPayment.disbursements', function ($dq) {
+                            $dq->whereNotNull('amount_disbursement')->where('amount_disbursement', '>', 0);
+                        });
+                })->count();
+
+            $pStat->montant_total_decaisse = Disbursement::whereHas('selfEmploymentMonitoredPayment', function ($q) use ($pCandIds) {
+                $q->whereIn('candidature_id', $pCandIds);
+            })->sum('amount_disbursement') ?? 0;
+        }
+
+        // Liste complète des candidats pour l'onglet individuel
+        $candidats = (clone $query)->with([
+            'user',
+            'cohort',
+            'partnerTechnical.user',
+            'partnerFinancial.user',
+            'selfEmploymentMonitoredPayment.disbursements',
+            'creditCommittee',
+            'commissionCandidats',
+            'pas'
+        ])->get()->sortBy(function ($candidat) {
+            return mb_strtolower($candidat->user ? $candidat->user->fullName() : '');
+        }, SORT_NATURAL | SORT_FLAG_CASE);
+
+        $cohortes = Cohort::orderBy('title')->get();
+        $technicalPartners = Partenaire::with('user')->whereHas('user.permissions', function ($q) {
+            $q->where('slug', 'like', 'partner-technical%');
+        })->get();
+        if ($technicalPartners->isEmpty()) {
+            $technicalPartners = Partenaire::with('user')->get();
+        }
+        $financialPartners = Partenaire::with('user')->whereHas('user.permissions', function ($q) {
+            $q->where('slug', 'like', 'partner-financial%');
+        })->get();
+
+        $activeTab = $request->get('tab', 'stats');
+        $title = 'Suivi des Candidats (Auto-Emploi)';
+
+        return view('dashboard.candidatentreprise.suivie_ae_candidats', compact(
+            'candidats',
+            'activeTab',
+            'totalCandidats',
+            'totalHommes',
+            'totalFemmes',
+            'sessionCount',
+            'assignedPartnerTechCount',
+            'paSoumisCount',
+            'paValidesCount',
+            'paEnAttenteCount',
+            'paDifferesCount',
+            'commissionTotalCount',
+            'commissionAcceptedCount',
+            'commissionDeferredCount',
+            'commissionRefusedCount',
+            'compteOuvertCount',
+            'compteEnAttenteCount',
+            'creditCommitteeCount',
+            'authorizationCount',
+            'disbursementCandidatesCount',
+            'totalMontantDecaisse',
+            'pretsEnPlaceCount',
+            'postMonitoredCount',
+            'tauxValidationPA',
+            'tauxCommission',
+            'tauxBancarisation',
+            'tauxFinancement',
+            'partnersStats',
+            'cohortes',
+            'technicalPartners',
+            'financialPartners',
+            'selectedCohort',
+            'selectedPartnerTech',
+            'selectedPartnerFin',
             'dateFrom',
             'dateTo',
             'title'

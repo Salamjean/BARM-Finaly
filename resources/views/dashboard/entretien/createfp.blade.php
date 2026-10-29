@@ -183,7 +183,6 @@
                                            id="date" 
                                            name="date" 
                                            value="{{ old('date', date('Y-m-d')) }}" 
-                                           min="{{ date('Y-m-d') }}"
                                            style="height: 52px;"
                                            required />
                                 </div>

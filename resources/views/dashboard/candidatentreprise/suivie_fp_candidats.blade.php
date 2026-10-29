@@ -167,9 +167,9 @@
                 <button type="button" class="btn btn-outline-secondary btn-sm shadow-sm" onclick="window.print()">
                     <i class="bx bx-printer me-1"></i> Imprimer
                 </button>
-                <button type="button" class="btn btn-primary btn-sm shadow-sm" onclick="exportToPDF('suivi-candidats-fp')">
-                    <i class="bx bx-download me-1"></i> Exporter en PDF
-                </button>
+                <a href="{{ route('export.pdf.suivi_fp_candidats', request()->query()) }}" class="btn btn-danger btn-sm shadow-sm text-white" title="Télécharger la liste complète officielle en PDF (sans coupure ni page blanche)">
+                    <i class="bx bxs-file-pdf me-1"></i> Exporter en PDF
+                </a>
             </div>
         </div>
 

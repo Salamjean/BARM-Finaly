@@ -302,21 +302,28 @@
             const target = document.querySelector('.container-fluid') || document.querySelector('.content-wrapper') || document.body;
             const hiddenElements = document.querySelectorAll('.no-print, #layout-menu, .layout-navbar, .footer, .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate');
             
-            hiddenElements.forEach(el => el.style.visibility = 'hidden');
+            const originalDisplays = [];
+            hiddenElements.forEach((el, i) => {
+                originalDisplays[i] = el.style.display;
+                el.style.display = 'none';
+            });
             
             const opt = {
                 margin:       [10, 10, 10, 10],
                 filename:     (filename || 'export') + '.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                image:        { type: 'jpeg', quality: 0.95 },
+                html2canvas:  { scale: 1.5, useCORS: true, logging: false, scrollY: 0, scrollX: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            html2pdf().set(opt).from(target).save().then(function() {
-                hiddenElements.forEach(el => el.style.visibility = 'visible');
-            }).catch(function() {
-                hiddenElements.forEach(el => el.style.visibility = 'visible');
-            });
+            const restore = () => {
+                hiddenElements.forEach((el, i) => {
+                    el.style.display = originalDisplays[i];
+                });
+            };
+
+            html2pdf().set(opt).from(target).save().then(restore).catch(restore);
         }
     </script>
     @include('partials.script.sweetalert')

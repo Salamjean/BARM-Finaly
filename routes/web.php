@@ -131,6 +131,8 @@ Route::get('titles/offres/{$title}', [FrontController::class, 'getTitles'])->nam
 
 Route::group(['middleware' => ['auth']], function () {
 
+    Route::get('/document/download', [App\Http\Controllers\DocumentController::class, 'download'])->name('document.download');
+
     Route::prefix('pdf')->name('pdf.')->group(function () {
         Route::get('file_candidature/{user}', [DashboardController::class, 'fileCandidature'])->name('file_candidature');
     });
@@ -579,6 +581,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('adherents', [ExportController::class, 'exportAdherents'])->name('adherents');
         Route::get('adherent/{id}', [ExportController::class, 'adherent'])->name('adherent');
         Route::get('session-presents', [ExportController::class, 'exportSessionCollectivePresents'])->name('session_presents');
+        Route::get('suivi-ep-candidats', [ExportController::class, 'exportSuiviEpCandidats'])->name('suivi_ep_candidats');
+        Route::get('suivi-fp-candidats', [ExportController::class, 'exportSuiviFpCandidats'])->name('suivi_fp_candidats');
+        Route::get('suivi-ae-candidats', [ExportController::class, 'exportSuiviAeCandidats'])->name('suivi_ae_candidats');
     });
 
     /**
@@ -898,6 +903,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/store', [EntretienController::class, 'store'])->name('store');
         Route::post('/storefp', [EntretienController::class, 'storefp'])->name('storefp');
         Route::post('/presence', [EntretienController::class, 'presence'])->name('presence');
+        Route::match(['put', 'post'], '/{id}/update', [EntretienController::class, 'update'])->name('update');
         Route::delete('{id}', [EntretienController::class, 'destroy'])->name('destroy');
         Route::delete('/candidatentretiens/{id}', [EntretienController::class, 'destroy_candidatentretiens'])->name('destroy_candidatentretiens');
     });
@@ -984,6 +990,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('{id}', [CandidatentrepriseController::class, 'destroy'])->name('destroy');
         Route::get('/suivie_ep_candidats', [CandidatentrepriseController::class, 'suivie_ep_candidats'])->name('suivie_ep_candidats');
         Route::get('/suivie_fp_candidats', [CandidatentrepriseController::class, 'suivie_fp_candidats'])->name('suivie_fp_candidats');
+        Route::get('/suivie_ae_candidats', [CandidatentrepriseController::class, 'suivie_ae_candidats'])->name('suivie_ae_candidats');
         Route::get('/decision_ep', [CandidatentrepriseController::class, 'decision_ep'])->name('decision_ep');
         Route::get('/decision_fp', [CandidatentrepriseController::class, 'decision_fp'])->name('decision_fp');
         Route::get('/historique_ep', [CandidatentrepriseController::class, 'historique_ep'])->name('historique_ep');

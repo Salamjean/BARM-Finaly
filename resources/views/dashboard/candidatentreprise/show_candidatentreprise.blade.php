@@ -14,7 +14,7 @@
 
             @if(can('conseiller-entreprise-prive') || can('chef-cellule-formation-et-insertion'))
             <div class="btn-group">
-                <a href="{{ route('candidatentreprises.mise_a_disposition') }}" type="button" class="btn btn-primary">Mise à disposition</a>
+                <a href="{{ route('candidatentreprises.mise_a_disposition') }}" type="button" class="btn btn-primary">Mise en relation</a>
             </div>
             @endif
 
@@ -29,7 +29,7 @@
                         <tr>
                             <th class="text-start">#</th>
                             <th>Entreprise</th>
-                            <th class="text-start">Date de mise à disposition</th>
+                            <th class="text-start">Date de mise en relation</th>
                             <th class="text-start">Satut</th>
                             <th>Poste</th>
                             <th>Lettre de recommandation</th>
@@ -76,7 +76,7 @@
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Compte rendu mise à disposition</h5>
+                                                <h5 class="modal-title">Compte rendu mise en relation</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <form action="{{route('candidatentreprises.changestatut')}}" method="POST" class="row g-3" enctype="multipart/form-data">

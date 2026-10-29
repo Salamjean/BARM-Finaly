@@ -29,44 +29,28 @@ class EntretienController extends Controller
 
     public function index(Request $request, String $type)
     {
-        $entretiens = Entretien::orderByDESC('created_at')
+        $entretiens = Entretien::orderByDESC('date')
+            ->orderByDESC('created_at')
             ->where('parcours', 'entreprise_privee')
             ->where('type', $type)
-            ->whereHas('candidatentretiens', function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNull('presence')->orWhere('presence', '!=', 1);
-                });
-            })
-            ->with(['candidatentretiens' => function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNull('presence')->orWhere('presence', '!=', 1);
-                });
-            }])
+            ->with(['candidatentretiens.candidature.user'])
             ->get();
 
-        $title = 'Liste des pré-entretien - BARM';
+        $title = 'Liste des entretiens - BARM';
 
         return view('dashboard.entretien.index', compact('entretiens', 'title', 'type'));
     }
 
     public function indexfp(Request $request, String $type)
     {
-        $entretiens = Entretien::orderByDESC('created_at')
+        $entretiens = Entretien::orderByDESC('date')
+            ->orderByDESC('created_at')
             ->where('parcours', 'fonction_public')
             ->where('type', $type)
-            ->whereHas('candidatentretiens', function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNull('presence')->orWhere('presence', '!=', 1);
-                });
-            })
-            ->with(['candidatentretiens' => function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNull('presence')->orWhere('presence', '!=', 1);
-                });
-            }])
+            ->with(['candidatentretiens.candidature.user'])
             ->get();
 
-        $title = 'Liste des pré-entretien - BARM';
+        $title = 'Liste des entretiens - BARM';
 
         return view('dashboard.entretien.indexfp', compact('entretiens', 'title', 'type'));
     }
@@ -219,14 +203,12 @@ class EntretienController extends Controller
     public function presence(Request $request)
     {
         try {
-            //dd($request);
-
             $this->validate($request, [
                 'presence' => 'required|int',
                 'comment' => 'nullable|string',
+                'candidatentretien_id' => 'required',
             ]);
 
-            // $candidatentretien = Candidatentretien::where('candidature_id', $request->candidat_id)->where('entretien_id', $request->entretien_id)->first();
             $candidatentretien = Candidatentretien::findOrFail($request->candidatentretien_id);
 
             $candidatentretien->update([
@@ -234,16 +216,22 @@ class EntretienController extends Controller
                 'comment' => $request->comment,
             ]);
 
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Statut de l\'entretien mis à jour avec succès']);
+            }
 
-            return back()->with("success", 'Donnée modifiées');
+            return back()->with("success", 'Statut de l\'entretien mis à jour avec succès');
         } catch (ValidationException $e) {
-            // En cas d'erreur de validation, renvoyez les erreurs au format JSON
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Erreur de validation des données'], 422);
+            }
             return back()->with("error", 'Un problème est survenu lors de la validation');
         } catch (\Exception $e) {
-            // Gérez les autres exceptions ici (par exemple, des erreurs de base de données)
-            return $e->getMessage();
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            return back()->with("error", 'Un problème est survenu : ' . $e->getMessage());
         }
-
     }
 
     public function show(Request $request, Entretien $entretien)
@@ -256,13 +244,34 @@ class EntretienController extends Controller
         return view('dashboard.entretien.edit', compact('entretien'));
     }
 
-    public function update(Request $request, Entretien $entretien)
+    public function update(Request $request, $id)
     {
-        $entretien->update($request->validated());
+        try {
+            $this->validate($request, [
+                'date' => 'required|date',
+            ]);
 
-        $request->session()->flash('entretien.id', $entretien->id);
+            $entretien = Entretien::findOrFail($id);
+            $entretien->update([
+                'date' => $request->date,
+            ]);
 
-        return redirect()->route('entretiens.index');
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Date de l\'entretien mise à jour avec succès']);
+            }
+
+            return back()->with("success", 'Date de l\'entretien mise à jour avec succès');
+        } catch (ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'La date saisie n\'est pas valide'], 422);
+            }
+            return back()->with("error", 'La date saisie n\'est pas valide');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            return back()->with("error", 'Un problème est survenu lors de la mise à jour');
+        }
     }
 
     public function updateCandidatentretienComment(Request $request, $id)

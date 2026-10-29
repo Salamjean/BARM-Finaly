@@ -21,14 +21,35 @@
             </div>
         </div>
 
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                <i class="bx bx-check-circle me-2 fs-5 align-middle"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                <i class="bx bx-error-circle me-2 fs-5 align-middle"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <!-- Header avec informations -->
         <div class="bg-white p-4 rounded-3 shadow-none mb-4">
-            <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div class="d-flex align-items-center">
                     <i class="bx bx-conversation text-success fs-3 me-3"></i>
                     <div>
-                        <h5 class="mb-0 text-dark">Candidats de l'entretien | {{ $entretien->parcours == 'fonction_public' ? 'Fonction publique' : 'Entréprise privée' }}</h5>
-                        <small class="text-muted">Gestion des présences et commentaires</small>
+                        <h5 class="mb-1 text-dark fw-bold">Candidats de l'entretien | {{ $entretien->parcours == 'fonction_public' ? 'Fonction publique' : 'Entreprise privée' }}</h5>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="badge bg-light-primary text-primary border">
+                                <i class="bx bx-calendar me-1"></i> Date : <strong>{{ dateFr($entretien->date, 'letter') }}</strong>
+                            </span>
+                            <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2" data-bs-toggle="modal" data-bs-target="#modalEditEntretienDate">
+                                <i class="bx bx-edit-alt me-1"></i> Modifier la date
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
@@ -56,6 +77,54 @@
                         </div>
                         <small class="text-muted d-block">Abandons</small>
                     </div>
+                    <div>
+                        <a href="{{ $entretien->parcours == 'fonction_public' ? route('entretiens.indexfp', $entretien->type) : route('entretiens.index', $entretien->type) }}" 
+                           class="btn btn-outline-secondary btn-sm shadow-sm">
+                            <i class="bx bx-arrow-back me-1"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Modification Date Entretien -->
+        <div id="modalEditEntretienDate" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title text-white">
+                            <i class="bx bx-calendar-edit me-2"></i> Mettre à jour la date de l'entretien
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ route('entretiens.update', $entretien->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-body p-4">
+                            <p class="text-muted small mb-3">
+                                Vous pouvez modifier la date de cet entretien (y compris pour un entretien passé ou rétroactif).
+                            </p>
+                            <div class="mb-3">
+                                <label for="modal_entretien_date" class="form-label fw-semibold text-dark">
+                                    Nouvelle date de l'entretien <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" 
+                                       class="form-control form-control-lg" 
+                                       id="modal_entretien_date" 
+                                       name="date" 
+                                       value="{{ \Carbon\Carbon::parse($entretien->date)->format('Y-m-d') }}" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                <i class="bx bx-x me-1"></i> Annuler
+                            </button>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bx bx-check me-1"></i> Enregistrer la date
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

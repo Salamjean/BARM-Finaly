@@ -117,7 +117,11 @@ class BilancompetenceController extends Controller
 
             if ($request->hasFile('rapport')) {
                 $fileName = uniqid('rapport_') . '.' . $request->file('rapport')->getClientOriginalExtension();
-                $request->rapport->move(saveByEnv() . 'data/docs/bilancompetence', $fileName);
+                $dir = public_path('data/docs/bilancompetence');
+                if (!\Illuminate\Support\Facades\File::isDirectory($dir)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($dir, 0755, true, true);
+                }
+                $request->rapport->move($dir, $fileName);
                 $filePath = 'data/docs/bilancompetence/' . $fileName;
             }
 

@@ -61,7 +61,7 @@ function domain_orientation(): array
 
 function saveByEnv(): string
 {
-    return config('app.env') == 'production' ? 'public/' : '';
+    return 'public/';
 }
 
 function regions()

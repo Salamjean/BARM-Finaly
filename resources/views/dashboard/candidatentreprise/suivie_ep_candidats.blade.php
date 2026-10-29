@@ -167,9 +167,9 @@
                 <button type="button" class="btn btn-outline-secondary btn-sm shadow-sm" onclick="window.print()">
                     <i class="bx bx-printer me-1"></i> Imprimer
                 </button>
-                <button type="button" class="btn btn-primary btn-sm shadow-sm" onclick="exportToPDF('suivi-candidats-ep')">
-                    <i class="bx bx-download me-1"></i> Exporter en PDF
-                </button>
+                <a href="{{ route('export.pdf.suivi_ep_candidats', request()->query()) }}" class="btn btn-danger btn-sm shadow-sm text-white" title="Télécharger la liste complète officielle en PDF (sans coupure ni page blanche)">
+                    <i class="bx bxs-file-pdf me-1"></i> Exporter en PDF
+                </a>
             </div>
         </div>
 
@@ -178,18 +178,7 @@
             <div class="card-body p-3">
                 <form action="{{ route('candidatentreprises.suivie_ep_candidats') }}" method="GET" class="row g-2 align-items-end">
                     <input type="hidden" name="tab" id="inputActiveTab" value="{{ $activeTab }}">
-                    <div class="col-md-3 col-sm-6">
-                        <label class="form-label small fw-semibold text-muted mb-1">Cohorte</label>
-                        <select name="cohort_id" class="form-select form-select-sm">
-                            <option value="">Toutes les cohortes</option>
-                            @foreach ($cohortes as $c)
-                                <option value="{{ $c->id }}" {{ $selectedCohort == $c->id ? 'selected' : '' }}>
-                                    {{ $c->title }} ({{ $c->reference }})
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
+                    <div class="col-md-4 col-sm-12">
                         <label class="form-label small fw-semibold text-muted mb-1">Entreprise Partenaire</label>
                         <select name="entreprise" class="form-select form-select-sm">
                             <option value="">Toutes les entreprises</option>
@@ -200,11 +189,11 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-3 col-sm-6">
                         <label class="form-label small fw-semibold text-muted mb-1">Date Début</label>
                         <input type="date" name="date_from" value="{{ $dateFrom }}" class="form-control form-control-sm">
                     </div>
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-3 col-sm-6">
                         <label class="form-label small fw-semibold text-muted mb-1">Date Fin</label>
                         <input type="date" name="date_to" value="{{ $dateTo }}" class="form-control form-control-sm">
                     </div>
@@ -212,7 +201,7 @@
                         <button type="submit" class="btn btn-primary btn-sm flex-grow-1 shadow-sm">
                             <i class="bx bx-filter-alt me-1"></i> Filtrer
                         </button>
-                        @if($selectedCohort || $selectedEntreprise || $dateFrom || $dateTo)
+                        @if($selectedEntreprise || $dateFrom || $dateTo)
                             <a href="{{ route('candidatentreprises.suivie_ep_candidats', ['tab' => $activeTab]) }}" class="btn btn-outline-secondary btn-sm" title="Réinitialiser">
                                 <i class="bx bx-reset"></i>
                             </a>
@@ -220,7 +209,9 @@
                     </div>
                 </form>
             </div>
-        </di        <!-- Système d'onglets (Navigation entre Statistiques globales et Liste individuelle) -->
+        </div>
+
+        <!-- Système d'onglets (Navigation entre Statistiques globales et Liste individuelle) -->
         <ul class="nav nav-pills nav-pills-custom gap-2 mb-4" id="suiviTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link {{ $activeTab === 'stats' ? 'active' : '' }}" 
@@ -318,11 +309,11 @@
                         </div>
                     </div>
 
-                    <!-- 4. Mis à Disposition -->
+                    <!-- 4. Mis en relation -->
                     <div class="col-xl-2 col-md-4 col-sm-6">
                         <div class="stat-kpi-card p-3 h-100 shadow-sm">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="text-muted small fw-semibold">Mises à Disposition</span>
+                                <span class="text-muted small fw-semibold">Mises en Relation</span>
                                 <div class="kpi-icon-wrapper kpi-icon-secondary shadow-sm">
                                     <i class="bx bx-send"></i>
                                 </div>
@@ -455,10 +446,10 @@
                                 <i class="bx bx-right-arrow-alt"></i>
                             </div>
 
-                            <!-- Étape 5 : Mise à disposition -->
+                            <!-- Étape 5 : Mise en relation -->
                             <div class="col-lg col-md-4 col-6">
                                 <div class="funnel-step h-100">
-                                    <span class="badge badge-subtle-dark mb-2">5. Mis à disposition</span>
+                                    <span class="badge badge-subtle-dark mb-2">5. Mis en relation</span>
                                     <h4 class="fw-bold text-dark mb-1">{{ $madCandidatsUniques }}</h4>
                                     <small class="text-muted d-block">
                                         {{ $madTotal }} envois réalisés
@@ -641,7 +632,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Statut Mises à disposition -->
+                                <!-- Statut Mises en relation -->
                                 <hr class="my-4">
                                 <div class="row text-center g-3">
                                     <div class="col-4">
@@ -685,12 +676,12 @@
                                 <i class="bx bxs-buildings text-primary fs-4 me-2"></i>
                                 <div>
                                     <h6 class="mb-0 fw-bold text-dark">Récapitulatif par Entreprise Partenaire</h6>
-                                    <small class="text-muted">Détail chiffré des mises à disposition, acceptations et taux de placement par structure</small>
+                                    <small class="text-muted">Détail chiffré des mises en relation, acceptations et taux de placement par structure</small>
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
                                 <a href="{{ route('candidatentreprises.envoi') }}" class="btn btn-outline-primary btn-sm">
-                                    <i class="bx bx-send me-1"></i> Envoi en entreprise
+                                    <i class="bx bx-conversation me-1"></i> Entretien d’embauche
                                 </a>
                                 <a href="{{ route('candidatentreprises.integres') }}" class="btn btn-outline-success btn-sm">
                                     <i class="bx bx-check-double me-1"></i> Intégrés en poste
@@ -768,7 +759,7 @@
                                         <tr>
                                             <td colspan="7" class="text-center py-5 text-muted">
                                                 <i class="bx bx-buildings fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                                                <p class="mb-0 fw-bold">Aucune mise à disposition enregistrée pour le moment</p>
+                                                <p class="mb-0 fw-bold">Aucune mise en relation enregistrée pour le moment</p>
                                                 <small class="text-muted">Les candidatures envoyées en entreprise apparaîtront ici avec leurs statistiques.</small>
                                             </td>
                                         </tr>
@@ -818,7 +809,7 @@
                                             <i class="bx bx-book-open text-primary me-1"></i> Formations
                                         </th>
                                         <th class="border-0 text-center" style="min-width: 160px;">
-                                            <i class="bx bxs-buildings text-primary me-1"></i> Mise à disposition
+                                            <i class="bx bxs-buildings text-primary me-1"></i> Mise en relation
                                         </th>
                                         <th class="border-0 text-center" style="min-width: 110px;">
                                             <i class="bx bx-flag text-primary me-1"></i> Situation
@@ -839,7 +830,7 @@
                                             $treCountCand = $candidat->techrechercheemplois ? $candidat->techrechercheemplois->count() : 0;
                                             // Formations
                                             $formationsCountCand = $candidat->candidatformations ? $candidat->candidatformations->count() : 0;
-                                            // Mise à disposition
+                                            // Mise en relation
                                             $mads = $candidat->candidatentreprises ?? collect();
                                             $lastMad = $mads->sortByDesc('created_at')->first();
                                             $madTotalCand = $mads->count();
@@ -942,7 +933,7 @@
                                                 @endif
                                             </td>
 
-                                            <!-- 5. Mise à disposition (Entreprise) -->
+                                            <!-- 5. Mise en relation (Entreprise) -->
                                             <td class="text-center">
                                                 @if ($lastMad)
                                                     <div>

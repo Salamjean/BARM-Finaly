@@ -123,6 +123,14 @@
         </div>
     </li>
     <ul class="mx-2 p-2 rounded-3">
+        @if (can('conseiller-auto-emploi') || can('chef-cellule-formation-et-insertion'))
+            <li class="menu-item {{ routeActive(['candidatentreprises.suivie_ae_candidats']) }}">
+                <a href="{{ route('candidatentreprises.suivie_ae_candidats') }}" class="menu-link">
+                    <i class='menu-icon tf-icons bx bx-bar-chart-alt-2'></i>
+                    <div>Suivi des candidats</div>
+                </a>
+            </li>
+        @endif
         <li class="menu-item {{ routeActive(['cohort.create', 'cohort.index']) }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class='menu-icon tf-icons bx bx-layer'></i>
@@ -346,14 +354,6 @@
             </ul>
         </li>
 
-        <li
-            class="menu-item {{ routeActive(['entreprises.index', 'entreprises.create', 'entreprises.show', 'entreprises.edit']) }}">
-            <a href="{{ route('entreprises.index') }}" class="menu-link">
-                <i class='menu-icon tf-icons bx bxs-school'></i>
-                <div>Entreprises</div>
-            </a>
-        </li>
-
         <li class="menu-item {{ routeActive(['formations.index', 'formations.create', 'formations.presence']) }}">
             <a href="{{ route('formations.index') }}" class="menu-link">
                 <i class='menu-icon tf-icons bx bxs-file-doc'></i>
@@ -395,12 +395,12 @@
                 class="menu-item {{ routeActive(['candidatentreprises.index', 'candidatentreprises.envoi', 'candidatentreprises.integres', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class='menu-icon tf-icons bx bx-briefcase'></i>
-                    <div>Mise à disposition</div>
+                    <div>Mise en relation</div>
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item {{ routeActive(['candidatentreprises.envoi', 'candidatentreprises.index', 'candidatentreprises.show', 'candidatentreprises.mise_a_disposition']) }}">
                         <a href="{{ route('candidatentreprises.envoi') }}" class="menu-link">
-                            <div>Envoi en entreprise</div>
+                            <div>Entretien d'embauche</div>
                         </a>
                     </li>
                     <li class="menu-item {{ routeActive(['candidatentreprises.integres']) }}">
